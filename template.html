@@ -1,0 +1,956 @@
+<title>/*__TITLE__*/</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* 教材棚（左）と作業机（右）。印刷するのは机の上のA4だけ。 */
+:root {
+  --desk: #e6e9e4;      /* 机：すこし緑がかった灰 */
+  --shelf: #f7f6f1;     /* 棚：紙の白より少しあたたかい */
+  --paper: #ffffff;
+  --ink: #1f2b33;
+  --mute: #66737c;
+  --rule: #c9d0d3;
+  --geo: #2c5f86;       /* 地理：地図の海の色 */
+  --his: #8f4a2f;       /* 歴史：れんが */
+  --civ: #3b6a4c;       /* 公民：深い緑 */
+  --accent: var(--geo);
+  --font: "UDP Print", "BIZ UDPGothic", "BIZ UDゴシック", "Meiryo", "Hiragino Sans", "Noto Sans CJK JP", sans-serif;
+  --font-num: "UD Num Print", "BIZ UDGothic", "BIZ UDPGothic", "Meiryo", sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body { font-family: var(--font); color: var(--ink); background: var(--desk); font-size: 14px; }
+
+/* ---------- 画面のレイアウト ---------- */
+.app { display: grid; grid-template-columns: 300px 1fr; min-height: 100vh; align-items: start; }
+/* 左の一覧はスクロールしても画面に残る（一覧が長いときは一覧の中だけスクロール） */
+.shelf { background: var(--shelf); border-right: 1px solid var(--rule); overflow-y: auto; padding: 20px 16px 40px; position: sticky; top: 0; height: 100vh; height: 100dvh; }
+.brand { font-size: 18px; font-weight: 700; line-height: 1.35; margin: 0 0 4px; letter-spacing: .02em; }
+.brand small { display: block; font-size: 12px; font-weight: 400; color: var(--mute); margin-top: 4px; }
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 18px 0 14px; }
+.tab { font: inherit; font-weight: 700; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); padding: 8px 0; border-radius: 6px; cursor: pointer; }
+.tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.tab:focus-visible, .btn:focus-visible, .unit:focus-visible { outline: 3px solid #f0b429; outline-offset: 2px; }
+.part { font-size: 12px; color: var(--mute); margin: 16px 4px 6px; letter-spacing: .06em; }
+.unit { display: flex; gap: 10px; align-items: baseline; width: 100%; text-align: left; font: inherit; color: var(--ink); background: none; border: 0; border-radius: 6px; padding: 7px 8px; cursor: pointer; }
+.unit .no { font-family: var(--font-num); font-size: 12px; color: var(--mute); min-width: 3.2em; font-variant-numeric: tabular-nums; }
+.unit .nm { flex: 1; }
+.unit .st { font-size: 11px; color: var(--mute); }
+.unit.ready .st { color: var(--accent); font-weight: 700; }
+.unit[disabled] { cursor: default; color: #9aa3a8; }
+.unit:not([disabled]):hover { background: #ecebe4; }
+.unit[aria-current="true"] { background: var(--paper); box-shadow: inset 3px 0 0 var(--accent); }
+
+.desk { display: flex; flex-direction: column; min-width: 0; min-height: 100vh; }
+/* 上のチェック欄もスクロールしても画面に残る */
+.bar { position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 6px rgba(0,0,0,.06); background: var(--paper); border-bottom: 1px solid var(--rule); padding: 7px 18px; display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center; }
+.bar h1 { margin: 0; font-size: 16px; line-height: 1.3; white-space: nowrap; }
+.bar h1 small { font-size: 11px; color: var(--accent); font-weight: 700; letter-spacing: .06em; margin-right: 8px; }
+.ctrl { display: flex; flex-direction: row; align-items: center; gap: 6px; }
+.ctrl-label { font-size: 11px; color: var(--mute); white-space: nowrap; }
+.picks { display: flex; flex-wrap: wrap; gap: 4px; }
+.pick { display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--rule); border-radius: 999px; padding: 2px 9px 2px 6px; cursor: pointer; user-select: none; background: var(--paper); font-size: 12px; }
+.pick input { accent-color: var(--accent); margin: 0; }
+.pick:has(input:checked) { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 9%, white); }
+.pick .mode { font-size: 10px; color: var(--mute); }
+.row-btns { display: flex; gap: 4px; flex-wrap: wrap; }
+.btn { font: inherit; font-size: 12px; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); padding: 3px 10px; border-radius: 6px; cursor: pointer; }
+.btn:hover { border-color: var(--ink); }
+.btn.primary { background: var(--ink); color: #fff; border-color: var(--ink); font-weight: 700; padding: 6px 16px; font-size: 13px; white-space: nowrap; }
+.btn.primary:hover { background: #000; }
+.print-box { margin-left: auto; display: flex; flex-direction: row-reverse; align-items: center; gap: 10px; }
+.print-box .hint { font-size: 10.5px; color: var(--mute); max-width: 30em; text-align: right; line-height: 1.4; }
+select.btn { padding-right: 8px; }
+
+.preview { flex: 1; padding: 24px; }
+.sheets { display: flex; flex-direction: column; align-items: center; gap: 22px; }
+.sheet-wrap { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+.sheet-tag { font-size: 12px; color: var(--mute); }
+.empty { color: var(--mute); text-align: center; padding: 80px 16px; line-height: 1.8; }
+
+/* ---------- A4の紙 ---------- */
+.page { width: 210mm; height: 297mm; background: var(--paper); box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 6px 18px rgba(0,0,0,.08); position: relative; overflow: hidden; color: #111; font-size: 10.5pt; line-height: 1.55; }
+.pg { position: absolute; inset: 11mm 13mm 10mm; overflow: hidden; }
+.pgi { display: flex; flex-direction: column; gap: 3.2mm; }
+.page.land { width: 297mm; height: 210mm; }
+.page.land > .rot { position: absolute; inset: 0; }
+/* 時代の移り変わり年表（横向き・縦書き） */
+.tl-cap { font-size: 11pt; font-weight: 700; }
+.tl { contain: size layout; display: grid; height: 158mm; grid-template-rows: auto auto auto 1fr; column-gap: 1.2mm; row-gap: 1.2mm; }
+.tl .kb { border: .8pt solid #777; border-radius: 1.4mm; text-align: center; font-weight: 700; font-size: 10pt; padding: .6mm 0; }
+.tl .era { border: 1pt solid #444; border-radius: 1.6mm; text-align: center; padding: 1.4mm .6mm 1.2mm; line-height: 1.25; }
+.tl .era b { display: block; font-size: 12.5pt; letter-spacing: .04em; }
+.tl .era small { display: block; font-size: 7.5pt; color: #444; margin-top: .4mm; }
+.tl .yr { text-align: center; font-weight: 700; font-size: 10.5pt; color: #8e2a1f; line-height: 1.2; position: relative; padding-bottom: 2.6mm; align-self: end; }
+.tl .yr::after { content: ''; position: absolute; left: 50%; bottom: 0; height: 2.2mm; border-left: 1.2pt solid #8e2a1f; }
+.tl .why { writing-mode: vertical-rl; border: 1pt solid #8f4a2f; border-radius: 2mm; padding: 2.4mm 1.6mm; font-size: 9.4pt; line-height: 1.48; background: #fffdf8; overflow: hidden; }
+.tl .why .ev { font-weight: 700; font-size: 11pt; color: #8e2a1f; padding-left: 1.4mm; margin-left: 1.4mm; border-left: .8pt dashed #c9a58f; }
+.tl .why .tag { font-size: 7.5pt; font-weight: 700; color: #fff; background: #555; border-radius: 1mm; padding: 1mm .4mm; margin-left: 1mm; height: max-content; line-height: 1.2; }
+.tl .why .ch::before { content: '●'; color: #8f4a2f; font-size: .75em; margin-bottom: .8mm; }
+.tl .why .sum { border-right: .8pt dashed #c9a58f; padding-right: 1.4mm; margin-right: 1.2mm; }
+.tl .y { text-orientation: upright; letter-spacing: -.05em; }
+.tl .why .q { display: inline-block; font-size: 8pt; font-weight: 700; color: #fff; background: #8f4a2f; border-radius: 1mm; padding: .8mm .3mm; margin-bottom: 1.2mm; }
+.tl .legend { writing-mode: vertical-rl; font-size: 8.5pt; color: #555; line-height: 1.6; padding: 1mm; }
+.tl .legend b { color: #8e2a1f; }
+.tl-cap2 { display: flex; justify-content: space-between; align-items: baseline; font-size: 11pt; font-weight: 700; }
+.tl-cap2 .lg { font-size: 8pt; font-weight: 400; color: #444; }
+.tl-cap2 .lg i { font-style: normal; font-weight: 700; }
+.tlh { position: relative; width: 271mm; height: 160mm; contain: size layout; }
+.tlh svg { position: absolute; left: 0; top: 0; width: 271mm; height: 160mm; overflow: visible; }
+.tlh .kb2, .tlh .era2 { position: absolute; border: .8pt solid #666; border-radius: 1.4mm; text-align: center; overflow: hidden; }
+.tlh .kb2 { font-size: 9.5pt; font-weight: 700; line-height: 5.4mm; }
+.tlh .era2 { line-height: 1.2; padding-top: 1mm; }
+.tlh .era2 b { display: block; font-size: 12pt; letter-spacing: .04em; white-space: nowrap; }
+.tlh .era2 small { display: block; font-size: 7.2pt; color: #444; white-space: nowrap; }
+.tlh .lb { position: absolute; writing-mode: vertical-rl; font-size: 9.6pt; line-height: 1.38; color: #222; }
+.tlh .y { text-orientation: upright; letter-spacing: -.06em; }
+.tlh .lb .yy { font-weight: 700; color: #2f5d8a; margin-bottom: 1mm; }
+.tlh .lb.x { color: #555; }
+.tlh .lb.x .yy { color: #777; }
+.tlh .lb.b { font-size: 10.5pt; font-weight: 700; color: #8e2a1f; background: #fdf0ea; border: 1pt solid #c0392b; border-radius: 1.4mm; padding: 1.2mm .5mm; box-sizing: border-box; }
+.tlh .lb.b .yy { color: #c0392b; }
+.tlh .sm { position: absolute; border: 1pt solid #8f4a2f; border-radius: 1.6mm; background: #fffdf8; font-size: 9.2pt; line-height: 1.45; padding: 1.2mm 1.8mm; box-sizing: border-box; overflow: hidden; }
+.tlh .sm b { display: block; color: #8e2a1f; font-size: 8.6pt; }
+.flw { position: relative; width: 184mm; contain: size layout; }
+.flw-con { position: absolute; top: 0; overflow: visible; }
+.fl .lb { font-size: 8.2pt; line-height: 1.34; }
+.fl .lb.b { font-size: 8.8pt; padding: .8mm .3mm; }
+.fl .lb .yy { margin-bottom: 0; }
+.fl .era2 { padding-top: .5mm; line-height: 1.15; }
+.fl .era2 b { white-space: nowrap; }
+.fl .era2 small { font-size: 6.8pt; }
+.fl-lg { font-size: 7.5pt; color: #555; text-align: right; margin: -1mm 0 .6mm; }
+.fl-lg i { font-style: normal; }
+.pg-foot { position: absolute; left: 13mm; right: 13mm; bottom: 5mm; display: flex; justify-content: space-between; font-size: 7.5pt; color: #777; }
+ruby rt { font-size: 50%; }
+rt:empty { display: none; }
+
+/* 講座 */
+.lhead { display: flex; align-items: flex-end; justify-content: space-between; border-bottom: 2.2pt solid #111; padding-bottom: 1.6mm; }
+.lhead .t { font-size: 17pt; font-weight: 700; letter-spacing: .04em; line-height: 1.2; }
+.lhead .t small { display: block; font-size: 9pt; letter-spacing: .1em; font-weight: 700; margin-bottom: 1mm; }
+.lhead .p { font-size: 9pt; font-weight: 700; border: 1pt solid #111; padding: .6mm 2.4mm; border-radius: 1mm; }
+.lecture section { display: flex; flex-direction: column; gap: 2mm; }
+.lecture h2 { margin: 1mm 0 0; font-size: 13pt; display: flex; align-items: center; gap: 2.4mm; letter-spacing: .03em; }
+.lecture h2 .sn { display: inline-block; color: #111; font-size: 15pt; line-height: 1; font-weight: 700; }
+.lecture h3, .lecture .h3 { margin: 0 0 1mm; font-size: 10.5pt; }
+.lecture h4 { margin: 1mm 0 .5mm; font-size: 10.5pt; }
+.lecture p { margin: 0; }
+.lecture .cap { font-size: 8.5pt; color: #444; }
+.lecture .mini { font-size: 9pt; margin-top: 1mm; }
+.k { font-weight: 700; text-decoration: underline; text-decoration-color: #8fa9bf; text-decoration-thickness: .14em; text-underline-offset: .14em; text-decoration-skip-ink: none; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm; }
+.box { border: .8pt solid #888; border-radius: 1.6mm; padding: 2.2mm 3mm; }
+.row { display: flex; gap: 4mm; align-items: center; }
+.row.top { align-items: flex-start; }
+.row .col { flex: 1; min-width: 0; }
+.terms { margin: 0; padding-left: 1.1em; display: flex; flex-direction: column; gap: .6mm; }
+.point { border-left: 2.4pt solid #111; padding: 1mm 0 1mm 2.6mm; margin-top: 1.4mm !important; font-size: 10pt; }
+.fig svg { display: block; width: 100%; height: auto; }
+.fig.w55 { flex: 0 0 55%; }
+.fig.w38 { flex: 0 0 38%; }
+.fig.w62 { flex: 0 0 62%; }
+.fig.w50 { flex: 0 0 50%; }
+.fig.w56 { flex: 0 0 56%; }
+.fig.w30, .w30 { flex: 0 0 30%; }
+.stack { display: flex; flex-direction: column; gap: 2mm; }
+.fig.w86c { width: 86%; margin: 0 auto; }
+.fig.w50c { width: 50%; margin: 0 auto; }
+.fig.w62c { width: 62%; margin: 0 auto; }
+.fig.w72c { width: 72%; margin: 0 auto; }
+.fig.w80c { width: 80%; margin: 0 auto; }
+.fig.w92c { width: 92%; margin: 0 auto; }
+.fig.w96c { width: 96%; margin: 0 auto; }
+.blk > .fig.w58 { width: 58%; margin: 0 auto; }
+.blk > .fig { flex: none; }
+.blk > .fig.w50 { width: 50%; margin: 0 auto; }
+.blk > .fig.w72 { width: 72%; margin: 0 auto; }
+.blk > .fig.w36 { width: 36%; margin: 0 auto; }
+.blk > .fig.w44 { width: 44%; margin: 0 auto; }
+.blk > .fig.w92 { width: 92%; margin: 0 auto; }
+.blk > .fig.w84 { width: 84%; margin: 0 auto; }
+.blk > .fig.w96 { width: 96%; margin: 0 auto; }
+.blk > .fig.w38 { width: 38%; margin: 0 auto; }
+.blk > .fig.w42 { width: 42%; margin: 0 auto; }
+.blk > .fig.w48 { width: 48%; margin: 0 auto; }
+.blk > .fig.w56 { width: 56%; margin: 0 auto; }
+.blk > .fig.w60 { width: 60%; margin: 0 auto; }
+.graphs2 { flex: 0 0 52%; display: grid; grid-template-columns: 1fr 1fr; gap: 3mm; }
+.fig.w44 { flex: 0 0 44%; }
+.fig.w36 { flex: 0 0 36%; }
+.three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm; }
+.charts3.two-only { grid-template-columns: 1fr 1fr; width: 76%; margin: 0 auto; }
+.flow5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2.4mm; }
+.flow5 .fl { border: 1pt solid #111; border-radius: 1.6mm; padding: 1.6mm 2mm; display: flex; flex-direction: column; gap: .8mm; font-size: 9pt; text-align: center; position: relative; }
+.flow5 .fl b { font-size: 10pt; }
+.flow5 .fl:not(:last-child)::after { content: '▶'; position: absolute; right: -2.6mm; top: 40%; font-size: 8pt; }
+.charts2 { display: grid; grid-template-columns: 1fr 1.6fr; gap: 5mm; align-items: center; }
+.charts3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; }
+.graphs3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2mm 6mm; width: 92%; margin: 0 auto; }
+.pointbox { align-self: center; font-size: 10pt; }
+.graphs4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1mm 3mm; }
+.tbl.zones th { background: #f0f0f0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.tbl.zones td { vertical-align: top; border-bottom: .6pt solid #bbb; }
+.tbl.zones td:first-child { white-space: nowrap; }
+.pics3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2mm 4mm; width: 92%; margin: 0 auto; }
+.blk > .fig.w55 { width: 55%; margin: 0 auto; }
+.lecture > section > .fig.w80, .lecture .fig.w80 { width: 80%; margin: 0 auto; }
+.blk > .fig.w62 { width: 62%; margin: 0 auto; }
+.calc { border: 1pt solid #111; border-radius: 1.6mm; padding: 1.6mm 3mm; text-align: center; font-size: 11pt; }
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm; }
+.step { display: flex; gap: 2mm; align-items: flex-start; border: .8pt solid #888; border-radius: 1.6mm; padding: 2mm 2.6mm; font-size: 10pt; }
+.stn { flex: 0 0 auto; width: 6mm; height: 6mm; display: grid; place-items: center; border: 1.3pt solid #111; color: #111; border-radius: 50%; font-weight: 700; font-family: var(--font-num); box-sizing: border-box; }
+.tbl.cap3 td { width: 33.3%; border-bottom: .6pt solid #ddd; }
+.fig.w88 { width: 86%; margin: 0 auto; }
+.blk > .fig.w80 { width: 80%; margin: 0 auto; }
+.blk > .fig.w86 { width: 86%; margin: 0 auto; }
+.blk > .fig.w64 { width: 64%; margin: 0 auto; }
+.blk > .fig.w70 { width: 70%; margin: 0 auto; }
+.figs2 .fig { padding: 0 4mm; }
+.ratio { flex: 0 0 62mm; display: flex; height: 13mm; border: 1pt solid #111; font-weight: 700; font-size: 9pt; text-align: center; line-height: 1.15; }
+.ratio-land { flex: 3; display: grid; place-items: center; background: #e2ddd0; border-right: 1pt solid #111; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.ratio-sea { flex: 7; display: grid; place-items: center; background: #eef4f8; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.tbl { border-collapse: collapse; width: 100%; font-size: 9.5pt; }
+.tbl th, .tbl td { border-bottom: .6pt solid #bbb; padding: .7mm 1.5mm; text-align: left; }
+.tbl th { white-space: nowrap; width: 6.5em; }
+.maps3 { display: grid; grid-template-columns: 1.15fr .9fr 1.15fr; gap: 3mm; align-items: start; }
+.m3 p { font-size: 9pt; line-height: 1.5; }
+
+/* 問題 */
+.qhead { display: grid; grid-template-columns: 1fr auto; gap: 1.5mm 4mm; border-bottom: 2.2pt solid #111; padding-bottom: 2mm; }
+.qhead .unitname { font-size: 9pt; font-weight: 700; letter-spacing: .06em; }
+.qhead .t { font-size: 15pt; font-weight: 700; line-height: 1.25; display: flex; align-items: baseline; gap: 3mm; }
+.qhead .t .n { font-family: var(--font-num); }
+.qhead .right { grid-row: 1 / span 2; grid-column: 2; display: flex; gap: 2.5mm; align-items: stretch; }
+.namebox { border: 1pt solid #111; width: 46mm; display: flex; flex-direction: column; padding: .8mm 1.6mm; font-size: 7.5pt; }
+.scorebox { border: 1pt solid #111; width: 25mm; display: flex; align-items: flex-end; justify-content: flex-end; padding: 1mm 1.8mm; font-size: 11pt; font-weight: 700; font-family: var(--font-num); }
+.meta { display: flex; gap: 2.4mm; align-items: center; font-size: 8.5pt; }
+.badge { border: 1pt solid #111; border-radius: 99px; padding: .2mm 2.6mm; font-weight: 700; }
+.badge.closed { border-width: 2.2pt; }
+.lead { font-size: 9pt; color: #333; margin: 0; }
+.blk { display: flex; flex-direction: column; gap: 1.6mm; }
+.blk-note { font-size: 9.5pt; font-weight: 700; }
+.blk.side { flex-direction: row; gap: 4mm; align-items: flex-start; }
+.blk.side > .side-l { flex: 0 0 60%; display: flex; flex-direction: column; gap: 1.4mm; }
+.blk.side .qs { flex: 1; min-width: 0; }
+.figrow { width: 78%; margin: 0 auto; display: grid; grid-template-columns: 1.15fr .9fr 1.15fr; gap: 3mm; align-items: end; }
+.figrow .flabel { font-size: 9.5pt; font-weight: 700; text-align: center; margin-top: .6mm; }
+.qs { display: grid; gap: 0 5mm; }
+.qs.c2 { grid-template-columns: 1fr 1fr; }
+.qs.c3 { grid-template-columns: 1fr 1fr 1fr; }
+.qs.c4 { grid-template-columns: 1fr 1fr 1fr 1fr; gap: 0 3mm; }
+.qs.c4 .ab.s { width: 22mm; } .qs.c4 .ab.m { width: 27mm; }
+.q { display: flex; align-items: center; gap: 2mm; border-bottom: .5pt solid #c8c8c8; min-height: 9mm; padding: .4mm 0; }
+.qn { flex: 0 0 auto; min-width: 6.4mm; height: 6.4mm; display: inline-grid; place-items: center; border: .9pt solid #111; border-radius: 1mm; font-size: 8.5pt; font-weight: 700; font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.qt { flex: 1; min-width: 0; line-height: 1.4; }
+.ab { flex: 0 0 auto; height: 8mm; border: 1pt solid #111; border-radius: 1mm; background: #fff; }
+.ab.xs { width: 12mm; } .ab.s { width: 26mm; } .ab.m { width: 40mm; } .ab.l { width: 46mm; }
+.q.xl { flex-wrap: wrap; }
+.q.xl .ab { flex: 0 0 calc(100% - 8.4mm); height: 11mm; margin-left: 8.4mm; margin-bottom: 1mm; }
+.qs.c2 .ab.l { width: 36mm; }
+.qs.c3 .ab.l { width: 44mm; }
+.qs.c2 .q.choice { align-items: flex-start; }
+.q.choice .qt .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 0 2mm; font-size: 9pt; margin-top: .6mm; color: #222; }
+.q.choice .qt .opts.one { grid-template-columns: 1fr; }
+.q.choice .ab { align-self: center; }
+.q.choice.qtf .ab { width: 12mm; }
+
+/* 解答 */
+.ans-sec { display: flex; flex-direction: column; gap: 1.2mm; }
+.ans-sec h3 { margin: 0; font-size: 10.5pt; border-bottom: 1pt solid #111; padding-bottom: .6mm; display: flex; justify-content: space-between; }
+.ans-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6mm 4mm; font-size: 9.5pt; }
+.ans-grid .it { display: flex; gap: 1.6mm; align-items: baseline; }
+.ans-grid .it b { font-family: var(--font-num); min-width: 5mm; text-align: right; font-size: 8.5pt; }
+.ans-grid .it.wide { grid-column: 1 / -1; }
+.ans-grid .src { font-size: 6.8pt; color: #888; margin-left: 1.2mm; white-space: nowrap; }
+/* 読んで解くプリント（上半分：本文、下半分：問題。真ん中で折ると本文がかくれる） */
+.ys { position: relative; height: 276mm; }
+.ys .ytop { position: absolute; left: 0; right: 0; top: 0; height: 132mm; display: flex; flex-direction: column; gap: 2.4mm; overflow: hidden; }
+.ys .yhead { display: flex; align-items: flex-end; justify-content: space-between; border-bottom: 1.6pt solid #111; padding-bottom: 1.2mm; }
+.ys .yt { font-size: 15pt; font-weight: 700; line-height: 1.2; letter-spacing: .03em; }
+.ys .yt small { display: block; font-size: 8.5pt; letter-spacing: .08em; margin-bottom: .8mm; }
+.ys .yname { font-size: 9pt; display: flex; gap: 2mm; align-items: flex-end; white-space: pre; }
+.ys .yname span { display: inline-block; width: 42mm; border-bottom: .6pt solid #111; font-size: 8pt; color: #555; }
+.ys .ytext { flex: 1; overflow: hidden; font-size: 14pt; line-height: 2.05; display: flex; flex-direction: column; gap: 1.2mm; text-align: justify; }
+.ys .ytext p { margin: 0; text-indent: 0; }
+.ys .ytext .pn { font-family: var(--font-num); font-weight: 700; margin-right: 1.2mm; }
+.ys .ytext ruby rt { font-size: 48%; }
+.ys .yfold { position: absolute; left: -13mm; right: -13mm; top: 134mm; height: 7mm; display: flex; align-items: center; }
+.ys .yfold::before, .ys .yfold::after { content: ''; flex: 1; border-top: .8pt dashed #777; }
+.ys .yfold span { font-size: 7.5pt; color: #555; padding: 0 3mm; white-space: nowrap; }
+.ys .ybot { position: absolute; left: 0; right: 0; top: 143mm; bottom: 0; display: flex; flex-direction: column; gap: 1.3mm; overflow: hidden; font-size: 10.5pt; }
+.ys .yqh { font-size: 10pt; font-weight: 700; border-left: 2.2mm solid #111; padding-left: 2mm; margin-bottom: .6mm; }
+.ys .yq { display: flex; align-items: center; gap: 2mm; min-height: 11mm; border-bottom: .5pt solid #c8c8c8; padding: .8mm 0; line-height: 1.6; }
+.ys .yq .qn { font-family: var(--font-num); font-weight: 700; flex: 0 0 6mm; text-align: right; }
+.ys .yq .yqt { flex: 1; }
+.ys .yq .ab { flex: 0 0 48mm; height: 9mm; }
+.ys .yq.fill .yqt { line-height: 2.1; }
+.ys .yb { display: inline-block; height: 7.2mm; vertical-align: middle; border: 1pt solid #111; border-radius: 1mm; background: #fff; margin: 0 1mm; }
+.ys .yh { display: inline-block; font-size: 7.5pt; color: #444; border: .6pt solid #777; border-radius: 3mm; padding: 0 1.6mm; margin-left: 1.5mm; line-height: 1.5; vertical-align: .2mm; white-space: nowrap; }
+.ys .yq.wr { flex-wrap: wrap; }
+.ys .yq.wr .yqt::before { content: '書こう'; font-size: 7.5pt; font-weight: 700; color: #fff; background: #111; border-radius: 1mm; padding: .2mm 1.4mm; margin-right: 1.6mm; vertical-align: .3mm; }
+.ys .yq.wr .lines { flex: 0 0 calc(100% - 8mm); margin-left: 8mm; height: 17mm; background: repeating-linear-gradient(#fff 0 7.6mm, #999 7.6mm 8.1mm); border: 1pt solid #111; border-radius: 1mm; }
+.ys .yhide { margin-top: 1.2mm; font-size: 8.5pt; font-weight: 700; background: #eee; border-radius: 1mm; padding: .9mm 2.4mm; }
+.ya { font-size: 11pt; }
+.ya .yai { display: flex; gap: 2.4mm; align-items: baseline; padding: 1.6mm 0; border-bottom: .5pt dotted #aaa; line-height: 1.6; }
+.ya .yai b.n { font-family: var(--font-num); flex: 0 0 6mm; text-align: right; }
+.ya .yai .yaa { font-weight: 700; }
+.ya .yai .yap { font-size: 8.5pt; color: #666; margin-left: 2mm; white-space: nowrap; }
+.ya .yai .yaw { display: block; font-size: 8.5pt; color: #555; font-weight: 400; }
+.ya .ysec { margin-top: 2mm; }
+.ya .ysec h3 { margin: 0 0 .6mm; font-size: 10.5pt; border-bottom: 1pt solid #111; padding-bottom: .5mm; }
+.ya.compact { font-size: 9.5pt; }
+.ya.compact .yai { padding: .7mm 0; }
+.yhow { font-size: 9pt; border: 1pt solid #111; border-radius: 1.5mm; padding: 2mm 3mm; line-height: 1.7; margin-top: 3mm; }
+.exa { display: flex; flex-direction: column; gap: 2.2mm; }
+.exa .xs h3 { margin: 0 0 .8mm; font-size: 10.5pt; border-bottom: 1pt solid #111; padding-bottom: .6mm; display: flex; justify-content: space-between; }
+.exa .xi { display: flex; gap: 1.6mm; align-items: baseline; padding: .55mm 0; border-bottom: .3pt dotted #bbb; font-size: 8.8pt; line-height: 1.42; break-inside: avoid; }
+.exa .xn { font-family: var(--font-num); min-width: 6mm; text-align: right; font-size: 8.3pt; flex: none; }
+.exa .xb { flex: 1; }
+.exa .xa { font-weight: 700; margin-right: 2mm; }
+.exa .xc { font-weight: 400; }
+.exa .xe { color: #333; }
+.exa .src { font-size: 6.8pt; color: #888; margin-left: 1.4mm; white-space: nowrap; }
+
+/* ---------- スマホで読む（生徒用） ---------- */
+.rhead, .reader { display: none; }
+body.read .shelf, body.read .bar, body.read .preview { display: none !important; }
+body.read .app { grid-template-columns: 1fr; }
+body.read .rhead { display: flex; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); border-bottom: 1px solid var(--rule); box-shadow: 0 2px 6px rgba(0,0,0,.06); padding-block: 8px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); gap: 8px; align-items: center; flex-wrap: wrap; }
+body.read .reader { display: block; background: var(--paper); padding-block: 16px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+body.read { background: var(--paper); }
+.tomode { margin-top: 10px; width: 100%; padding: 7px 10px; font-weight: 700; }
+.rhead select { flex: 1; min-width: 0; font: inherit; font-size: 15px; padding: 7px 8px; border: 1px solid var(--rule); border-radius: 8px; background: var(--paper); color: var(--ink); }
+.rhead .btn { font-size: 12px; padding: 7px 10px; white-space: nowrap; }
+.rd { max-width: 680px; margin: 0 auto; font-size: 16px; line-height: 1.75; color: var(--ink); }
+.rd h1 { font-size: 22px; line-height: 1.35; margin: 4px 0 2px; text-wrap: balance; }
+.rd .rsub { font-size: 13px; color: var(--accent); font-weight: 700; letter-spacing: .04em; }
+.rd .rjump { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 4px; }
+.rd .rjump button { font: inherit; font-size: 13px; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); border-radius: 999px; padding: 4px 12px; cursor: pointer; }
+.rd .rjump button.on { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+.rd > h2 { font-size: 18px; margin: 28px 0 10px; padding-bottom: 4px; border-bottom: 2px solid var(--ink); display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; scroll-margin-top: 70px; }
+.rd > h2 small { font-size: 12px; font-weight: 400; color: var(--mute); }
+.rd .rlec { border-bottom: 1px dashed var(--rule); padding-bottom: 14px; margin-bottom: 14px; }
+.rd .lecture { font-size: 15px; line-height: 1.8; display: flex; flex-direction: column; gap: 12px; }
+.rd .lecture h3, .rd .lecture .h3 { font-size: 16.5px; }
+.rd .lecture .cap, .rd .lecture .mini { font-size: 13px; }
+.rd .lecture .point { font-size: 14.5px; }
+.rd .tbl { font-size: 14px; }
+.rd .rscroll { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 6px; }
+.rd .rscroll-note { font-size: 12px; color: var(--mute); margin: 0 0 2px; }
+.rd .fig { max-width: 100%; }
+.rd .rq { border-bottom: 1px solid var(--rule); padding: 10px 0; display: grid; grid-template-columns: 30px 1fr auto; gap: 4px 8px; align-items: start; }
+.rd .rq .rn { font-family: var(--font-num); font-weight: 700; font-size: 13px; border: 1.5px solid var(--ink); border-radius: 5px; height: 24px; display: grid; place-items: center; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.rd .rq .rt { min-width: 0; }
+.rd .rq .ropts { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 12px; font-size: 15px; margin-top: 4px; }
+.rd .rq .ropts.one { grid-template-columns: 1fr; }
+.rd .rq .rbtn { grid-column: 3; grid-row: 1; justify-self: end; white-space: nowrap; font: inherit; font-size: 13px; font-weight: 700; color: var(--accent); background: var(--paper); border: 1.5px solid var(--accent); border-radius: 999px; padding: 3px 14px; cursor: pointer; margin-top: 2px; }
+.rd .rq .rbtn:focus-visible, .rd .rjump button:focus-visible, .rhead .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.rd .rq .rans { grid-column: 2 / 4; background: color-mix(in srgb, var(--accent) 8%, white); border-radius: 8px; padding: 6px 10px; margin-top: 4px; }
+.rd .rq .rans b { font-size: 16.5px; }
+.rd .rq .rans .rex { display: block; font-size: 14px; color: #3b464d; margin-top: 2px; }
+.rd .rq .rans .rsrc { font-size: 12px; color: var(--mute); margin-left: 6px; }
+.rd .rblank { display: inline-block; min-width: 4em; border-bottom: 1.5px solid var(--ink); margin: 0 3px; }
+.rd .rnote { font-weight: 700; margin: 14px 0 6px; font-size: 15px; }
+.rd .rfig { margin: 8px auto; max-width: 520px; }
+.rd .rfigs { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin: 8px 0; }
+.rd .rfigs .flabel { text-align: center; font-size: 13px; font-weight: 700; }
+.rd .rlead { font-size: 13px; color: var(--mute); margin: 0 0 6px; }
+.rd .rpat { display: flex; flex-wrap: wrap; gap: 6px; margin: 16px 0 6px; }
+.rd .rpat button { font: inherit; font-size: 14px; font-weight: 700; border: 1.5px solid var(--rule); background: var(--paper); color: var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+.rd .rpat button.on { border-color: var(--accent); background: var(--accent); color: #fff; }
+.rd .rpat button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.rd .rall { font: inherit; font-size: 12px; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); border-radius: 6px; padding: 3px 10px; cursor: pointer; }
+.rd .ypara { font-size: 17px; line-height: 2.1; margin: 0 0 10px; }
+.rd .ypara .pn { font-family: var(--font-num); font-weight: 700; margin-right: 4px; }
+.rd .yhint { display: inline-block; font-size: 11.5px; color: var(--mute); border: 1px solid var(--rule); border-radius: 99px; padding: 0 7px; margin-left: 6px; white-space: nowrap; }
+.rd .rhide { font-size: 13px; font-weight: 700; background: #f0f1ee; border-radius: 6px; padding: 5px 10px; margin-top: 10px; }
+.rd .rend { margin-top: 32px; font-size: 13px; color: var(--mute); text-align: center; }
+@media (max-width: 640px) {
+  .rd .two, .rd .three, .rd .steps, .rd .charts2, .rd .charts3, .rd .maps3, .rd .flow5, .rd .figrow, .rd .charts3.two-only { grid-template-columns: 1fr !important; width: 100% !important; }
+  .rd .graphs3, .rd .graphs4, .rd .pics3 { grid-template-columns: 1fr 1fr !important; width: 100% !important; }
+  .rd .flow5 .fl:not(:last-child)::after { content: '▼'; right: auto; left: 50%; top: auto; bottom: -14px; transform: translateX(-50%); }
+  .rd .flow5 { gap: 16px !important; }
+  .rd .row { flex-direction: column; align-items: stretch; }
+  .rd .row > *, .rd .row .fig, .rd .graphs2 { flex: none !important; width: 100% !important; }
+  .rd .lecture .fig[class*="w"] { width: 100% !important; flex: none !important; }
+  .rd .rq .ropts { grid-template-columns: 1fr; }
+  .rd .ratio { flex: none; width: 100%; }
+}
+
+@media (max-width: 860px) {
+  .app { grid-template-columns: 1fr; height: auto; }
+  .shelf { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--rule); max-height: 50vh; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .bar { position: static; box-shadow: none; }
+  .bar, .preview { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .print-box { margin-left: 0; align-items: flex-start; }
+  .print-box .hint { text-align: left; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* ---------- 印刷 ---------- */
+@page { size: A4; margin: 0; }
+@media print {
+  html, body { height: auto; background: #fff; }
+  .shelf, .bar, .sheet-tag { display: none !important; }
+  .desk { min-height: 0; }
+  .app { display: block; height: auto; min-height: 0; }
+  .desk, .preview { display: block; padding: 0; overflow: visible; height: auto; }
+  .sheets { display: block; zoom: 1 !important; }
+  .sheet-wrap { display: block; }
+  .page { box-shadow: none; break-after: page; page-break-after: always; margin: 0; }
+  .sheet-wrap:last-child .page { break-after: auto; page-break-after: auto; }
+  /* Safari：用紙ぴったりの高さだと余白ではみ出して白紙ページができるので、少し縮めて中央に置く */
+  html.safari .page { zoom: .9; margin: 0 auto; height: 297mm; }
+  .page.land { width: 210mm; height: 297mm; }
+  .page.land > .rot { inset: auto; top: 0; left: 0; width: 297mm; height: 210mm; transform-origin: 0 0; transform: translate(0, 297mm) rotate(-90deg); }
+}
+</style>
+
+<div class="app">
+  <nav class="shelf" aria-label="単元">
+    <p class="brand">中学社会<br>解いて覚えるプリント<small>/*__FILELABEL__*/</small></p>
+    <button class="btn tomode" id="toRead">スマホで読む画面にする</button>
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div id="unitList"></div>
+  </nav>
+  <main class="desk">
+    <div class="rhead" id="rhead"></div>
+    <div class="reader" id="reader"></div>
+    <div class="bar" id="bar"></div>
+    <div class="preview" id="preview"><div class="sheets" id="sheets"></div></div>
+  </main>
+</div>
+
+<script>
+/*__FIGS__*/
+/*__UNITS__*/
+const OTHER_FILES = /*__OTHER__*/;
+const IS_SAFARI = /^((?!chrome|chromium|crios|fxios|edg|android).)*safari/i.test(navigator.userAgent);
+if (IS_SAFARI) document.documentElement.classList.add('safari');
+
+// ---------- 単元の一覧（作ったものから「印刷できる」になる） ----------
+const SUBJECTS = {
+  geo: { name: '地理', color: '#2c5f86', parts: [
+    ['世界と日本の地域構成', [['geo01', '世界のすがた'], ['geo02', '日本のすがた']]],
+    ['世界のさまざまな地域', [['geo03', '世界各地の人々の生活と環境'], ['geo04', 'アジア州'], ['geo05', 'ヨーロッパ州'], ['geo06', 'アフリカ州'], ['geo07', '北アメリカ州'], ['geo08', '南アメリカ州'], ['geo09', 'オセアニア州']]],
+    ['日本のさまざまな地域', [['geo10', '地域調査の手法'], ['geo11', '日本の自然環境'], ['geo12', '日本の人口'], ['geo13', '日本の資源・エネルギーと産業'], ['geo14', '日本の交通・通信'], ['geo15', '九州地方'], ['geo16', '中国・四国地方'], ['geo17', '近畿地方'], ['geo18', '中部地方'], ['geo19', '関東地方'], ['geo20', '東北地方'], ['geo21', '北海道地方']]],
+    ['受験対策', [['geo90', '地理の全範囲 総まとめ', '受験']]],
+  ]},
+  his: { name: '歴史', color: '#8f4a2f', parts: [
+    ['古代まで', [['his01', '歴史のとらえ方'], ['his02', '人類の出現と文明のおこり'], ['his03', '縄文・弥生・古墳時代'], ['his04', '飛鳥時代'], ['his05', '奈良時代'], ['his06', '平安時代']]],
+    ['中世・近世', [['his07', '鎌倉時代'], ['his08', '室町時代'], ['his09', 'ヨーロッパ人の来航と全国統一'], ['his10', '江戸幕府の成立'], ['his11', '江戸時代の産業と文化'], ['his12', '江戸幕府の改革']]],
+    ['近代・現代', [['his13', '欧米の近代化と開国'], ['his14', '明治維新'], ['his15', '日清・日露戦争'], ['his16', '第一次世界大戦と大正時代'], ['his17', '第二次世界大戦'], ['his18', '戦後の日本と現代']]],
+    ['まとめ', [['his19', '時代の移り変わり年表', 'まとめ']]],
+    ['受験対策', [['his90', '歴史の全範囲 総まとめ', '受験']]],
+    ['中1向け 読んで解くプリント', [['his04y', '飛鳥時代', '読む'], ['his05y', '奈良時代', '読む'], ['his06y', '平安時代', '読む'], ['his07y', '鎌倉時代', '読む']]],
+  ]},
+  civ: { name: '公民', color: '#3b6a4c', parts: [
+    ['現代社会と私たち', [['civ01', '現代社会の特色'], ['civ02', 'きまりの意義と対立・合意']]],
+    ['人権と日本国憲法', [['civ03', '人権と日本国憲法'], ['civ04', '基本的人権']]],
+    ['民主政治', [['civ05', '選挙と政党'], ['civ06', '国会・内閣'], ['civ07', '裁判所と三権分立'], ['civ08', '地方自治']]],
+    ['経済', [['civ09', '消費生活と市場'], ['civ10', '生産と労働'], ['civ11', '金融と財政']]],
+    ['国際社会', [['civ12', '国際社会と国際連合'], ['civ13', '地球規模の課題']]],
+  ]},
+};
+const MARU = '①②③④⑤⑥⑦⑧⑨⑩';
+const KANA = ['ア', 'イ', 'ウ', 'エ', 'オ'];
+const PATTERNS = ['A', 'B', 'C', 'D'];
+
+const state = { subject: 'geo', unit: 'geo01', pattern: 0, sel: null };
+state.unit = Object.keys(UNITS)[0];
+try { const s = JSON.parse(localStorage.getItem('shakai-print') || '{}'); if (s.unit && UNITS[s.unit]) { state.unit = s.unit; state.subject = UNITS[s.unit].subject; } } catch (e) {}
+if (UNITS[state.unit]) state.subject = UNITS[state.unit].subject;
+function save() { try { localStorage.setItem('shakai-print', JSON.stringify({ subject: state.subject, unit: state.unit })); } catch (e) {} }
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const withFigs = html => html.replace(/\{\{fig:(\w+)\}\}/g, (_, k) => FIGS[k] || '');
+
+// ---------- 並べかえ（パターンごとに同じ結果になる） ----------
+function rng(seed) { return function () { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function hash(s) { let h = 2166136261; for (const c of s) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return h >>> 0; }
+function shuffled(arr, rand) { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+// 1枚分の問題を、パターンに合わせて組み立てる（答えもいっしょに）
+// 受験用の総まとめは「セット」ごとに問題そのものがちがう（並べかえはしない）
+function sheetsOf(unit, pattern) { return unit.sets ? (unit.sets[pattern] || unit.sets[0]).sheets : unit.sheets; }
+function patName(unit, p) { return unit.sets ? `セット${p + 1}` : `パターン${PATTERNS[p]}`; }
+function buildSheet(unit, si, pattern) {
+  const sh = sheetsOf(unit, pattern)[si];
+  const rand = rng(hash(unit.id + ':' + si) + pattern * 7919);
+  let n = 0; const answers = [];
+  const blocks = sh.blocks.map(b => {
+    const qs = (unit.sets || pattern === 0 || b.noShuffle) ? b.qs : shuffled(b.qs, rand);
+    return { ...b, qs: qs.map(q => {
+      n++;
+      if (q.c) {
+        let order = q.c.map((_, i) => i);
+        if ((unit.sets || pattern !== 0 || unit.mixA) && !q.fixc) order = shuffled(order, rand);
+        const correct = KANA[order.indexOf(q.a)];
+        answers.push({ n, a: correct, src: q.src, ex: q.ex, ct: q.c[q.a] });
+        return { ...q, n, opts: order.map(i => q.c[i]) };
+      }
+      answers.push({ n, a: q.a, wide: q.w === 'xl', src: q.src, ex: q.ex });
+      return { ...q, n };
+    }) };
+  });
+  return { ...sh, blocks, total: n, answers };
+}
+
+// ---------- 紙をつくる ----------
+function pageShell(inner, foot, land = false) {
+  const body = `<div class="pg"><div class="pgi">${inner}</div></div><div class="pg-foot"><span>${foot}</span><span>中学社会 解いて覚えるプリント</span></div>`;
+  // 横向きのページは、画面では横長に表示し、印刷ではA4縦の紙に90度回して入れる（紙を右に回して読む）
+  return land ? `<div class="page land"><div class="rot">${body}</div></div>` : `<div class="page">${body}</div>`;
+}
+function noLabel(unit) { return typeof unit.no === 'number' ? `第${unit.no}講` : unit.no; }
+function unitLabel(unit) { return `${SUBJECTS[unit.subject].name} ${noLabel(unit)}　${unit.title}`; }
+
+
+// ---------- この講の流れ（年の位置に出来事を置く年表） ----------
+function flowPack(items, lo, hi, gap) {
+  const cl = [];
+  items.forEach(it => {
+    cl.push({ list: [it], w: it.w, sum: it.d - it.w / 2 });
+    while (cl.length > 1) {
+      const a = cl[cl.length - 2], b = cl[cl.length - 1];
+      if (a.sum / a.list.length + a.w + gap <= b.sum / b.list.length) break;
+      const m = { list: a.list.concat(b.list), w: a.w + gap + b.w, sum: 0 };
+      let off = 0; m.list.forEach(e => { m.sum += e.d - e.w / 2 - off; off += e.w + gap; });
+      cl.splice(cl.length - 2, 2, m);
+    }
+  });
+  let x = lo;
+  cl.forEach(c => { let s = Math.max(c.sum / c.list.length, x); c.list.forEach(e => { e.x = s + e.w / 2; s += e.w + gap; }); x = s; });
+  const all = cl.flatMap(c => c.list);
+  let r = hi;
+  for (let i = all.length - 1; i >= 0; i--) { const e = all[i]; if (e.x + e.w / 2 > r) e.x = r - e.w / 2; r = e.x - e.w / 2 - gap; }
+  return all;
+}
+function flowSplit(t, per) {
+  // 区切りのよいところ（・、）の後、（の前）で行を分ける
+  const toks = String(t).split(/(?<=[・、）])|(?=（)/).filter(Boolean);
+  const lines = []; let cur = '';
+  toks.forEach(k => {
+    while (k.length > per) { if (cur) { lines.push(cur); cur = ''; } lines.push(k.slice(0, per)); k = k.slice(per); }
+    if ((cur + k).length > per) { lines.push(cur); cur = k; } else cur += k;
+  });
+  if (cur) lines.push(cur);
+  return lines;
+}
+function flowHTML(f) {
+  const FW = 184, multi = f.rows.length > 1, RW = multi ? 150 : FW, BAND = ['#f3e6d6', '#e6eef3', '#e9f1e4', '#f6e3df', '#eee8f3', '#eceae3'];
+  const Yd = t => String(t).replace(/(\d+)/g, '<span class="y">$1</span>');
+  const legend = `<div class="fl-lg"><i style="color:#c0392b">■</i> 大きな区切り　<i style="color:#2f5d8a">●</i> おもな出来事　<i style="color:#888">○</i> 関連する出来事</div>`;
+  const ERA_T = 0, ERA_H = 7.6, AXIS = 10.4, LB_T = 13, GAP = 3;
+  let top = 0; const tops = [], hs = [];
+  const rows = f.rows.map((row, ri) => {
+    const W = RW, OFF = multi && ri % 2 ? FW - RW : 0;
+    const lb = row.lb || f.lb || 42, H = LB_T + lb + .6;
+    tops.push(top); hs.push(H); top += H + GAP;
+    const A = row.anchors, u0 = A[0][1], u1 = A[A.length - 1][1];
+    const X = y => { let i = 0; while (i < A.length - 2 && y > A[i + 1][0]) i++; const [ya, ua] = A[i], [yb, ub] = A[i + 1]; return 2 + ((ua + (Math.max(ya, Math.min(yb, y)) - ya) / (yb - ya) * (ub - ua)) - u0) / (u1 - u0) * (W - 6); };
+    let h = `<div class="tlh fl" style="width:${W}mm; height:${H}mm; position:absolute; left:${OFF}mm; top:${tops[ri]}mm">`;
+    let sv = `<line x1="0.5" y1="${AXIS}" x2="${W - 1.6}" y2="${AXIS}" stroke="#555" stroke-width=".5"/><path d="M${W - 2.2},${AXIS - 1.3} L${W - .2},${AXIS} L${W - 2.2},${AXIS + 1.3} Z" fill="#555"/>`;
+    row.eras.forEach(([n, sub, a, b], i) => {
+      const xa = X(a), xb = X(b), w = xb - xa - .6;
+      const fs = Math.min(9.5, (w - 1.5) / Math.max(n.length, 1) / 0.36);
+      h += `<div class="era2" style="left:${(xa + .3).toFixed(2)}mm; width:${w.toFixed(2)}mm; top:${ERA_T}mm; height:${ERA_H}mm; background:${BAND[i % BAND.length]}"><b style="font-size:${fs.toFixed(1)}pt">${n}</b>${sub ? `<small>${sub}</small>` : ''}</div>`;
+    });
+    const L = row.items.map(([y, yl, t, k]) => {
+      const fs = k === 'b' ? 3.1 : 2.9, lw = fs * 1.34, pad = k === 'b' ? 2.4 : .4;
+      const per = Math.max(4, Math.floor((lb - pad - 1.2) / fs));
+      const lines = flowSplit(t, per);
+      const cols = lines.length + (yl ? 1 : 0);
+      return { y, yl, lines, k, d: X(y), w: cols * lw + pad + (k === 'b' ? .5 : 0), h: k === 'b' ? Math.min(lb, Math.max(...lines.map(s => s.length), yl ? yl.length : 0) * fs + pad + 2) : lb };
+    });
+    flowPack(L, .3, W - 2.5, .5);
+    L.forEach(e => {
+      const col = e.k === 'b' ? '#c0392b' : e.k === 'c' ? '#2f5d8a' : '#888';
+      sv += `<polyline points="${e.d.toFixed(2)},${AXIS} ${e.d.toFixed(2)},${AXIS + 1.1} ${e.x.toFixed(2)},${LB_T - .5}" fill="none" stroke="${col}" stroke-width="${e.k === 'b' ? .4 : .28}"/>`;
+      sv += e.k === 'x' ? `<circle cx="${e.d.toFixed(2)}" cy="${AXIS}" r=".8" fill="#fff" stroke="#888" stroke-width=".3"/>` : `<circle cx="${e.d.toFixed(2)}" cy="${AXIS}" r="${e.k === 'b' ? 1.1 : .85}" fill="${col}"/>`;
+      h += `<div class="lb ${e.k}" style="left:${(e.x - e.w / 2).toFixed(2)}mm; top:${LB_T}mm; width:${e.w.toFixed(2)}mm; height:${e.h.toFixed(2)}mm">${e.yl ? `<span class="yy">${Yd(e.yl)}</span><br>` : ''}${e.lines.map(Yd).join('<br>')}</div>`;
+    });
+    return h + `<svg viewBox="0 0 ${W} ${H}" style="width:${W}mm; height:${H}mm">${sv}</svg></div>`;
+  });
+  const TH = top - GAP;
+  // 段がかわるところを矢印でつなぐ（右の端 → 次の段の左の端）
+  let con = '';
+  for (let i = 0; i + 1 < f.rows.length; i++) {
+    const a1 = tops[i] + AXIS, a2 = tops[i + 1] + AXIS, gy = tops[i + 1] - GAP / 2;
+    const xr = (i % 2 ? FW : RW) + 1.2, xs = (i % 2 ? 0 : FW - RW) - 1.6;
+    con += `<polyline points="${(xr - 2.4).toFixed(1)},${a1} ${xr},${a1} ${xr},${gy} ${xs},${gy} ${xs},${a2} ${xs + 1.6},${a2}" fill="none" stroke="#999" stroke-width=".45" stroke-dasharray="1.4 1"/><path d="M${xs + 1.2},${a2 - 1.1} L${xs + 2.8},${a2} L${xs + 1.2},${a2 + 1.1} Z" fill="#999"/>`;
+  }
+  return legend + `<div class="flw" style="height:${TH}mm">${rows.join('')}${con ? `<svg class="flw-con" viewBox="-3 0 ${FW + 6} ${TH}" style="left:-3mm; width:${FW + 6}mm; height:${TH}mm">${con}</svg>` : ''}</div>`;
+}
+
+function lecturePage(unit, i) {
+  const head = `<div class="lhead"><div class="t"><small>${SUBJECTS[unit.subject].name}　${noLabel(unit)}　講座</small>${unit.title}</div><div class="p">講座 ${i + 1} / ${unit.lecture.length}</div></div>`;
+  const L = unit.lecture[i], land = typeof L === 'object' && L.land, html = (typeof L === 'object' ? L.html : L).replace('{{flow}}', () => unit.flow ? flowHTML(unit.flow) : '');
+  return pageShell(`${head}<div class="lecture" style="display:flex;flex-direction:column;gap:3mm">${withFigs(html).replace(/<span class="sn">(\d+)<\/span>/g, (m, n) => `<span class="sn">${String.fromCharCode(0x245F + +n)}</span>`)}</div>`, unitLabel(unit) + '　講座' + (i + 1), land);
+}
+
+function qHTML(q, opts = {}) {
+  if (q.opts) {
+    const long = q.opts.some(o => o.length > 9);
+    return `<div class="q choice"><span class="qn">${q.n}</span><div class="qt">${esc(q.q)}<div class="opts ${long ? 'one' : ''}">${q.opts.map((o, i) => `<span>${KANA[i]}　${esc(o)}</span>`).join('')}</div></div><span class="ab xs"></span></div>`;
+  }
+  const w = q.w || 'm';
+  return `<div class="q ${w === 'xl' ? 'xl' : ''} ${opts.tf ? 'choice qtf' : ''}"><span class="qn">${q.n}</span><span class="qt">${esc(q.q)}</span><span class="ab ${w === 'xl' ? '' : w}"></span></div>`;
+}
+
+function problemPage(unit, si, pattern) {
+  const sh = buildSheet(unit, si, pattern);
+  const head = `<div class="qhead">
+    <div class="unitname">${unitLabel(unit)}</div>
+    <div class="right"><div class="namebox">名前</div><div class="scorebox">／${sh.total}</div></div>
+    <div class="t"><span class="n">問題${MARU[si]}</span><span>${esc(sh.title)}</span></div>
+    <div class="meta"><span class="badge ${sh.mode === 'closed' ? 'closed' : ''}">${unit.sets ? '何も見ないで' : sh.mode === 'closed' ? '講座はしまって' : '講座を見ながら'}</span><span>${patName(unit, pattern)}</span></div>
+  </div>
+  <p class="lead">${esc(sh.lead)}</p>`;
+  const body = sh.blocks.map(b => {
+    const qs = `<div class="qs ${b.cols === 4 ? 'c4' : b.cols === 3 ? 'c3' : b.cols === 2 ? 'c2' : ''}">${b.qs.map(q => qHTML(q, { tf: b.tf })).join('')}</div>`;
+    const note = b.note ? `<div class="blk-note">${esc(b.note)}</div>` : '';
+    if (b.housesQ || b.graphsQ) {
+      const list = b.housesQ || b.graphsQ;
+      const grid = `<div class="pics3" style="width:${b.gw || (b.graphsQ ? '86%' : '74%')}">${list.map(f => `<div class="fig">${FIGS[f]}</div>`).join('')}</div>`;
+      return `<div class="blk">${note}${grid}${qs}</div>`;
+    }
+    if (b.figs) {
+      const row = `<div class="figrow" style="${b.figGrid ? `grid-template-columns:${b.figGrid};` : ''}${b.figW ? `width:${b.figW};` : ''}">${b.figs.map((f, i) => `<div><div class="fig">${FIGS[f]}</div><div class="flabel">${esc(b.figLabels[i])}</div></div>`).join('')}</div>`;
+      return `<div class="blk">${note}${row}${qs}</div>`;
+    }
+    if (b.fig && b.side) return `<div class="blk side"><div class="side-l"${b.sideW ? ` style="flex-basis:${b.sideW}%"` : ''}>${note}<div class="fig">${FIGS[b.fig]}</div></div>${qs}</div>`;
+    if (b.fig) return `<div class="blk">${note}<div class="fig ${b.figCls || ''}">${FIGS[b.fig]}</div>${qs}</div>`;
+    return `<div class="blk">${note}${qs}</div>`;
+  }).join('');
+  return pageShell(head + body, `${unitLabel(unit)}　問題${MARU[si]}　${patName(unit, pattern)}`);
+}
+
+function answerSections(unit, sheetIdx, pattern) {
+  return sheetIdx.map(si => {
+    const sh = buildSheet(unit, si, pattern);
+    return `<div class="ans-sec"><h3><span>問題${MARU[si]}　${esc(sh.title)}</span><span>${patName(unit, pattern)}</span></h3><div class="ans-grid">${sh.answers.map(a => `<div class="it ${a.wide || String(a.a).length > 14 ? 'wide' : ''}"><b>${a.n}</b><span>${esc(a.a)}${a.src ? `<small class="src">${esc(a.src)}</small>` : ''}</span></div>`).join('')}</div></div>`;
+  });
+}
+
+// ---------- 中1向け 読んで解くプリント ----------
+const CIRC = n => String.fromCharCode(0x245F + n);
+const yomuHint = (unit, q) => { const h = unit.yomu.hint; return h === 'all' || (h === 'some' && (q.k === 'f' || q.k === 'w')) || (h === 'write' && q.k === 'w'); };
+const yomuEra = unit => unit.title.replace('（読んで解く）', '');
+function yomuPage(unit, i) {
+  const s = unit.yomu.sheets[i];
+  const head = `<div class="yhead"><div class="yt"><small>${SUBJECTS[unit.subject].name}　${yomuEra(unit)}　読んで解くプリント　No.${i + 1}</small>${esc(s.t)}</div><div class="yname">　　月　　日　<span>名前</span></div></div>`;
+  const text = `<div class="ytext">${s.paras.map((p, k) => `<p><span class="pn">${CIRC(k + 1)}</span>${p}</p>`).join('')}</div>`;
+  let n = 0;
+  const qs = s.qs.map(q => {
+    n++;
+    const hint = yomuHint(unit, q) ? `<span class="yh">${CIRC(q.p)}の段落</span>` : '';
+    if (q.k === 'f') {
+      const w = Math.max(4.5, [...q.a].length * 1.15 + 2);
+      return `<div class="yq fill"><span class="qn">${n}</span><span class="yqt">${esc(q.q).replace('＿＿', `<span class="yb" style="width:${w}em"></span>`)}${hint}</span></div>`;
+    }
+    if (q.k === 'w') return `<div class="yq wr"><span class="qn">${n}</span><span class="yqt">${esc(q.q)}本文の言葉を使って書こう。${hint}</span><div class="lines"></div></div>`;
+    const pre = q.k === 'h' ? `<div class="yhide">✂ 最後の問題は、紙を点線で折って上の文をかくしてから答えよう。</div>` : '';
+    return `${pre}<div class="yq"><span class="qn">${n}</span><span class="yqt">${esc(q.q)}${hint}</span><span class="ab"></span></div>`;
+  }).join('');
+  const inner = `<div class="ys"><div class="ytop">${head}${text}</div><div class="yfold"><span>✂ ここで折ると上の文がかくれます</span></div><div class="ybot"><div class="yqh">問題　上の文を読んで答えよう</div>${qs}</div></div>`;
+  return pageShell(inner, `${unitLabel(unit)}　No.${i + 1}　${s.t}`);
+}
+function yomuAnsItems(unit, i) {
+  return unit.yomu.sheets[i].qs.map((q, k) => `<div class="yai"><b class="n">${k + 1}</b><div><span class="yaa">${q.k === 'w' ? '（例）' : ''}${esc(q.a)}</span><span class="yap">→ ${CIRC(q.p)}の段落</span>${q.k === 'w' ? '<span class="yaw">同じような内容が書けていれば正解。</span>' : ''}</div></div>`).join('');
+}
+// 両面印刷で、その枚のうらに来る答え
+function yomuAnsPage(unit, i) {
+  const s = unit.yomu.sheets[i];
+  const head = `<div class="lhead"><div class="t"><small>${SUBJECTS[unit.subject].name}　${yomuEra(unit)}　No.${i + 1}　答え</small>${esc(s.t)}</div><div class="p">答え</div></div>`;
+  const how = `<div class="yhow">丸つけのしかた：まちがえた問題は、「→ ①の段落」の所をもう一度読んで、赤で書き直そう。<br>書き直したら、紙を折って上の文をかくし、もう一度答えられるかためそう。</div>`;
+  return pageShell(`${head}<div class="ya">${yomuAnsItems(unit, i)}</div>${how}`, `${unitLabel(unit)}　No.${i + 1}　答え`);
+}
+// 答えをまとめて最後に
+function yomuAnsPages(unit, idx) {
+  const head = `<div class="lhead"><div class="t"><small>${SUBJECTS[unit.subject].name}　${yomuEra(unit)}　読んで解くプリント　答え</small>${yomuEra(unit)}</div><div class="p">答え</div></div>`;
+  const secs = idx.map(i => `<div class="ysec"><h3>No.${i + 1}　${esc(unit.yomu.sheets[i].t)}</h3>${yomuAnsItems(unit, i)}</div>`);
+  const tmp = document.createElement('div'); tmp.style.cssText = 'position:absolute;left:-9999px;top:0;zoom:1'; document.body.appendChild(tmp);
+  const fits = list => { tmp.innerHTML = pageShell(head + `<div class="ya compact">${list.join('')}</div>`, ''); const pg = tmp.querySelector('.pg'); return pg.scrollHeight <= pg.clientHeight + 1; };
+  const pages = []; let cur = [];
+  for (const sc of secs) { if (fits([...cur, sc])) cur.push(sc); else { if (cur.length) pages.push(cur); cur = [sc]; } }
+  if (cur.length) pages.push(cur);
+  tmp.remove();
+  return pages.map((p, k) => pageShell(head + `<div class="ya compact">${p.join('')}</div>`, `${unitLabel(unit)}　答え${pages.length > 1 ? ' ' + (k + 1) + '/' + pages.length : ''}`));
+}
+// 本文・問題が枠に入らないときは、文字を少しずつ小さくする
+function yomuFit() {
+  document.querySelectorAll('#sheets .ys .ytext, #sheets .ys .ybot').forEach(el => {
+    el.style.fontSize = '';
+    let f = parseFloat(getComputedStyle(el).fontSize);
+    while (el.scrollHeight > el.clientHeight + 1 && f > 11) { f -= 0.4; el.style.fontSize = f + 'px'; }
+  });
+}
+
+// 受験用（セット）の解答・解説：1問ずつ「番号・答え・解説・出どころ」を並べ、あふれたら問題の途中でも次のページへ
+function examAnswerPages(unit, sheetIdx, pattern) {
+  const head = `<div class="lhead"><div class="t"><small>${SUBJECTS[unit.subject].name}　${noLabel(unit)}　解答・解説</small>${unit.title}</div><div class="p">${patName(unit, pattern)}</div></div>`;
+  const tmp = document.createElement('div'); tmp.style.cssText = 'position:absolute;left:-9999px;top:0;zoom:1'; document.body.appendChild(tmp);
+  tmp.innerHTML = pageShell(head + '<div class="exa" id="exa-m"></div>', '');
+  const pg = tmp.querySelector('.pg'), box = tmp.querySelector('#exa-m');
+  const pages = []; let cur = '';
+  const fits = h => { box.innerHTML = h; return pg.scrollHeight <= pg.clientHeight + 1; };
+  for (const si of sheetIdx) {
+    const sh = buildSheet(unit, si, pattern);
+    const h3 = cont => `<h3><span>問題${MARU[si]}　${esc(sh.title)}${cont ? '（つづき）' : ''}</span><span>${patName(unit, pattern)}</span></h3>`;
+    let sec = h3(false), open = true;
+    sh.answers.forEach((a, k) => {
+      const it = `<div class="xi"><b class="xn">${a.n}</b><div class="xb"><span class="xa">${esc(a.a)}${a.ct ? `<span class="xc">（${esc(a.ct)}）</span>` : ''}</span>${a.ex ? `<span class="xe">${esc(a.ex)}</span>` : ''}${a.src ? `<small class="src">${esc(a.src)}</small>` : ''}</div></div>`;
+      const trySec = sec + it;
+      if (fits(cur + `<section class="xs">${trySec}</section>`)) { sec = trySec; return; }
+      // 入らない：今のページを閉じて、次のページは見出し（つづき）から
+      if (sec !== h3(false) && sec !== h3(true)) cur += `<section class="xs">${sec}</section>`;
+      pages.push(cur); cur = ''; sec = h3(k > 0) + it;
+    });
+    cur += `<section class="xs">${sec}</section>`;
+  }
+  if (cur) pages.push(cur);
+  tmp.remove();
+  return pages.map((p, i) => pageShell(head + `<div class="exa">${p}</div>`, `${unitLabel(unit)}　解答・解説${pages.length > 1 ? ' ' + (i + 1) + '/' + pages.length : ''}　${patName(unit, pattern)}`));
+}
+
+// 解答は、1ページに入るだけ入れて、あふれたら次のページへ
+function answerPages(unit, sheetIdx, pattern, host) {
+  if (unit.sets) return examAnswerPages(unit, sheetIdx, pattern);
+  const secs = answerSections(unit, sheetIdx, pattern);
+  const head = `<div class="lhead"><div class="t"><small>${SUBJECTS[unit.subject].name}　${noLabel(unit)}　解答</small>${unit.title}</div><div class="p">${patName(unit, pattern)}</div></div>`;
+  const pages = [];
+  const tmp = document.createElement('div'); tmp.style.cssText = 'position:absolute;left:-9999px;top:0;zoom:1'; document.body.appendChild(tmp);
+  let cur = [];
+  const fits = list => { tmp.innerHTML = pageShell(head + list.join(''), ''); const pg = tmp.querySelector('.pg'); return pg.scrollHeight <= pg.clientHeight + 1; };
+  for (const s of secs) {
+    if (fits([...cur, s])) cur.push(s);
+    else { if (cur.length) pages.push(cur); cur = [s]; }
+  }
+  if (cur.length) pages.push(cur);
+  tmp.remove();
+  return pages.map((p, i) => pageShell(head + p.join(''), `${unitLabel(unit)}　解答${pages.length > 1 ? ' ' + (i + 1) + '/' + pages.length : ''}　${patName(unit, pattern)}`));
+}
+
+// ---------- 画面 ----------
+function renderTabs() {
+  $('#tabs').innerHTML = Object.entries(SUBJECTS).map(([k, s]) => `<button class="tab" role="tab" id="tab-${k}" aria-selected="${state.subject === k}" style="--accent:${s.color}">${s.name}</button>`).join('');
+  $('#tabs').querySelectorAll('.tab').forEach(b => b.onclick = () => { state.subject = b.id.slice(4); save(); renderAll(); });
+}
+function renderUnits() {
+  const s = SUBJECTS[state.subject];
+  let no = 0;
+  $('#unitList').innerHTML = s.parts.map(([part, units]) => `<div class="part">${part}</div>` + units.map(([id, nm, tag]) => {
+    if (!tag) no++; const ready = !!UNITS[id]; const other = OTHER_FILES[id];
+    return `<button class="unit ${ready ? 'ready' : ''}" id="u-${id}" ${ready ? '' : 'disabled'} aria-current="${state.unit === id}"><span class="no">${tag || `第${no}講`}</span><span class="nm">${nm}</span><span class="st">${ready ? '印刷できる' : other ? '「' + other + '」に' : '準備中'}</span></button>`;
+  }).join('')).join('');
+  $('#unitList').querySelectorAll('.unit.ready').forEach(b => b.onclick = () => { state.unit = b.id.slice(2); state.sel = null; save(); renderAll(); });
+}
+function defaultSel(unit) {
+  const sel = {};
+  if (unit.yomu) { unit.yomu.sheets.forEach((_, i) => sel['Y' + i] = true); return sel; }
+  unit.lecture.forEach((_, i) => sel['L' + i] = true);
+  unit.sheets.forEach((_, i) => sel['Q' + i] = true);
+  if (unit.sheets.length) sel.A = true; return sel;
+}
+function renderBar() {
+  const unit = UNITS[state.unit];
+  if (!unit || unit.subject !== state.subject) {
+    $('#bar').innerHTML = `<h1><small>${SUBJECTS[state.subject].name}</small>単元を選んでください</h1>`;
+    return;
+  }
+  if (!state.sel) state.sel = defaultSel(unit);
+  if (unit.yomu) { renderYomuBar(unit); return; }
+  if (state.pattern >= (unit.sets ? unit.sets.length : PATTERNS.length)) state.pattern = 0;
+  const pk = (key, label, sub = '') => `<label class="pick"><input type="checkbox" id="pk-${key}" ${state.sel[key] ? 'checked' : ''}>${label}${sub ? `<span class="mode">${sub}</span>` : ''}</label>`;
+  $('#bar').innerHTML = `
+    <h1><small>${SUBJECTS[unit.subject].name}　${noLabel(unit)}</small>${unit.title}</h1>
+    ${unit.lecture.length ? `<div class="ctrl"><span class="ctrl-label">講座</span><div class="picks">${unit.lecture.map((_, i) => pk('L' + i, `講座${i + 1}`)).join('')}</div></div>` : ''}
+    ${unit.sheets.length ? `<div class="ctrl"><span class="ctrl-label">問題（全${sheetsOf(unit, state.pattern).reduce((t, s) => t + s.blocks.reduce((u, b) => u + b.qs.length, 0), 0)}問）</span><div class="picks">${unit.sheets.map((s, i) => pk('Q' + i, `問題${MARU[i]}`, s.mode === 'closed' ? 'しまって' : '見ながら')).join('')}${pk('A', unit.sets ? '解答・解説' : '解答')}</div></div>` : ''}
+    ${unit.sheets.length ? `<div class="ctrl"><span class="ctrl-label">選び方</span><div class="row-btns">
+      <button class="btn" id="b-all">ぜんぶ</button>${unit.lecture.length ? `<button class="btn" id="b-lec">講座だけ</button><button class="btn" id="b-q">問題と解答</button>` : ''}
+      <select class="btn" id="pattern" aria-label="問題の並び">${unit.sets ? unit.sets.map((s, i) => `<option value="${i}" ${state.pattern === i ? 'selected' : ''}>セット${i + 1}（${s.note}）</option>`).join('') : PATTERNS.map((p, i) => `<option value="${i}" ${state.pattern === i ? 'selected' : ''}>パターン${p}${i === 0 ? '（基本の並び）' : '（並べかえ）'}</option>`).join('')}</select>
+    </div></div>` : ''}
+    <div class="print-box"><button class="btn primary" id="b-print">選んだページを印刷</button><span class="hint" id="count"></span></div>`;
+  $('#bar').querySelectorAll('.pick input').forEach(cb => cb.onchange = () => { state.sel[cb.id.slice(3)] = cb.checked; renderSheets(); });
+  const setAll = f => { Object.keys(defaultSel(unit)).forEach(k => state.sel[k] = f(k)); renderBar(); renderSheets(); };
+  if (!unit.sheets.length) { $('#b-print').onclick = () => window.print(); return; }
+  $('#b-all').onclick = () => setAll(() => true);
+  if ($('#b-lec')) $('#b-lec').onclick = () => setAll(k => k[0] === 'L');
+  if ($('#b-q')) $('#b-q').onclick = () => setAll(k => k[0] !== 'L');
+  $('#pattern').onchange = e => { state.pattern = +e.target.value; renderBar(); renderSheets(); };
+  $('#b-print').onclick = () => window.print();
+}
+function renderYomuBar(unit) {
+  const pk = (key, label) => `<label class="pick"><input type="checkbox" id="pk-${key}" ${state.sel[key] ? 'checked' : ''}>${label}</label>`;
+  if (!state.yans) state.yans = 'back';
+  $('#bar').innerHTML = `
+    <h1><small>${SUBJECTS[unit.subject].name}　中1向け 読んで解くプリント</small>${yomuEra(unit)}</h1>
+    <div class="ctrl"><span class="ctrl-label">プリント（全${unit.yomu.sheets.length}枚）</span><div class="picks">${unit.yomu.sheets.map((s, i) => pk('Y' + i, `No.${i + 1}`)).join('')}</div></div>
+    <div class="ctrl"><span class="ctrl-label">選び方</span><div class="row-btns">
+      <button class="btn" id="b-all">ぜんぶ</button><button class="btn" id="b-none">はずす</button>
+      <select class="btn" id="yans" aria-label="答えの入れ方">
+        <option value="back" ${state.yans === 'back' ? 'selected' : ''}>答えはうらに（両面印刷）</option>
+        <option value="end" ${state.yans === 'end' ? 'selected' : ''}>答えは最後にまとめて</option>
+        <option value="none" ${state.yans === 'none' ? 'selected' : ''}>答えなし</option>
+      </select>
+    </div></div>
+    <div class="print-box"><button class="btn primary" id="b-print">選んだページを印刷</button><span class="hint" id="count"></span></div>`;
+  $('#bar').querySelectorAll('.pick input').forEach(cb => cb.onchange = () => { state.sel[cb.id.slice(3)] = cb.checked; renderSheets(); });
+  const setAll = f => { Object.keys(defaultSel(unit)).forEach(k => state.sel[k] = f); renderYomuBar(unit); renderSheets(); };
+  $('#b-all').onclick = () => setAll(true);
+  $('#b-none').onclick = () => setAll(false);
+  $('#yans').onchange = e => { state.yans = e.target.value; renderSheets(); };
+  $('#b-print').onclick = () => window.print();
+}
+function yomuOut(unit) {
+  const out = [], idx = unit.yomu.sheets.map((_, i) => i).filter(i => state.sel['Y' + i]);
+  idx.forEach(i => { out.push(['No.' + (i + 1), yomuPage(unit, i)]); if (state.yans === 'back') out.push(['No.' + (i + 1) + ' 答え（うら）', yomuAnsPage(unit, i)]); });
+  if (state.yans === 'end' && idx.length) yomuAnsPages(unit, idx).forEach((p, k, a) => out.push(['答え' + (a.length > 1 ? k + 1 : ''), p]));
+  return out;
+}
+function renderSheets() {
+  const unit = UNITS[state.unit];
+  const host = $('#sheets');
+  if (!unit || unit.subject !== state.subject) { host.innerHTML = `<p class="empty">左の一覧から「印刷できる」単元を選ぶと、ここにA4のプリントが並びます。</p>`; return; }
+  const out = unit.yomu ? yomuOut(unit) : [];
+  if (!unit.yomu) unit.lecture.forEach((_, i) => { if (state.sel['L' + i]) out.push(['講座' + (i + 1), lecturePage(unit, i)]); });
+  if (state.pattern >= (unit.sets ? unit.sets.length : PATTERNS.length)) state.pattern = 0;
+  const qIdx = unit.sheets.map((_, i) => i).filter(i => state.sel['Q' + i]);
+  qIdx.forEach(i => out.push(['問題' + MARU[i], problemPage(unit, i, state.pattern)]));
+  if (state.sel.A && unit.sheets.length) {
+    const idx = qIdx.length ? qIdx : unit.sheets.map((_, i) => i);
+    answerPages(unit, idx, state.pattern).forEach((p, i, a) => out.push([(unit.sets ? '解答・解説' : '解答') + (a.length > 1 ? (i + 1) : ''), p]));
+  }
+  host.innerHTML = out.length ? out.map(([tag, html]) => `<div class="sheet-wrap"><span class="sheet-tag">${tag}</span>${html}</div>`).join('') : `<p class="empty">印刷するページを上で選んでください。</p>`;
+  const c = $('#count'); if (c) c.textContent = out.length ? `A4 ${out.length}ページ。${unit.yomu && state.yans === 'back' ? '「両面印刷（長辺とじ）」にすると、答えがそれぞれのプリントのうらに来ます。' : ''}${IS_SAFARI ? '印刷画面で「背景をプリント」にチェック、「ヘッダとフッタをプリント」のチェックを外してください。' : '印刷画面で「余白：なし」「背景のグラフィック：オン」にするときれいに出ます。'}` : '';
+  shrinkToFit();
+  yomuFit();
+  fitZoom();
+}
+// 万一1ページに収まらないときは、そのページだけ少し縮めて収める
+function shrinkToFit() {
+  document.querySelectorAll('#sheets .pg').forEach(g => {
+    const inner = g.firstElementChild; inner.style.zoom = '';
+    const need = inner.scrollHeight, have = g.clientHeight;
+    if (need > have + 1) inner.style.zoom = (have / need * 0.995).toFixed(4);
+  });
+}
+function fitZoom() {
+  const w = $('#preview').clientWidth - 48;
+  const z = Math.min(1, w / ($('#sheets .page.land') ? 1123 : 794));
+  $('#sheets').style.zoom = z > 0 ? z : 1;
+}
+
+// ---------- スマホで読む（生徒用） ----------
+function allUnitOptions() {
+  return Object.entries(SUBJECTS).map(([sk, sb]) => { let no = 0; return sb.parts.map(([part, units]) => {
+    const ops = units.map(([id, nm, tag]) => { if (!tag) no++; return UNITS[id] && (UNITS[id].sheets.length || UNITS[id].yomu) ? `<option value="${id}" ${state.unit === id ? 'selected' : ''}>${tag ? tag : '第' + no + '講'}　${esc(nm)}</option>` : ''; }).join('');
+    return ops ? `<optgroup label="${sb.name}｜${esc(part)}">${ops}</optgroup>` : '';
+  }).join(''); }).join('');
+}
+function rFig(k, cls = 'rfig') { return FIGS[k] ? `<div class="fig ${cls}">${FIGS[k]}</div>` : ''; }
+function rAnsBtn() { return `<button class="rbtn" type="button" aria-expanded="false">答え</button>`; }
+function rQ(n, inner, ans) { return `<div class="rq"><span class="rn">${n}</span><div class="rt">${inner}</div>${rAnsBtn()}<div class="rans" hidden>${ans}</div></div>`; }
+function readSheet(unit, si, pattern) {
+  const sh = buildSheet(unit, si, pattern);
+  let k = 0;
+  const body = sh.blocks.map(b => {
+    let figs = '';
+    if (b.housesQ || b.graphsQ) figs = `<div class="rfigs">${(b.housesQ || b.graphsQ).map(f => rFig(f, '')).join('')}</div>`;
+    else if (b.figs) figs = `<div class="rfigs">${b.figs.map((f, i) => `<div>${rFig(f, '')}<div class="flabel">${esc(b.figLabels[i])}</div></div>`).join('')}</div>`;
+    else if (b.fig) figs = rFig(b.fig);
+    const qs = b.qs.map(q => {
+      const a = sh.answers[k++];
+      const opts = q.opts ? `<div class="ropts ${q.opts.some(o => o.length > 9) ? 'one' : ''}">${q.opts.map((o, i) => `<span>${KANA[i]}　${esc(o)}</span>`).join('')}</div>` : '';
+      const ans = `<b>${esc(a.a)}${a.ct ? `（${esc(a.ct)}）` : ''}</b>${a.src ? `<span class="rsrc">${esc(a.src)}</span>` : ''}${a.ex ? `<span class="rex">${esc(a.ex)}</span>` : ''}`;
+      return rQ(q.n, `${esc(q.q)}${opts}`, ans);
+    }).join('');
+    return `${b.note ? `<div class="rnote">${esc(b.note)}</div>` : ''}${figs}${qs}`;
+  }).join('');
+  const mode = unit.sets ? '何も見ないで' : sh.mode === 'closed' ? '講座をかくして' : '講座を見ながら';
+  return `<h2 id="r-q${si}"><span>問題${MARU[si]}　${esc(sh.title)}</span><small>${mode}　<button class="rall" type="button">答えをぜんぶ見る</button></small></h2>${sh.lead ? `<p class="rlead">${esc(sh.lead)}</p>` : ''}${body}`;
+}
+function readYomu(unit) {
+  const ys = unit.yomu.sheets;
+  return ys.map((s, i) => {
+    const paras = '';
+    const qs = s.qs.map((q, k) => {
+      const hint = yomuHint(unit, q) ? `<span class="yhint">${CIRC(q.p)}の段落</span>` : '';
+      const text = q.k === 'f' ? esc(q.q).replace('＿＿', '<span class="rblank"></span>') : esc(q.q) + (q.k === 'w' ? '本文の言葉を使って書こう。' : '');
+      const pre = q.k === 'h' ? `<div class="rhide">最後の問題は、プリントの文を見ないで答えよう。</div>` : '';
+      return pre + rQ(k + 1, text + hint, `<b>${q.k === 'w' ? '（例）' : ''}${esc(q.a)}</b><span class="rsrc">→ ${CIRC(q.p)}の段落</span>`);
+    }).join('');
+    return `<h2 id="r-y${i}"><span>No.${i + 1}　${esc(s.t)}</span><small><button class="rall" type="button">答えをぜんぶ見る</button></small></h2>${qs}`;
+  }).join('');
+}
+function renderRead() {
+  const unit = UNITS[state.unit];
+  document.documentElement.style.setProperty('--accent', SUBJECTS[unit.subject].color);
+  $('#rhead').innerHTML = `<select id="rsel" aria-label="単元をえらぶ">${allUnitOptions()}</select><button class="btn" id="toPrint" type="button">印刷用</button>`;
+  $('#rsel').onchange = e => { state.unit = e.target.value; state.subject = UNITS[state.unit].subject; state.sel = null; state.rpat = 0; save(); renderRead(); window.scrollTo(0, 0); };
+  $('#toPrint').onclick = () => setView('print');
+  let jump = [], main = '', patSel = '';
+  if (unit.yomu) {
+    jump = unit.yomu.sheets.map((s, i) => [`r-y${i}`, `No.${i + 1}`]);
+    main = readYomu(unit);
+  } else if (!unit.sheets.length) {
+    main = `<p class="rlead" style="margin-top:20px">この単元は印刷して使う資料だけで、問題はありません。</p>`;
+  } else {
+    // 講座は紙で配るので、スマホでは問題だけ。印刷と同じパターン（セット）を選べる
+    const n = unit.sets ? unit.sets.length : PATTERNS.length;
+    if ((state.rpat || 0) >= n) state.rpat = 0;
+    const p = state.rpat || 0;
+    const label = i => unit.sets ? `セット${i + 1}` : `パターン${PATTERNS[i]}`;
+    patSel = `<div class="rpat" role="group" aria-label="${unit.sets ? 'セット' : 'パターン'}をえらぶ">${Array.from({ length: n }, (_, i) => `<button type="button" data-p="${i}" class="${i === p ? 'on' : ''}" aria-pressed="${i === p}">${label(i)}</button>`).join('')}</div><p class="rlead">${unit.sets ? `セット${p + 1}（${esc(unit.sets[p].note)}）` : p === 0 ? 'パターンA：基本の並び' : `パターン${PATTERNS[p]}：問題とア〜エの順番を並べかえたもの`}。プリントと同じパターンを選ぼう。</p>`;
+    sheetsOf(unit, p).forEach((_, si) => { jump.push([`r-q${si}`, `問題${MARU[si]}`]); main += readSheet(unit, si, p); });
+  }
+  const head = `<div class="rsub">${SUBJECTS[unit.subject].name}　${noLabel(unit)}</div><h1>${esc(unit.yomu ? yomuEra(unit) + '（読んで解く）' : unit.title)}</h1>`;
+  const nav = jump.length > 1 ? `<div class="rjump">${jump.map(([id, l]) => `<button type="button" data-to="${id}">${l}</button>`).join('')}</div>` : '';
+  $('#reader').innerHTML = `<article class="rd">${head}${patSel}${nav}${main}<p class="rend">おわり。まちがえた問題は、講座プリントのその部分をもう一度読もう。</p></article>`;
+  // 横に長い年表は、横にスクロールして見る
+  $('#reader').querySelectorAll('.flw, .tlh, .tl').forEach(el => {
+    if (el.closest('.rscroll')) return;
+    const w = document.createElement('div'); w.className = 'rscroll'; el.parentNode.insertBefore(w, el); w.appendChild(el);
+    const n = document.createElement('p'); n.className = 'rscroll-note'; n.textContent = '← 横にスクロールして見よう →'; w.parentNode.insertBefore(n, w);
+  });
+  $('#reader').querySelectorAll('.rjump button').forEach(b => b.onclick = () => { const t = document.getElementById(b.dataset.to); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+  $('#reader').querySelectorAll('.rq .rbtn').forEach(b => b.onclick = () => { const a = b.nextElementSibling; a.hidden = !a.hidden; b.textContent = a.hidden ? '答え' : 'かくす'; b.setAttribute('aria-expanded', String(!a.hidden)); });
+  $('#reader').querySelectorAll('.rall').forEach(b => b.onclick = () => {
+    let el = b.closest('h2').nextElementSibling; const show = b.textContent.includes('見る');
+    while (el && el.tagName !== 'H2') { el.querySelectorAll?.('.rq').forEach(q => setQ(q, show)); if (el.classList?.contains('rq')) setQ(el, show); el = el.nextElementSibling; }
+    b.textContent = show ? '答えをぜんぶかくす' : '答えをぜんぶ見る';
+  });
+  $('#reader').querySelectorAll('.rpat button').forEach(b => b.onclick = () => { state.rpat = +b.dataset.p; const y = window.scrollY; renderRead(); window.scrollTo(0, Math.min(y, document.body.scrollHeight)); });
+  try { history.replaceState(null, '', '#' + state.unit); } catch (e) {}
+}
+function setQ(q, show) { const a = q.querySelector('.rans'), b = q.querySelector('.rbtn'); a.hidden = !show; b.textContent = show ? 'かくす' : '答え'; b.setAttribute('aria-expanded', String(show)); }
+function setView(v) {
+  state.view = v; try { localStorage.setItem('shakai-view', v); } catch (e) {}
+  document.body.classList.toggle('read', v === 'read');
+  if (v === 'read') renderRead(); else { try { history.replaceState(null, '', location.pathname); } catch (e) {} renderAll(); }
+  window.scrollTo(0, 0);
+}
+function renderAll() {
+  if (state.view === 'read') { renderRead(); return; }
+  document.documentElement.style.setProperty('--accent', SUBJECTS[state.subject].color);
+  renderTabs(); renderUnits(); renderBar(); renderSheets();
+}
+window.addEventListener('resize', () => { if (state.view !== 'read') fitZoom(); });
+window.addEventListener('beforeprint', () => { $('#sheets').style.zoom = 1; });
+window.addEventListener('afterprint', () => { if (state.view !== 'read') fitZoom(); });
+$('#toRead').onclick = () => setView('read');
+// 最初の画面：URLの #単元 で開くと、その単元を「読む画面」で表示（生徒に送るリンク用）。スマホはふだんから読む画面。
+(() => {
+  const h = decodeURIComponent(location.hash.slice(1));
+  let v = null; try { v = localStorage.getItem('shakai-view'); } catch (e) {}
+  if (h && UNITS[h]) { state.unit = h; state.subject = UNITS[h].subject; v = 'read'; }
+  if (!v) v = matchMedia('(max-width: 700px)').matches ? 'read' : 'print';
+  state.view = v; document.body.classList.toggle('read', v === 'read');
+})();
+window.addEventListener('hashchange', () => { const h = decodeURIComponent(location.hash.slice(1)); if (h && UNITS[h] && h !== state.unit) { state.unit = h; state.subject = UNITS[h].subject; state.sel = null; setView('read'); } });
+document.fonts && document.fonts.ready.then(() => { if (state.view !== 'read') renderSheets(); });
+renderAll();
+</script>

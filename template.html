@@ -444,7 +444,7 @@ const SUBJECTS = {
     ['近代・現代', [['his13', '欧米の近代化と開国'], ['his14', '明治維新'], ['his15', '日清・日露戦争'], ['his16', '第一次世界大戦と大正時代'], ['his17', '第二次世界大戦'], ['his18', '戦後の日本と現代']]],
     ['まとめ', [['his19', '時代の移り変わり年表', 'まとめ']]],
     ['受験対策', [['his90', '歴史の全範囲 総まとめ', '受験']]],
-    ['中1向け 読んで解くプリント', [['his04y', '飛鳥時代', '読む'], ['his05y', '奈良時代', '読む'], ['his06y', '平安時代', '読む'], ['his07y', '鎌倉時代', '読む']]],
+    ['中1向け 読んで解く宿題（7日分）', [['his04y', '飛鳥時代', '読む'], ['his05y', '奈良時代', '読む'], ['his06y', '平安時代', '読む'], ['his07y', '鎌倉時代', '読む']]],
   ]},
   civ: { name: '公民', color: '#3b6a4c', parts: [
     ['現代社会と私たち', [['civ01', '現代社会の特色'], ['civ02', 'きまりの意義と対立・合意']]],
@@ -642,7 +642,7 @@ const yomuHint = (unit, q) => { const h = unit.yomu.hint; return h === 'all' || 
 const yomuEra = unit => unit.title.replace('（読んで解く）', '');
 function yomuPage(unit, i) {
   const s = unit.yomu.sheets[i];
-  const head = `<div class="yhead"><div class="yt"><small>${SUBJECTS[unit.subject].name}　${yomuEra(unit)}　読んで解くプリント　No.${i + 1}</small>${esc(s.t)}</div><div class="yname">　　月　　日　<span>名前</span></div></div>`;
+  const head = `<div class="yhead"><div class="yt"><small>${SUBJECTS[unit.subject].name}　${yomuEra(unit)}　読んで解く宿題　${i + 1}日目／${unit.yomu.sheets.length}日</small>${esc(s.t)}</div><div class="yname">　　月　　日　<span>名前</span></div></div>`;
   const text = `<div class="ytext">${s.paras.map((p, k) => `<p><span class="pn">${CIRC(k + 1)}</span>${p}</p>`).join('')}</div>`;
   let n = 0;
   const qs = s.qs.map(q => {
@@ -657,7 +657,7 @@ function yomuPage(unit, i) {
     return `${pre}<div class="yq"><span class="qn">${n}</span><span class="yqt">${esc(q.q)}${hint}</span><span class="ab"></span></div>`;
   }).join('');
   const inner = `<div class="ys"><div class="ytop">${head}${text}</div><div class="yfold"><span>✂ ここで折ると上の文がかくれます</span></div><div class="ybot"><div class="yqh">問題　上の文を読んで答えよう</div>${qs}</div></div>`;
-  return pageShell(inner, `${unitLabel(unit)}　No.${i + 1}　${s.t}`);
+  return pageShell(inner, `${unitLabel(unit)}　${i + 1}日目　${s.t}`);
 }
 function yomuAnsItems(unit, i) {
   return unit.yomu.sheets[i].qs.map((q, k) => `<div class="yai"><b class="n">${k + 1}</b><div><span class="yaa">${q.k === 'w' ? '（例）' : ''}${esc(q.a)}</span><span class="yap">→ ${CIRC(q.p)}の段落</span>${q.k === 'w' ? '<span class="yaw">同じような内容が書けていれば正解。</span>' : ''}</div></div>`).join('');
@@ -665,14 +665,14 @@ function yomuAnsItems(unit, i) {
 // 両面印刷で、その枚のうらに来る答え
 function yomuAnsPage(unit, i) {
   const s = unit.yomu.sheets[i];
-  const head = `<div class="lhead"><div class="t"><small>${SUBJECTS[unit.subject].name}　${yomuEra(unit)}　No.${i + 1}　答え</small>${esc(s.t)}</div><div class="p">答え</div></div>`;
+  const head = `<div class="lhead"><div class="t"><small>${SUBJECTS[unit.subject].name}　${yomuEra(unit)}　${i + 1}日目　答え</small>${esc(s.t)}</div><div class="p">答え</div></div>`;
   const how = `<div class="yhow">丸つけのしかた：まちがえた問題は、「→ ①の段落」の所をもう一度読んで、赤で書き直そう。<br>書き直したら、紙を折って上の文をかくし、もう一度答えられるかためそう。</div>`;
-  return pageShell(`${head}<div class="ya">${yomuAnsItems(unit, i)}</div>${how}`, `${unitLabel(unit)}　No.${i + 1}　答え`);
+  return pageShell(`${head}<div class="ya">${yomuAnsItems(unit, i)}</div>${how}`, `${unitLabel(unit)}　${i + 1}日目　答え`);
 }
 // 答えをまとめて最後に
 function yomuAnsPages(unit, idx) {
   const head = `<div class="lhead"><div class="t"><small>${SUBJECTS[unit.subject].name}　${yomuEra(unit)}　読んで解くプリント　答え</small>${yomuEra(unit)}</div><div class="p">答え</div></div>`;
-  const secs = idx.map(i => `<div class="ysec"><h3>No.${i + 1}　${esc(unit.yomu.sheets[i].t)}</h3>${yomuAnsItems(unit, i)}</div>`);
+  const secs = idx.map(i => `<div class="ysec"><h3>${i + 1}日目　${esc(unit.yomu.sheets[i].t)}</h3>${yomuAnsItems(unit, i)}</div>`);
   const tmp = document.createElement('div'); tmp.style.cssText = 'position:absolute;left:-9999px;top:0;zoom:1'; document.body.appendChild(tmp);
   const fits = list => { tmp.innerHTML = pageShell(head + `<div class="ya compact">${list.join('')}</div>`, ''); const pg = tmp.querySelector('.pg'); return pg.scrollHeight <= pg.clientHeight + 1; };
   const pages = []; let cur = [];
@@ -788,8 +788,8 @@ function renderYomuBar(unit) {
   const pk = (key, label) => `<label class="pick"><input type="checkbox" id="pk-${key}" ${state.sel[key] ? 'checked' : ''}>${label}</label>`;
   if (!state.yans) state.yans = 'back';
   $('#bar').innerHTML = `
-    <h1><small>${SUBJECTS[unit.subject].name}　中1向け 読んで解くプリント</small>${yomuEra(unit)}</h1>
-    <div class="ctrl"><span class="ctrl-label">プリント（全${unit.yomu.sheets.length}枚）</span><div class="picks">${unit.yomu.sheets.map((s, i) => pk('Y' + i, `No.${i + 1}`)).join('')}</div></div>
+    <h1><small>${SUBJECTS[unit.subject].name}　中1向け 読んで解く宿題</small>${yomuEra(unit)}</h1>
+    <div class="ctrl"><span class="ctrl-label">宿題（${unit.yomu.sheets.length}日分）</span><div class="picks">${unit.yomu.sheets.map((s, i) => pk('Y' + i, `${i + 1}日目`)).join('')}</div></div>
     <div class="ctrl"><span class="ctrl-label">選び方</span><div class="row-btns">
       <button class="btn" id="b-all">ぜんぶ</button><button class="btn" id="b-none">はずす</button>
       <select class="btn" id="yans" aria-label="答えの入れ方">
@@ -808,7 +808,7 @@ function renderYomuBar(unit) {
 }
 function yomuOut(unit) {
   const out = [], idx = unit.yomu.sheets.map((_, i) => i).filter(i => state.sel['Y' + i]);
-  idx.forEach(i => { out.push(['No.' + (i + 1), yomuPage(unit, i)]); if (state.yans === 'back') out.push(['No.' + (i + 1) + ' 答え（うら）', yomuAnsPage(unit, i)]); });
+  idx.forEach(i => { out.push([(i + 1) + '日目', yomuPage(unit, i)]); if (state.yans === 'back') out.push([(i + 1) + '日目 答え（うら）', yomuAnsPage(unit, i)]); });
   if (state.yans === 'end' && idx.length) yomuAnsPages(unit, idx).forEach((p, k, a) => out.push(['答え' + (a.length > 1 ? k + 1 : ''), p]));
   return out;
 }
@@ -884,7 +884,7 @@ function readYomu(unit) {
       const pre = q.k === 'h' ? `<div class="rhide">最後の問題は、プリントの文を見ないで答えよう。</div>` : '';
       return pre + rQ(k + 1, text + hint, `<b>${q.k === 'w' ? '（例）' : ''}${esc(q.a)}</b><span class="rsrc">→ ${CIRC(q.p)}の段落</span>`);
     }).join('');
-    return `<h2 id="r-y${i}"><span>No.${i + 1}　${esc(s.t)}</span><small><button class="rall" type="button">答えをぜんぶ見る</button></small></h2>${qs}`;
+    return `<h2 id="r-y${i}"><span>${i + 1}日目　${esc(s.t)}</span><small><button class="rall" type="button">答えをぜんぶ見る</button></small></h2>${qs}`;
   }).join('');
 }
 function renderRead() {
@@ -895,7 +895,7 @@ function renderRead() {
   $('#toPrint').onclick = () => setView('print');
   let jump = [], main = '', patSel = '';
   if (unit.yomu) {
-    jump = unit.yomu.sheets.map((s, i) => [`r-y${i}`, `No.${i + 1}`]);
+    jump = unit.yomu.sheets.map((s, i) => [`r-y${i}`, `${i + 1}日目`]);
     main = readYomu(unit);
   } else if (!unit.sheets.length) {
     main = `<p class="rlead" style="margin-top:20px">この単元は印刷して使う資料だけで、問題はありません。</p>`;
@@ -908,7 +908,7 @@ function renderRead() {
     patSel = `<div class="rpat" role="group" aria-label="${unit.sets ? 'セット' : 'パターン'}をえらぶ">${Array.from({ length: n }, (_, i) => `<button type="button" data-p="${i}" class="${i === p ? 'on' : ''}" aria-pressed="${i === p}">${label(i)}</button>`).join('')}</div><p class="rlead">${unit.sets ? `セット${p + 1}（${esc(unit.sets[p].note)}）` : p === 0 ? 'パターンA：基本の並び' : `パターン${PATTERNS[p]}：問題とア〜エの順番を並べかえたもの`}。プリントと同じパターンを選ぼう。</p>`;
     sheetsOf(unit, p).forEach((_, si) => { jump.push([`r-q${si}`, `問題${MARU[si]}`]); main += readSheet(unit, si, p); });
   }
-  const head = `<div class="rsub">${SUBJECTS[unit.subject].name}　${noLabel(unit)}</div><h1>${esc(unit.yomu ? yomuEra(unit) + '（読んで解く）' : unit.title)}</h1>`;
+  const head = `<div class="rsub">${SUBJECTS[unit.subject].name}　${noLabel(unit)}</div><h1>${esc(unit.yomu ? yomuEra(unit) + '（読んで解く宿題）' : unit.title)}</h1>`;
   const nav = jump.length > 1 ? `<div class="rjump">${jump.map(([id, l]) => `<button type="button" data-to="${id}">${l}</button>`).join('')}</div>` : '';
   $('#reader').innerHTML = `<article class="rd">${head}${patSel}${nav}${main}<p class="rend">おわり。まちがえた問題は、講座プリントのその部分をもう一度読もう。</p></article>`;
   // 横に長い年表は、横にスクロールして見る

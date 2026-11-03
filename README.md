@@ -25,6 +25,7 @@
 | `flows/` | 歴史各講の「この講の流れ」年表データ |
 | `fonts/` | BIZ UDPゴシック等（SIL Open Font License） |
 | `tools/yomu_data.py` → `tools/gen_yomu.py` | 「読んで解く」の本文と問題 → `units/hisNNy.js` を作る |
+| `tools/yomu_gloss.py` | 「読んで解く」のむずかしい言葉の説明。各プリントで最初に出た所に「唐（中国の国の名前）」のようにカッコで入れる（中国・朝鮮の国名は自動） |
 | `tools/gen_exam.js`, `tools/run_exam.py` | 受験用総まとめ（geo90/his90）を作る。最後に `add_ex.py` で解説をつける |
 | `tools/ex_final.json`, `tools/exfix/`, `tools/merge_ex.py` | 総まとめの解説（自動抽出＋手直し） |
 | `tools/*check*.py`, `tools/readtest*.py` | 印刷のはみ出し・答えの一致・スマホ表示の確認用 |

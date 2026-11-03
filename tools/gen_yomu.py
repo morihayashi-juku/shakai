@@ -1,7 +1,7 @@
 import json, re, html, sys
 sys.path.insert(0,'tmp')
 from yomu_data import UNITS
-from yomu_gloss import G, COUNTRY, SKIPC
+from yomu_gloss import G, COUNTRY, PLACES
 GL_L, GL_R = '\u2063(', ')\u2063'   # 説明のしるし（あとで <span class="gl"> にする）
 def inside(pp, i):
     return pp[:i].count(GL_L) > pp[:i].count(GL_R)
@@ -17,15 +17,22 @@ def gloss(uid, si, paras):
             if j<len(pp) and pp[j]=='《': j=pp.index('》',j)+1
             paras[k]=pp[:j]+GL_L+m+GL_R+pp[j:]; break
         else: raise SystemExit(f'not found {uid} {si} {t}')
-    skip=SKIPC.get((uid,si),set())
+    # 国の名前：毎回（各プリントの最初）説明する。「中国の宋」のように前に書いてあるときは「国の名前」だけ
     for name,m in COUNTRY.items():
-        if name in skip: continue
         pat=re.compile(r'(?<![遣])'+name+r'(?![招風銭寇号年軍])(《[^》]*》)?')
         for k,pp in enumerate(paras):
-            mo=next((m for m in pat.finditer(pp) if not inside(pp, m.start())), None)
+            mo=next((x for x in pat.finditer(pp) if not inside(pp, x.start())), None)
             if mo:
-                if pp[max(0,mo.start()-5):mo.start()].endswith(('中国の','朝鮮半島の')): break
-                if pp[mo.end():mo.end()+1]==GL_L[0]: break
+                if pp[mo.end():mo.end()+1] in (GL_L[0], '（'): break
+                mm='国の名前' if pp[max(0,mo.start()-5):mo.start()].endswith(('中国の','朝鮮半島の')) else m
+                paras[k]=pp[:mo.end()]+GL_L+mm+GL_R+pp[mo.end():]; break
+    # 地名・地域名：毎回（各プリントの最初）説明する
+    for name,m,nf in PLACES:
+        pat=re.compile(re.escape(name)+(r'(?![%s])' % nf if nf else '')+r'(《[^》]*》)?')
+        for k,pp in enumerate(paras):
+            mo=next((x for x in pat.finditer(pp) if not inside(pp, x.start())), None)
+            if mo:
+                if pp[mo.end():mo.end()+1] in (GL_L[0], '（'): break
                 paras[k]=pp[:mo.end()]+GL_L+m+GL_R+pp[mo.end():]; break
     return paras
 def ruby(t):

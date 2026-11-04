@@ -5,7 +5,7 @@ with sync_playwright() as p:
     b=p.chromium.launch(); pg=b.new_page(viewport={'width':1440,'height':1000})
     errs=[]; pg.on('pageerror',lambda e: errs.append(str(e)))
     pg.goto('file:///home/claude/shakai/out/中学社会プリント.html'); pg.wait_for_timeout(1200)
-    pg.click('#tab-his'); pg.wait_for_timeout(300)
+    pg.click('#mode-kouza'); pg.wait_for_timeout(300); pg.click('#tab-his'); pg.wait_for_timeout(300)
     for u in units:
         pg.click('#u-'+u); pg.wait_for_timeout(500)
         r=pg.evaluate("""(()=>{const pages=[...document.querySelectorAll('#sheets .page')];

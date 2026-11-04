@@ -58,7 +58,7 @@ for fname, label, title, ids in FILES:
     used={k:v for k,v in allfigs.items() if re.search(r"['\"]"+re.escape(k)+r"['\"]", units)}
     other={i:l for i,l in built.items() if l!=label}
     t=open('template.html',encoding='utf-8').read()
-    t=t.replace('/*__TITLE__*/',title).replace('/*__FILELABEL__*/','講座を読んで、問題をたくさん解いて覚える')
+    t=t.replace('/*__TITLE__*/',title).replace('/*__FILELABEL__*/','宿題プリントと、講座・問題')
     t=t.replace('/*__FIGS__*/','const FIGS='+json.dumps(used,ensure_ascii=False)+';').replace('/*__UNITS__*/',units).replace('/*__OTHER__*/',json.dumps(other,ensure_ascii=False))
     chars=set(t)|set(chr(c) for c in range(0x20,0x7f))|set(chr(c) for c in range(0x3000,0x3100))|set(chr(c) for c in range(0xff01,0xff5f))|set('①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳°〜→←⇔＞・…')
     text=''.join(sorted(c for c in chars if ord(c)>=0x20))

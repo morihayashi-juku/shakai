@@ -27,7 +27,13 @@ body { font-family: var(--font); color: var(--ink); background: var(--desk); fon
 .shelf { background: var(--shelf); border-right: 1px solid var(--rule); overflow-y: auto; padding: 20px 16px 40px; position: sticky; top: 0; height: 100vh; height: 100dvh; }
 .brand { font-size: 18px; font-weight: 700; line-height: 1.35; margin: 0 0 4px; letter-spacing: .02em; }
 .brand small { display: block; font-size: 12px; font-weight: 400; color: var(--mute); margin-top: 4px; }
-.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 18px 0 14px; }
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 10px 0 14px; }
+.modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 18px 0 0; }
+.mode-tab { font: inherit; font-weight: 700; font-size: 13px; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); padding: 11px 0; border-radius: 6px; cursor: pointer; }
+.mode-tab[aria-selected="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+.mode-tab:focus-visible { outline: 3px solid #f0b429; outline-offset: 2px; }
+.tabs[hidden] { display: none; }
+.hw-empty { color: var(--mute); line-height: 1.7; margin: 18px 4px; }
 .tab { font: inherit; font-weight: 700; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); padding: 8px 0; border-radius: 6px; cursor: pointer; }
 .tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
 .tab:focus-visible, .btn:focus-visible, .unit:focus-visible { outline: 3px solid #f0b429; outline-offset: 2px; }
@@ -412,6 +418,7 @@ body.read { background: var(--paper); }
   <nav class="shelf" aria-label="単元">
     <p class="brand">中学社会<br>解いて覚えるプリント<small>/*__FILELABEL__*/</small></p>
     <button class="btn tomode" id="toRead">スマホで読む画面にする</button>
+    <div class="modes" role="tablist" id="modes"></div>
     <div class="tabs" role="tablist" id="tabs"></div>
     <div id="unitList"></div>
   </nav>
@@ -444,7 +451,6 @@ const SUBJECTS = {
     ['近代・現代', [['his13', '欧米の近代化と開国'], ['his14', '明治維新'], ['his15', '日清・日露戦争'], ['his16', '第一次世界大戦と大正時代'], ['his17', '第二次世界大戦'], ['his18', '戦後の日本と現代']]],
     ['まとめ', [['his19', '時代の移り変わり年表', 'まとめ']]],
     ['受験対策', [['his90', '歴史の全範囲 総まとめ', '受験']]],
-    ['中1向け 読んで解く宿題（7日分）', [['his04y', '飛鳥時代', '読む'], ['his05y', '奈良時代', '読む'], ['his06y', '平安時代', '読む'], ['his07y', '鎌倉時代', '読む']]],
   ]},
   civ: { name: '公民', color: '#3b6a4c', parts: [
     ['現代社会と私たち', [['civ01', '現代社会の特色'], ['civ02', 'きまりの意義と対立・合意']]],
@@ -454,15 +460,33 @@ const SUBJECTS = {
     ['国際社会', [['civ12', '国際社会と国際連合'], ['civ13', '地球規模の課題']]],
   ]},
 };
+// 宿題プリント（サイトの最初に出す）。新しい宿題は、ここの parts に足すと一覧に出る。
+const HOMEWORK = {
+  hw1: { name: '中1の宿題', parts: [['歴史', [['his04y', '飛鳥時代'], ['his05y', '奈良時代'], ['his06y', '平安時代'], ['his07y', '鎌倉時代']]]] },
+  hw2: { name: '中2の宿題', parts: [] },
+};
+const hwUnits = m => HOMEWORK[m].parts.flatMap(([, us]) => us.map(u => u[0])).filter(id => UNITS[id]);
+const modeOf = id => Object.keys(HOMEWORK).find(m => HOMEWORK[m].parts.some(([, us]) => us.some(u => u[0] === id))) || 'kouza';
 const MARU = '①②③④⑤⑥⑦⑧⑨⑩';
 const KANA = ['ア', 'イ', 'ウ', 'エ', 'オ'];
 const PATTERNS = ['A', 'B', 'C', 'D'];
 
-const state = { subject: 'geo', unit: 'geo01', pattern: 0, sel: null };
-state.unit = Object.keys(UNITS)[0];
-try { const s = JSON.parse(localStorage.getItem('shakai-print') || '{}'); if (s.unit && UNITS[s.unit]) { state.unit = s.unit; state.subject = UNITS[s.unit].subject; } } catch (e) {}
+const state = { mode: 'hw1', subject: 'his', unit: hwUnits('hw1')[0] || Object.keys(UNITS)[0], pattern: 0, sel: null, last: {} };
+// 前回の場所にもどす（宿題中心の画面にする前の記録は使わず、最初は宿題を出す）
+try { const s = JSON.parse(localStorage.getItem('shakai-print') || '{}'); if (s.mode && (s.mode === 'kouza' || HOMEWORK[s.mode])) { state.mode = s.mode; if (s.subject && SUBJECTS[s.subject]) state.subject = s.subject; if (s.last) state.last = s.last; if (s.unit && UNITS[s.unit]) state.unit = s.unit; } } catch (e) {}
 if (UNITS[state.unit]) state.subject = UNITS[state.unit].subject;
-function save() { try { localStorage.setItem('shakai-print', JSON.stringify({ subject: state.subject, unit: state.unit })); } catch (e) {} }
+function save() { state.last[state.mode] = state.unit; try { localStorage.setItem('shakai-print', JSON.stringify({ mode: state.mode, subject: state.subject, unit: state.unit, last: state.last })); } catch (e) {} }
+// 単元を開く（読む画面・リンクからも使う）
+function openUnit(id) { state.unit = id; state.subject = UNITS[id].subject; state.mode = modeOf(id); state.sel = null; }
+// 今の画面（宿題／講座と問題）に出ている単元か
+function inView(id) { const u = UNITS[id]; if (!u || modeOf(id) !== state.mode) return false; return state.mode !== 'kouza' || u.subject === state.subject; }
+function setMode(m) {
+  state.mode = m; state.sel = null;
+  const list = m === 'kouza' ? Object.keys(UNITS).filter(id => modeOf(id) === 'kouza') : hwUnits(m);
+  const id = list.includes(state.last[m]) ? state.last[m] : list[0];
+  if (id) { state.unit = id; state.subject = UNITS[id].subject; }
+  save(); renderAll();
+}
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -737,17 +761,30 @@ function answerPages(unit, sheetIdx, pattern, host) {
 
 // ---------- 画面 ----------
 function renderTabs() {
-  $('#tabs').innerHTML = Object.entries(SUBJECTS).map(([k, s]) => `<button class="tab" role="tab" id="tab-${k}" aria-selected="${state.subject === k}" style="--accent:${s.color}">${s.name}</button>`).join('');
-  $('#tabs').querySelectorAll('.tab').forEach(b => b.onclick = () => { state.subject = b.id.slice(4); save(); renderAll(); });
+  const modes = [...Object.entries(HOMEWORK).map(([k, h]) => [k, h.name]), ['kouza', '講座と問題']];
+  $('#modes').innerHTML = modes.map(([k, nm]) => `<button class="mode-tab" role="tab" id="mode-${k}" aria-selected="${state.mode === k}">${nm}</button>`).join('');
+  $('#modes').querySelectorAll('.mode-tab').forEach(b => b.onclick = () => setMode(b.id.slice(5)));
+  const tabs = $('#tabs'); tabs.hidden = state.mode !== 'kouza';
+  tabs.innerHTML = state.mode !== 'kouza' ? '' : Object.entries(SUBJECTS).map(([k, s]) => `<button class="tab" role="tab" id="tab-${k}" aria-selected="${state.subject === k}" style="--accent:${s.color}">${s.name}</button>`).join('');
+  tabs.querySelectorAll('.tab').forEach(b => b.onclick = () => { state.subject = b.id.slice(4); save(); renderAll(); });
 }
 function renderUnits() {
+  const pick = () => $('#unitList').querySelectorAll('.unit.ready').forEach(b => b.onclick = () => { state.unit = b.id.slice(2); state.sel = null; save(); renderAll(); });
+  if (state.mode !== 'kouza') {
+    const h = HOMEWORK[state.mode];
+    $('#unitList').innerHTML = hwUnits(state.mode).length ? h.parts.map(([part, us]) => `<div class="part">${part}</div>` + us.filter(u => UNITS[u[0]]).map(([id, nm]) => {
+      const days = UNITS[id].yomu ? UNITS[id].yomu.sheets.length + '日分' : '';
+      return `<button class="unit ready" id="u-${id}" aria-current="${state.unit === id}"><span class="nm">${nm}</span><span class="st">${days}</span></button>`;
+    }).join('')).join('') : `<p class="hw-empty">${h.name}は、これから作ります。</p>`;
+    pick(); return;
+  }
   const s = SUBJECTS[state.subject];
   let no = 0;
   $('#unitList').innerHTML = s.parts.map(([part, units]) => `<div class="part">${part}</div>` + units.map(([id, nm, tag]) => {
     if (!tag) no++; const ready = !!UNITS[id]; const other = OTHER_FILES[id];
     return `<button class="unit ${ready ? 'ready' : ''}" id="u-${id}" ${ready ? '' : 'disabled'} aria-current="${state.unit === id}"><span class="no">${tag || `第${no}講`}</span><span class="nm">${nm}</span><span class="st">${ready ? '印刷できる' : other ? '「' + other + '」に' : '準備中'}</span></button>`;
   }).join('')).join('');
-  $('#unitList').querySelectorAll('.unit.ready').forEach(b => b.onclick = () => { state.unit = b.id.slice(2); state.sel = null; save(); renderAll(); });
+  pick();
 }
 function defaultSel(unit) {
   const sel = {};
@@ -758,8 +795,8 @@ function defaultSel(unit) {
 }
 function renderBar() {
   const unit = UNITS[state.unit];
-  if (!unit || unit.subject !== state.subject) {
-    $('#bar').innerHTML = `<h1><small>${SUBJECTS[state.subject].name}</small>単元を選んでください</h1>`;
+  if (!inView(state.unit)) {
+    $('#bar').innerHTML = state.mode === 'kouza' ? `<h1><small>${SUBJECTS[state.subject].name}</small>単元を選んでください</h1>` : `<h1><small>${HOMEWORK[state.mode].name}</small>準備中です</h1>`;
     return;
   }
   if (!state.sel) state.sel = defaultSel(unit);
@@ -788,7 +825,7 @@ function renderYomuBar(unit) {
   const pk = (key, label) => `<label class="pick"><input type="checkbox" id="pk-${key}" ${state.sel[key] ? 'checked' : ''}>${label}</label>`;
   if (!state.yans) state.yans = 'back';
   $('#bar').innerHTML = `
-    <h1><small>${SUBJECTS[unit.subject].name}　中1向け 読んで解く宿題</small>${yomuEra(unit)}</h1>
+    <h1><small>${HOMEWORK[modeOf(state.unit)] ? HOMEWORK[modeOf(state.unit)].name + '　' : ''}${SUBJECTS[unit.subject].name}　読んで解く</small>${yomuEra(unit)}</h1>
     <div class="ctrl"><span class="ctrl-label">宿題（${unit.yomu.sheets.length}日分）</span><div class="picks">${unit.yomu.sheets.map((s, i) => pk('Y' + i, `${i + 1}日目`)).join('')}</div></div>
     <div class="ctrl"><span class="ctrl-label">選び方</span><div class="row-btns">
       <button class="btn" id="b-all">ぜんぶ</button><button class="btn" id="b-none">はずす</button>
@@ -815,7 +852,7 @@ function yomuOut(unit) {
 function renderSheets() {
   const unit = UNITS[state.unit];
   const host = $('#sheets');
-  if (!unit || unit.subject !== state.subject) { host.innerHTML = `<p class="empty">左の一覧から「印刷できる」単元を選ぶと、ここにA4のプリントが並びます。</p>`; return; }
+  if (!inView(state.unit)) { host.innerHTML = `<p class="empty">${state.mode === 'kouza' ? '左の一覧から「印刷できる」単元を選ぶと、ここにA4のプリントが並びます。' : HOMEWORK[state.mode].name + 'ができたら、左の一覧に出て、ここにA4のプリントが並びます。'}</p>`; return; }
   const out = unit.yomu ? yomuOut(unit) : [];
   if (!unit.yomu) unit.lecture.forEach((_, i) => { if (state.sel['L' + i]) out.push(['講座' + (i + 1), lecturePage(unit, i)]); });
   if (state.pattern >= (unit.sets ? unit.sets.length : PATTERNS.length)) state.pattern = 0;
@@ -847,7 +884,11 @@ function fitZoom() {
 
 // ---------- スマホで読む（生徒用） ----------
 function allUnitOptions() {
-  return Object.entries(SUBJECTS).map(([sk, sb]) => { let no = 0; return sb.parts.map(([part, units]) => {
+  const hw = Object.values(HOMEWORK).map(h => h.parts.map(([part, us]) => {
+    const ops = us.filter(u => UNITS[u[0]]).map(([id, nm]) => `<option value="${id}" ${state.unit === id ? 'selected' : ''}>${esc(nm)}</option>`).join('');
+    return ops ? `<optgroup label="${h.name}｜${esc(part)}">${ops}</optgroup>` : '';
+  }).join('')).join('');
+  return hw + Object.entries(SUBJECTS).map(([sk, sb]) => { let no = 0; return sb.parts.map(([part, units]) => {
     const ops = units.map(([id, nm, tag]) => { if (!tag) no++; return UNITS[id] && (UNITS[id].sheets.length || UNITS[id].yomu) ? `<option value="${id}" ${state.unit === id ? 'selected' : ''}>${tag ? tag : '第' + no + '講'}　${esc(nm)}</option>` : ''; }).join('');
     return ops ? `<optgroup label="${sb.name}｜${esc(part)}">${ops}</optgroup>` : '';
   }).join(''); }).join('');
@@ -891,7 +932,7 @@ function renderRead() {
   const unit = UNITS[state.unit];
   document.documentElement.style.setProperty('--accent', SUBJECTS[unit.subject].color);
   $('#rhead').innerHTML = `<select id="rsel" aria-label="単元をえらぶ">${allUnitOptions()}</select><button class="btn" id="toPrint" type="button">印刷用</button>`;
-  $('#rsel').onchange = e => { state.unit = e.target.value; state.subject = UNITS[state.unit].subject; state.sel = null; state.rpat = 0; save(); renderRead(); window.scrollTo(0, 0); };
+  $('#rsel').onchange = e => { openUnit(e.target.value); state.rpat = 0; save(); renderRead(); window.scrollTo(0, 0); };
   $('#toPrint').onclick = () => setView('print');
   let jump = [], main = '', patSel = '';
   if (unit.yomu) {
@@ -947,11 +988,11 @@ $('#toRead').onclick = () => setView('read');
 (() => {
   const h = decodeURIComponent(location.hash.slice(1));
   let v = null; try { v = localStorage.getItem('shakai-view'); } catch (e) {}
-  if (h && UNITS[h]) { state.unit = h; state.subject = UNITS[h].subject; v = 'read'; }
+  if (h && UNITS[h]) { openUnit(h); v = 'read'; }
   if (!v) v = matchMedia('(max-width: 700px)').matches ? 'read' : 'print';
   state.view = v; document.body.classList.toggle('read', v === 'read');
 })();
-window.addEventListener('hashchange', () => { const h = decodeURIComponent(location.hash.slice(1)); if (h && UNITS[h] && h !== state.unit) { state.unit = h; state.subject = UNITS[h].subject; state.sel = null; setView('read'); } });
+window.addEventListener('hashchange', () => { const h = decodeURIComponent(location.hash.slice(1)); if (h && UNITS[h] && h !== state.unit) { openUnit(h); setView('read'); } });
 document.fonts && document.fonts.ready.then(() => { if (state.view !== 'read') renderSheets(); });
 renderAll();
 </script>

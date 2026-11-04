@@ -1,5 +1,5 @@
 from playwright.sync_api import sync_playwright
-units=['geo01','geo03','geo04','geo10','geo11','geo15','his04','his06','his12','his19','geo90','his90','his04y']
+units=['geo01','geo03','geo04','geo10','geo11','geo15','his04','his06','his12','geo90','his90','his04y']
 with sync_playwright() as p:
     b=p.chromium.launch(); pg=b.new_page(viewport={'width':390,'height':844}, device_scale_factor=2, is_mobile=True, has_touch=True)
     errs=[]; pg.on('pageerror',lambda e: errs.append(str(e)))

@@ -3,7 +3,7 @@ with sync_playwright() as p:
     b=p.chromium.launch(); pg=b.new_page(viewport={'width':1500,'height':1000})
     errs=[]; pg.on('pageerror',lambda e: errs.append(str(e)))
     pg.goto('file:///home/claude/shakai/out/中学社会プリント.html'); pg.wait_for_timeout(1200)
-    pg.click('#tab-his'); pg.wait_for_timeout(300); pg.click('#u-his19'); pg.wait_for_timeout(800)
+    pg.click('#mode-kouza'); pg.wait_for_timeout(300); pg.click('#tab-his'); pg.wait_for_timeout(300); pg.click('#u-his19'); pg.wait_for_timeout(800)
     print('pages', pg.evaluate("document.querySelectorAll('#sheets .page').length"), pg.inner_text('#count'))
     print(pg.evaluate("[...document.querySelectorAll('.tl')].map(t=>[...t.querySelectorAll('.why')].map(e=>(e.scrollWidth-e.clientWidth)).join(',')).join(' | ')"))
     print(pg.evaluate("[...document.querySelectorAll('#sheets .page')].map(p=>{const i=p.querySelector('.pgi');const g=p.querySelector('.pg');return (i.style.zoom?'Z'+i.style.zoom:'')+((g.clientHeight-i.scrollHeight)/3.78).toFixed(1)}).join(' ')"))

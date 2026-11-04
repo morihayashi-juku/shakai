@@ -4,7 +4,7 @@ with sync_playwright() as p:
     b=p.chromium.launch(); pg=b.new_page(viewport={'width':1440,'height':1000})
     errs=[]; pg.on('pageerror',lambda e: errs.append(str(e)))
     pg.goto('file:///home/claude/shakai/out/中学社会プリント.html'); pg.wait_for_timeout(1500)
-    pg.click('#tab-his'); pg.wait_for_timeout(300)
+    
     for uid in ['his07y']:
         pg.click('#u-'+uid); pg.wait_for_timeout(800)
         r=pg.evaluate("""()=>[...document.querySelectorAll('#sheets .ys')].map(y=>{const t=y.querySelector('.ytext'),b=y.querySelector('.ybot');

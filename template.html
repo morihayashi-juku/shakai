@@ -27,7 +27,7 @@ body { font-family: var(--font); color: var(--ink); background: var(--desk); fon
 .shelf { background: var(--shelf); border-right: 1px solid var(--rule); overflow-y: auto; padding: 20px 16px 40px; position: sticky; top: 0; height: 100vh; height: 100dvh; }
 .brand { font-size: 18px; font-weight: 700; line-height: 1.35; margin: 0 0 4px; letter-spacing: .02em; }
 .brand small { display: block; font-size: 12px; font-weight: 400; color: var(--mute); margin-top: 4px; }
-.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 18px 0 14px; }
+.tabs { display: grid; grid-template-columns: repeat(4, auto); justify-content: stretch; gap: 4px; margin: 18px 0 14px; }
 .tab { font: inherit; font-weight: 700; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); padding: 8px 0; border-radius: 6px; cursor: pointer; }
 .tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
 .tab:focus-visible, .btn:focus-visible, .unit:focus-visible { outline: 3px solid #f0b429; outline-offset: 2px; }
@@ -266,32 +266,32 @@ rt:empty { display: none; }
 /* 読んで解くプリント（上半分：本文、下半分：問題。真ん中で折ると本文がかくれる） */
 .ys { position: relative; height: 276mm; }
 .ys .ytop { position: absolute; left: 0; right: 0; top: 0; height: 132mm; display: flex; flex-direction: column; gap: 2.4mm; overflow: hidden; }
-:is(.ys, .y2) .yhead { display: flex; align-items: flex-end; justify-content: space-between; border-bottom: 1.6pt solid #111; padding-bottom: 1.2mm; }
-:is(.ys, .y2) .yt { font-size: 15pt; font-weight: 700; line-height: 1.2; letter-spacing: .03em; }
-:is(.ys, .y2) .yt small { display: block; font-size: 8.5pt; letter-spacing: .08em; margin-bottom: .8mm; }
-:is(.ys, .y2) .yname { font-size: 9pt; display: flex; gap: 2mm; align-items: flex-end; white-space: pre; }
-:is(.ys, .y2) .yname span { display: inline-block; width: 42mm; border-bottom: .6pt solid #111; font-size: 8pt; color: #555; }
+:is(.ys, .y2, .jg) .yhead { display: flex; align-items: flex-end; justify-content: space-between; border-bottom: 1.6pt solid #111; padding-bottom: 1.2mm; }
+:is(.ys, .y2, .jg) .yt { font-size: 15pt; font-weight: 700; line-height: 1.2; letter-spacing: .03em; }
+:is(.ys, .y2, .jg) .yt small { display: block; font-size: 8.5pt; letter-spacing: .08em; margin-bottom: .8mm; }
+:is(.ys, .y2, .jg) .yname { font-size: 9pt; display: flex; gap: 2mm; align-items: flex-end; white-space: pre; }
+:is(.ys, .y2, .jg) .yname span { display: inline-block; width: 42mm; border-bottom: .6pt solid #111; font-size: 8pt; color: #555; }
 .ys .ytext { flex: 1; overflow: hidden; font-size: 14pt; line-height: 2.05; display: flex; flex-direction: column; gap: 1.2mm; text-align: justify; }
-:is(.ys, .y2) .ytext p { margin: 0; text-indent: 0; }
-:is(.ys, .y2) .ytext .gl, .rd .gl { font-size: .86em; color: #3d4a52; }
-:is(.ys, .y2) .ytext .pn { font-family: var(--font-num); font-weight: 700; margin-right: 1.2mm; }
-:is(.ys, .y2) .ytext ruby rt { font-size: 48%; }
+:is(.ys, .y2, .jg) .ytext p { margin: 0; text-indent: 0; }
+:is(.ys, .y2, .jg) .ytext .gl, .rd .gl { font-size: .86em; color: #3d4a52; }
+:is(.ys, .y2, .jg) .ytext .pn { font-family: var(--font-num); font-weight: 700; margin-right: 1.2mm; }
+:is(.ys, .y2, .jg) .ytext ruby rt { font-size: 48%; }
 .ys .yfold { position: absolute; left: -13mm; right: -13mm; top: 134mm; height: 7mm; display: flex; align-items: center; }
 .ys .yfold::before, .ys .yfold::after { content: ''; flex: 1; border-top: .8pt dashed #777; }
 .ys .yfold span { font-size: 7.5pt; color: #555; padding: 0 3mm; white-space: nowrap; }
 .ys .ybot { position: absolute; left: 0; right: 0; top: 143mm; bottom: 0; display: flex; flex-direction: column; gap: 1.3mm; overflow: hidden; font-size: 10.5pt; }
-:is(.ys, .y2) .yqh { font-size: 10pt; font-weight: 700; border-left: 2.2mm solid #111; padding-left: 2mm; margin-bottom: .6mm; }
-:is(.ys, .y2) .yq { display: flex; align-items: center; gap: 2mm; min-height: 11mm; border-bottom: .5pt solid #c8c8c8; padding: .8mm 0; line-height: 1.6; }
-:is(.ys, .y2) .yq .qn { font-family: var(--font-num); font-weight: 700; flex: 0 0 6mm; text-align: right; }
-:is(.ys, .y2) .yq .yqt { flex: 1; }
-:is(.ys, .y2) .yq .ab { flex: 0 0 48mm; height: 9mm; }
-:is(.ys, .y2) .yq.fill .yqt { line-height: 2.1; }
-:is(.ys, .y2) .yb { display: inline-block; height: 7.2mm; vertical-align: middle; border: 1pt solid #111; border-radius: 1mm; background: #fff; margin: 0 1mm; }
-:is(.ys, .y2) .yh { display: inline-block; font-size: 7.5pt; color: #444; border: .6pt solid #777; border-radius: 3mm; padding: 0 1.6mm; margin-left: 1.5mm; line-height: 1.5; vertical-align: .2mm; white-space: nowrap; }
-:is(.ys, .y2) .yq.wr { flex-wrap: wrap; }
-:is(.ys, .y2) .yq.wr .yqt::before { content: '書こう'; font-size: 7.5pt; font-weight: 700; color: #fff; background: #111; border-radius: 1mm; padding: .2mm 1.4mm; margin-right: 1.6mm; vertical-align: .3mm; }
-:is(.ys, .y2) .yq.wr .lines { flex: 0 0 calc(100% - 8mm); margin-left: 8mm; height: 17mm; background: repeating-linear-gradient(#fff 0 7.6mm, #999 7.6mm 8.1mm); border: 1pt solid #111; border-radius: 1mm; }
-:is(.ys, .y2) .yhide { margin-top: 1.2mm; font-size: 8.5pt; font-weight: 700; background: #eee; border-radius: 1mm; padding: .9mm 2.4mm; }
+:is(.ys, .y2, .jg) .yqh { font-size: 10pt; font-weight: 700; border-left: 2.2mm solid #111; padding-left: 2mm; margin-bottom: .6mm; }
+:is(.ys, .y2, .jg) .yq { display: flex; align-items: center; gap: 2mm; min-height: 11mm; border-bottom: .5pt solid #c8c8c8; padding: .8mm 0; line-height: 1.6; }
+:is(.ys, .y2, .jg) .yq .qn { font-family: var(--font-num); font-weight: 700; flex: 0 0 6mm; text-align: right; }
+:is(.ys, .y2, .jg) .yq .yqt { flex: 1; }
+:is(.ys, .y2, .jg) .yq .ab { flex: 0 0 48mm; height: 9mm; }
+:is(.ys, .y2, .jg) .yq.fill .yqt { line-height: 2.1; }
+:is(.ys, .y2, .jg) .yb { display: inline-block; height: 7.2mm; vertical-align: middle; border: 1pt solid #111; border-radius: 1mm; background: #fff; margin: 0 1mm; }
+:is(.ys, .y2, .jg) .yh { display: inline-block; font-size: 7.5pt; color: #444; border: .6pt solid #777; border-radius: 3mm; padding: 0 1.6mm; margin-left: 1.5mm; line-height: 1.5; vertical-align: .2mm; white-space: nowrap; }
+:is(.ys, .y2, .jg) .yq.wr { flex-wrap: wrap; }
+:is(.ys, .y2, .jg) .yq.wr .yqt::before { content: '書こう'; font-size: 7.5pt; font-weight: 700; color: #fff; background: #111; border-radius: 1mm; padding: .2mm 1.4mm; margin-right: 1.6mm; vertical-align: .3mm; }
+:is(.ys, .y2, .jg) .yq.wr .lines { flex: 0 0 calc(100% - 8mm); margin-left: 8mm; height: 17mm; background: repeating-linear-gradient(#fff 0 7.6mm, #999 7.6mm 8.1mm); border: 1pt solid #111; border-radius: 1mm; }
+:is(.ys, .y2, .jg) .yhide { margin-top: 1.2mm; font-size: 8.5pt; font-weight: 700; background: #eee; border-radius: 1mm; padding: .9mm 2.4mm; }
 /* 中2向け 読んで解く（A4両面：表＝本文→問題、うら＝続きの本文→問題→まとめ） */
 .y2 { height: 276mm; display: flex; flex-direction: column; gap: 3mm; }
 .y2 .ytext { font-size: 12.5pt; line-height: 1.95; display: flex; flex-direction: column; gap: 2mm; text-align: justify; }
@@ -305,6 +305,50 @@ rt:empty { display: none; }
 .y2 .ylast .yqh { border: 0; padding: 0; }
 .y2 .ylast .note { font-size: 8.5pt; color: #333; }
 .y2 .yspacer { flex: 1; }
+.jg { height: 276mm; display: flex; flex-direction: column; gap: 2.4mm; font-size: 10.5pt; line-height: 1.75; }
+.jg .yside { font-size: 8.5pt; font-weight: 700; color: #fff; background: #111; border-radius: 1mm; padding: .3mm 2mm; margin-left: 2mm; vertical-align: .4mm; }
+.jg .yside.tch { background: #c0392b; margin-left: 3mm; }
+.jg .jmemo { border: .8pt dashed #888; border-radius: 2mm; padding: 1.2mm 3mm; font-size: 8.5pt; color: #666; min-height: 0; overflow: hidden; }
+.jg .jmemo.off { display: none; }
+.jg .yspacer { flex: 1; }
+.jg .yturn { text-align: right; font-size: 9pt; font-weight: 700; }
+.jg .jgoal { border: 1.2pt solid #111; border-radius: 2mm; padding: 1.4mm 3mm; font-size: 10.5pt; }
+.jg .jgoal b { background: #111; color: #fff; border-radius: 1mm; padding: .2mm 1.8mm; margin-right: 2mm; font-size: 9pt; }
+.jg .jsec { display: flex; flex-direction: column; gap: 1.4mm; }
+.jg .jsec > h3 { margin: 0; font-size: 11.5pt; border-left: 2.2mm solid var(--accent, #111); padding: .2mm 0 .2mm 2mm; display: flex; justify-content: space-between; align-items: baseline; }
+.jg .jsec > h3 small { font-size: 8pt; font-weight: 400; color: #555; }
+.jg .jrow { display: flex; gap: 3mm; align-items: flex-start; }
+.jg .jrow > .fig { flex: 0 0 auto; }
+.jg .jrow > .jtx { flex: 1; min-width: 0; }
+.jg .fig svg { width: 100%; height: auto; display: block; }
+.jg p { margin: 0; }
+.jg ul.jl { margin: 0; padding-left: 4.5mm; display: flex; flex-direction: column; gap: .6mm; }
+.jg .jb { display: inline-block; border: .8pt solid #111; border-radius: .8mm; padding: 0 1.4mm; margin: .6mm .4mm; line-height: 1.5; vertical-align: baseline; white-space: nowrap; }
+.jg .jb i { font-style: normal; font-family: var(--font-num); font-size: 7pt; font-weight: 700; vertical-align: .9mm; margin-right: 1mm; color: #333; }
+.jg .jb b { visibility: hidden; font-weight: 700; display: inline-block; text-align: center; }
+.jg .jw { border: 1pt solid #111; border-radius: 1mm; min-height: 15mm; padding: .6mm 1.6mm; background: repeating-linear-gradient(#fff 0 7mm, #aaa 7mm 7.4mm); }
+.jg .jw i { font-style: normal; font-family: var(--font-num); font-size: 7.5pt; font-weight: 700; color: #333; margin-right: 1.4mm; }
+.jg .jw b { visibility: hidden; }
+.jg.teach .jb b, .jg.teach .jw b { visibility: visible; color: #c0392b; }
+.jg table.jt { border-collapse: collapse; width: 100%; font-size: 9.8pt; line-height: 1.5; }
+.jg table.jt th, .jg table.jt td { border: .7pt solid #333; padding: .8mm 1.6mm; vertical-align: middle; }
+.jg table.jt th { background: #eee; font-weight: 700; white-space: nowrap; }
+.jg table.jt td.c { text-align: center; }
+.jg .jtip { border: .8pt dashed #555; border-radius: 1.5mm; padding: 1.2mm 3mm; font-size: 9.8pt; background: #fafafa; }
+.jg .jtip b.t { margin-right: 2mm; }
+.jg .jq { display: flex; gap: 2mm; align-items: baseline; }
+.jg .jq > .qn { font-family: var(--font-num); font-weight: 700; flex: 0 0 auto; border: 1pt solid #111; border-radius: 1mm; padding: 0 1.4mm; font-size: 9.5pt; }
+.jg .jq > div { flex: 1; min-width: 0; }
+.jg .jflow { display: flex; align-items: stretch; gap: 1.2mm; }
+.jg .jflow > div { flex: 1; border: .8pt solid #8f4a2f; border-radius: 1.5mm; background: #f7f1e8; padding: 1mm 1.8mm; font-size: 9.6pt; line-height: 1.6; }
+.jg .jflow > span { align-self: center; font-weight: 700; color: #8f4a2f; }
+.jg .jflow > div b.h { display: block; font-size: 9pt; color: #8f4a2f; }
+.jg .jfuri { border-top: 1pt solid #111; padding-top: 1.4mm; font-size: 9pt; }
+.jg .jfuri b { margin-right: 2mm; }
+.jg .jfuri .jline { height: 8mm; border-bottom: .6pt solid #888; }
+.jg .cols3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5mm 3mm; }
+.ya .jans { display: grid; grid-template-columns: 1fr 1fr; column-gap: 6mm; }
+.ya .jans .yai.wide { grid-column: 1 / -1; }
 .y2 .ymemo { margin-top: 2mm; border: .8pt dashed #888; border-radius: 2mm; padding: 1.5mm 3mm; font-size: 8.5pt; color: #666; min-height: 0; overflow: hidden; }
 .y2 .ymemo span { font-weight: 700; color: #111; margin-right: 2mm; }
 .y2 .yturn { text-align: right; font-size: 9pt; font-weight: 700; }
@@ -470,15 +514,20 @@ const SUBJECTS = {
     ['経済', [['civ09', '消費生活と市場'], ['civ10', '生産と労働'], ['civ11', '金融と財政']]],
     ['国際社会', [['civ12', '国際社会と国際連合'], ['civ13', '地球規模の課題']]],
   ]},
+  // テスト対策：年・月・学年ごとに残す（新しいものを上に足していく）
+  test: { name: 'テスト対策', color: '#6b4c8a', parts: [
+    ['2026年11月　中2', [['tp2611c2gy', '地理 第13〜21講', '宿題'], ['tp2611c2hy', '歴史 第9〜12講', '宿題'], ['tp2611c2gj', '地理 気候・産業', '授業'], ['tp2611c2hj', '歴史 来航・鎖国・改革', '授業']]],
+  ]},
 };
+const tabOf = u => u.tab || u.subject;
 const MARU = '①②③④⑤⑥⑦⑧⑨⑩';
 const KANA = ['ア', 'イ', 'ウ', 'エ', 'オ'];
 const PATTERNS = ['A', 'B', 'C', 'D'];
 
 const state = { subject: 'geo', unit: 'geo01', pattern: 0, sel: null };
 state.unit = Object.keys(UNITS)[0];
-try { const s = JSON.parse(localStorage.getItem('shakai-print') || '{}'); if (s.unit && UNITS[s.unit]) { state.unit = s.unit; state.subject = UNITS[s.unit].subject; } } catch (e) {}
-if (UNITS[state.unit]) state.subject = UNITS[state.unit].subject;
+try { const s = JSON.parse(localStorage.getItem('shakai-print') || '{}'); if (s.unit && UNITS[s.unit]) { state.unit = s.unit; state.subject = tabOf(UNITS[s.unit]); } } catch (e) {}
+if (UNITS[state.unit]) state.subject = tabOf(UNITS[state.unit]);
 function save() { try { localStorage.setItem('shakai-print', JSON.stringify({ subject: state.subject, unit: state.unit })); } catch (e) {} }
 
 const $ = s => document.querySelector(s);
@@ -677,6 +726,40 @@ function yomuPage(unit, i) {
   return pageShell(inner, `${unitLabel(unit)}　${i + 1}日目　${s.t}`);
 }
 
+// ---------- 授業用プリント（A4両面1枚・図や表に書きこむ） ----------
+function jgPages(unit, i) {
+  const s = unit.jugyo.sheets[i], tc = state.jteach ? ' teach' : '';
+  const head = side => `<div class="yhead"><div class="yt"><small>${SUBJECTS[unit.subject].name}　${esc(unit.title)}　授業プリント　No.${i + 1}<span class="yside">${side}</span>${state.jteach ? '<span class="yside tch">先生用（答え入り）</span>' : ''}</small>${esc(s.t)}</div>${side === '表' ? '<div class="yname">　　月　　日　<span>名前</span></div>' : ''}</div>`;
+  const front = `<div class="jg${tc}">${head('表')}<div class="jgoal"><b>めあて</b>${s.goal}</div>${withFigs(s.front)}<div class="yspacer jmemo"><b>メモ</b>　先生の説明で大事だと思ったことを書こう。</div><div class="yturn">うらへつづく →</div></div>`;
+  const back = `<div class="jg${tc}">${head('うら')}${withFigs(s.back)}<div class="yspacer jmemo"><b>メモ</b>　先生の説明で大事だと思ったことを書こう。</div><div class="jfuri"><b>ふりかえり</b>今日の授業でわかったことを1つ書こう。<div class="jline"></div></div></div>`;
+  return [pageShell(front, `${unitLabel(unit)}　No.${i + 1}（表）`), pageShell(back, `${unitLabel(unit)}　No.${i + 1}（うら）`)];
+}
+function jgAnsPage(unit, idx) {
+  const head = `<div class="lhead"><div class="t"><small>${SUBJECTS[unit.subject].name}　${esc(unit.title)}　授業プリント　答え</small>${idx.map(i => 'No.' + (i + 1)).join('・')}</div><div class="p">答え</div></div>`;
+  const secs = idx.map(i => { const s = unit.jugyo.sheets[i];
+    return `<div class="ysec"><h3>No.${i + 1}　${esc(s.t)}</h3><div class="jans">${s.ans.map(([n, a, w]) => `<div class="yai${w ? ' wide' : ''}"><b class="n">${n}</b><div><span class="yaa">${w ? '（例）' : ''}${a}</span>${w ? '<span class="yaw">同じような内容が書けていれば正解。</span>' : ''}</div></div>`).join('')}</div></div>`; }).join('');
+  return pageShell(`${head}<div class="ya compact">${secs}</div>`, `${unitLabel(unit)}　答え`);
+}
+function jgOut(unit) {
+  const out = [], idx = unit.jugyo.sheets.map((_, i) => i).filter(i => state.sel['Y' + i]);
+  idx.forEach(i => { const [f, b] = jgPages(unit, i); out.push([`No.${i + 1} 表`, f], [`No.${i + 1} うら`, b]); });
+  if (state.yans !== 'none' && idx.length) out.push(['答え（別の紙）', jgAnsPage(unit, idx)]);
+  return out;
+}
+function renderJugyoBar(unit, pk) {
+  if (state.yans !== 'none') state.yans = 'end';
+  $('#bar').innerHTML = `
+    <h1><small>${SUBJECTS[unit.subject].name}　${esc(unit.title)}　授業用プリント（A4両面・40分）</small>${esc(unit.jugyo.name)}</h1>
+    <div class="ctrl"><span class="ctrl-label">プリント</span><div class="picks">${unit.jugyo.sheets.map((s, i) => pk('Y' + i, `No.${i + 1}　${esc(s.t)}`)).join('')}</div></div>
+    <div class="ctrl"><span class="ctrl-label">向け</span><div class="row-btns"><select class="btn" id="jteach" aria-label="生徒用か先生用か"><option value="0" ${!state.jteach ? 'selected' : ''}>生徒用（空らん）</option><option value="1" ${state.jteach ? 'selected' : ''}>先生用（答えを赤で入れる）</option></select>
+      <select class="btn" id="yans" aria-label="答えの入れ方"><option value="end" ${state.yans === 'end' ? 'selected' : ''}>答えは別の紙（最後に）</option><option value="none" ${state.yans === 'none' ? 'selected' : ''}>答えなし</option></select></div></div>
+    <div class="print-box"><button class="btn primary" id="b-print">選んだページを印刷</button><span class="hint" id="count"></span></div>`;
+  $('#bar').querySelectorAll('.pick input').forEach(cb => cb.onchange = () => { state.sel[cb.id.slice(3)] = cb.checked; renderSheets(); });
+  $('#yans').onchange = e => { state.yans = e.target.value; renderSheets(); };
+  $('#jteach').onchange = e => { state.jteach = e.target.value === '1'; renderSheets(); };
+  $('#b-print').onclick = () => window.print();
+}
+
 // ---------- 中2向け 読んで解く（A4両面1枚） ----------
 function y2Q(unit, q, n) {
   const hint = unit.yomu2.hint === 'write' && q.k === 'w' ? `<span class="yh">${CIRC(q.p)}の段落</span>` : '';
@@ -812,19 +895,19 @@ function renderUnits() {
 }
 function defaultSel(unit) {
   const sel = {};
-  if (unit.yomu || unit.yomu2) { (unit.yomu || unit.yomu2).sheets.forEach((_, i) => sel['Y' + i] = true); return sel; }
+  if (unit.yomu || unit.yomu2 || unit.jugyo) { (unit.yomu || unit.yomu2 || unit.jugyo).sheets.forEach((_, i) => sel['Y' + i] = true); return sel; }
   unit.lecture.forEach((_, i) => sel['L' + i] = true);
   unit.sheets.forEach((_, i) => sel['Q' + i] = true);
   if (unit.sheets.length) sel.A = true; return sel;
 }
 function renderBar() {
   const unit = UNITS[state.unit];
-  if (!unit || unit.subject !== state.subject) {
+  if (!unit || tabOf(unit) !== state.subject) {
     $('#bar').innerHTML = `<h1><small>${SUBJECTS[state.subject].name}</small>単元を選んでください</h1>`;
     return;
   }
   if (!state.sel) state.sel = defaultSel(unit);
-  if (unit.yomu || unit.yomu2) { renderYomuBar(unit); return; }
+  if (unit.yomu || unit.yomu2 || unit.jugyo) { renderYomuBar(unit); return; }
   if (state.pattern >= (unit.sets ? unit.sets.length : PATTERNS.length)) state.pattern = 0;
   const pk = (key, label, sub = '') => `<label class="pick"><input type="checkbox" id="pk-${key}" ${state.sel[key] ? 'checked' : ''}>${label}${sub ? `<span class="mode">${sub}</span>` : ''}</label>`;
   $('#bar').innerHTML = `
@@ -859,6 +942,7 @@ function renderYomu2Bar(unit, pk) {
 function renderYomuBar(unit) {
   const pk = (key, label) => `<label class="pick"><input type="checkbox" id="pk-${key}" ${state.sel[key] ? 'checked' : ''}>${label}</label>`;
   if (unit.yomu2) return renderYomu2Bar(unit, pk);
+  if (unit.jugyo) return renderJugyoBar(unit, pk);
   if (!state.yans) state.yans = 'back';
   $('#bar').innerHTML = `
     <h1><small>${SUBJECTS[unit.subject].name}　中1向け 読んで解く宿題</small>${yomuEra(unit)}</h1>
@@ -888,8 +972,8 @@ function yomuOut(unit) {
 function renderSheets() {
   const unit = UNITS[state.unit];
   const host = $('#sheets');
-  if (!unit || unit.subject !== state.subject) { host.innerHTML = `<p class="empty">左の一覧から「印刷できる」単元を選ぶと、ここにA4のプリントが並びます。</p>`; return; }
-  const out = unit.yomu ? yomuOut(unit) : unit.yomu2 ? yomu2Out(unit) : [];
+  if (!unit || tabOf(unit) !== state.subject) { host.innerHTML = `<p class="empty">左の一覧から「印刷できる」単元を選ぶと、ここにA4のプリントが並びます。</p>`; return; }
+  const out = unit.yomu ? yomuOut(unit) : unit.yomu2 ? yomu2Out(unit) : unit.jugyo ? jgOut(unit) : [];
   if (!unit.yomu) unit.lecture.forEach((_, i) => { if (state.sel['L' + i]) out.push(['講座' + (i + 1), lecturePage(unit, i)]); });
   if (state.pattern >= (unit.sets ? unit.sets.length : PATTERNS.length)) state.pattern = 0;
   const qIdx = unit.sheets.map((_, i) => i).filter(i => state.sel['Q' + i]);
@@ -899,8 +983,9 @@ function renderSheets() {
     answerPages(unit, idx, state.pattern).forEach((p, i, a) => out.push([(unit.sets ? '解答・解説' : '解答') + (a.length > 1 ? (i + 1) : ''), p]));
   }
   host.innerHTML = out.length ? out.map(([tag, html]) => `<div class="sheet-wrap"><span class="sheet-tag">${tag}</span>${html}</div>`).join('') : `<p class="empty">印刷するページを上で選んでください。</p>`;
-  const c = $('#count'); if (c) c.textContent = out.length ? `A4 ${out.length}ページ。${(unit.yomu && state.yans === 'back') || unit.yomu2 ? '「両面印刷（長辺とじ）」で印刷してください。' : ''}${IS_SAFARI ? '印刷画面で「背景をプリント」にチェック、「ヘッダとフッタをプリント」のチェックを外してください。' : '印刷画面で「余白：なし」「背景のグラフィック：オン」にするときれいに出ます。'}` : '';
+  const c = $('#count'); if (c) c.textContent = out.length ? `A4 ${out.length}ページ。${(unit.yomu && state.yans === 'back') || unit.yomu2 || unit.jugyo ? '「両面印刷（長辺とじ）」で印刷してください。' : ''}${IS_SAFARI ? '印刷画面で「背景をプリント」にチェック、「ヘッダとフッタをプリント」のチェックを外してください。' : '印刷画面で「余白：なし」「背景のグラフィック：オン」にするときれいに出ます。'}` : '';
   yomu2Fit();
+  document.querySelectorAll('#sheets .jmemo').forEach(m => m.classList.toggle('off', m.offsetHeight < m.closest('.jg').offsetHeight * 0.06));
   shrinkToFit();
   yomuFit();
   fitZoom();
@@ -965,7 +1050,7 @@ function renderRead() {
   const unit = UNITS[state.unit];
   document.documentElement.style.setProperty('--accent', SUBJECTS[unit.subject].color);
   $('#rhead').innerHTML = `<select id="rsel" aria-label="単元をえらぶ">${allUnitOptions()}</select><button class="btn" id="toPrint" type="button">印刷用</button>`;
-  $('#rsel').onchange = e => { state.unit = e.target.value; state.subject = UNITS[state.unit].subject; state.sel = null; state.rpat = 0; save(); renderRead(); window.scrollTo(0, 0); };
+  $('#rsel').onchange = e => { state.unit = e.target.value; state.subject = tabOf(UNITS[state.unit]); state.sel = null; state.rpat = 0; save(); renderRead(); window.scrollTo(0, 0); };
   $('#toPrint').onclick = () => setView('print');
   let jump = [], main = '', patSel = '';
   if (unit.yomu) {
@@ -1021,11 +1106,11 @@ $('#toRead').onclick = () => setView('read');
 (() => {
   const h = decodeURIComponent(location.hash.slice(1));
   let v = null; try { v = localStorage.getItem('shakai-view'); } catch (e) {}
-  if (h && UNITS[h]) { state.unit = h; state.subject = UNITS[h].subject; v = 'read'; }
+  if (h && UNITS[h]) { state.unit = h; state.subject = tabOf(UNITS[h]); v = 'read'; }
   if (!v) v = matchMedia('(max-width: 700px)').matches ? 'read' : 'print';
   state.view = v; document.body.classList.toggle('read', v === 'read');
 })();
-window.addEventListener('hashchange', () => { const h = decodeURIComponent(location.hash.slice(1)); if (h && UNITS[h] && h !== state.unit) { state.unit = h; state.subject = UNITS[h].subject; state.sel = null; setView('read'); } });
+window.addEventListener('hashchange', () => { const h = decodeURIComponent(location.hash.slice(1)); if (h && UNITS[h] && h !== state.unit) { state.unit = h; state.subject = tabOf(UNITS[h]); state.sel = null; setView('read'); } });
 document.fonts && document.fonts.ready.then(() => { if (state.view !== 'read') renderSheets(); });
 renderAll();
 </script>

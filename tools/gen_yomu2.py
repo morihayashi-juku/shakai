@@ -19,5 +19,5 @@ for uid,u in UNITS2.items():
                            back=dict(paras=[text(x) for x in s['back']['p']], qs=Q(s['back']['q'])), last=Q(s['last'])))
         print(uid, s['t'], 'paras', nf, nb, 'qs', len(s['front']['q']), len(s['back']['q']), len(s['last']),
               'chars', sum(len(re.sub(r'《[^》]*》|〔[^〕]*〕','',x)) for x in s['front']['p']), sum(len(re.sub(r'《[^》]*》|〔[^〕]*〕','',x)) for x in s['back']['p']))
-    unit=dict(id=uid, subject=u.get('subject','his'), no='中2', title=u['title']+'（読んで解く・中2）', lecture=[], sheets=[], yomu2=dict(hint=u['hint'], sheets=sheets))
+    unit=dict(id=uid, subject=u.get('subject','his'), **({'tab':u['tab']} if u.get('tab') else {}), no='中2', title=u['title']+'（読んで解く・中2）', lecture=[], sheets=[], yomu2=dict(hint=u['hint'], sheets=sheets))
     open(f'units/{uid}.js','w').write(f"// 中2向け 読んで解く宿題（A4両面1枚）\nwindow.UNITS = window.UNITS || {{}};\nwindow.UNITS.{uid} = "+json.dumps(unit,ensure_ascii=False)+";\n")

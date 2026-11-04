@@ -33,7 +33,7 @@ def slim(sv):
 
 FILES = [
   ('中学社会プリント.html', '中学社会', '中学社会 解いて覚えるプリント',
-   [f'geo{n:02d}' for n in range(1, 22)] + ['geo90'] + [f'his{n:02d}' for n in range(1, 20)] + ['his90', 'his04y', 'his05y', 'his06y', 'his07y', 'his10z', 'geo91', 'his91'] + [f'civ{n:02d}' for n in range(1, 14)]),
+   [f'geo{n:02d}' for n in range(1, 22)] + ['geo90'] + [f'his{n:02d}' for n in range(1, 20)] + ['his90', 'his04y', 'his05y', 'his06y', 'his07y', 'his10z', 'tp2611c2gy', 'tp2611c2hy', 'tp2611c2gj', 'tp2611c2hj'] + [f'civ{n:02d}' for n in range(1, 14)]),
 ]
 allfigs={}
 for f in sorted(glob.glob('figs*.json'), key=lambda p: (len(p), p)):

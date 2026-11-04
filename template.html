@@ -1096,6 +1096,9 @@ function readYomu(unit) {
   }).join('');
 }
 function renderRead() {
+  // 読む画面に出せない単元（授業プリント・中2の読んで解く）のときは、最初の単元にする
+  const ok = u => u && (u.sheets.length || u.yomu) && !u.yomu2;
+  if (!ok(UNITS[state.unit])) { state.unit = Object.keys(UNITS).find(k => ok(UNITS[k])); state.subject = tabOf(UNITS[state.unit]); }
   const unit = UNITS[state.unit];
   document.documentElement.style.setProperty('--accent', SUBJECTS[unit.subject].color);
   $('#rhead').innerHTML = `<select id="rsel" aria-label="単元をえらぶ">${allUnitOptions()}</select><button class="btn" id="toPrint" type="button">印刷用</button>`;

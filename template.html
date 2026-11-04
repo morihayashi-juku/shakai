@@ -266,32 +266,32 @@ rt:empty { display: none; }
 /* 読んで解くプリント（上半分：本文、下半分：問題。真ん中で折ると本文がかくれる） */
 .ys { position: relative; height: 276mm; }
 .ys .ytop { position: absolute; left: 0; right: 0; top: 0; height: 132mm; display: flex; flex-direction: column; gap: 2.4mm; overflow: hidden; }
-:is(.ys, .y2, .jg) .yhead { display: flex; align-items: flex-end; justify-content: space-between; border-bottom: 1.6pt solid #111; padding-bottom: 1.2mm; }
-:is(.ys, .y2, .jg) .yt { font-size: 15pt; font-weight: 700; line-height: 1.2; letter-spacing: .03em; }
-:is(.ys, .y2, .jg) .yt small { display: block; font-size: 8.5pt; letter-spacing: .08em; margin-bottom: .8mm; }
-:is(.ys, .y2, .jg) .yname { font-size: 9pt; display: flex; gap: 2mm; align-items: flex-end; white-space: pre; }
-:is(.ys, .y2, .jg) .yname span { display: inline-block; width: 42mm; border-bottom: .6pt solid #111; font-size: 8pt; color: #555; }
+:is(.ys, .y2, .jg, .kp) .yhead { display: flex; align-items: flex-end; justify-content: space-between; border-bottom: 1.6pt solid #111; padding-bottom: 1.2mm; }
+:is(.ys, .y2, .jg, .kp) .yt { font-size: 15pt; font-weight: 700; line-height: 1.2; letter-spacing: .03em; }
+:is(.ys, .y2, .jg, .kp) .yt small { display: block; font-size: 8.5pt; letter-spacing: .08em; margin-bottom: .8mm; }
+:is(.ys, .y2, .jg, .kp) .yname { font-size: 9pt; display: flex; gap: 2mm; align-items: flex-end; white-space: pre; }
+:is(.ys, .y2, .jg, .kp) .yname span { display: inline-block; width: 42mm; border-bottom: .6pt solid #111; font-size: 8pt; color: #555; }
 .ys .ytext { flex: 1; overflow: hidden; font-size: 14pt; line-height: 2.05; display: flex; flex-direction: column; gap: 1.2mm; text-align: justify; }
-:is(.ys, .y2, .jg) .ytext p { margin: 0; text-indent: 0; }
-:is(.ys, .y2, .jg) .ytext .gl, .rd .gl { font-size: .86em; color: #3d4a52; }
-:is(.ys, .y2, .jg) .ytext .pn { font-family: var(--font-num); font-weight: 700; margin-right: 1.2mm; }
-:is(.ys, .y2, .jg) .ytext ruby rt { font-size: 48%; }
+:is(.ys, .y2, .jg, .kp) .ytext p { margin: 0; text-indent: 0; }
+:is(.ys, .y2, .jg, .kp) .ytext .gl, .rd .gl { font-size: .86em; color: #3d4a52; }
+:is(.ys, .y2, .jg, .kp) .ytext .pn { font-family: var(--font-num); font-weight: 700; margin-right: 1.2mm; }
+:is(.ys, .y2, .jg, .kp) .ytext ruby rt { font-size: 48%; }
 .ys .yfold { position: absolute; left: -13mm; right: -13mm; top: 134mm; height: 7mm; display: flex; align-items: center; }
 .ys .yfold::before, .ys .yfold::after { content: ''; flex: 1; border-top: .8pt dashed #777; }
 .ys .yfold span { font-size: 7.5pt; color: #555; padding: 0 3mm; white-space: nowrap; }
 .ys .ybot { position: absolute; left: 0; right: 0; top: 143mm; bottom: 0; display: flex; flex-direction: column; gap: 1.3mm; overflow: hidden; font-size: 10.5pt; }
-:is(.ys, .y2, .jg) .yqh { font-size: 10pt; font-weight: 700; border-left: 2.2mm solid #111; padding-left: 2mm; margin-bottom: .6mm; }
-:is(.ys, .y2, .jg) .yq { display: flex; align-items: center; gap: 2mm; min-height: 11mm; border-bottom: .5pt solid #c8c8c8; padding: .8mm 0; line-height: 1.6; }
-:is(.ys, .y2, .jg) .yq .qn { font-family: var(--font-num); font-weight: 700; flex: 0 0 6mm; text-align: right; }
-:is(.ys, .y2, .jg) .yq .yqt { flex: 1; }
-:is(.ys, .y2, .jg) .yq .ab { flex: 0 0 48mm; height: 9mm; }
-:is(.ys, .y2, .jg) .yq.fill .yqt { line-height: 2.1; }
-:is(.ys, .y2, .jg) .yb { display: inline-block; height: 7.2mm; vertical-align: middle; border: 1pt solid #111; border-radius: 1mm; background: #fff; margin: 0 1mm; }
-:is(.ys, .y2, .jg) .yh { display: inline-block; font-size: 7.5pt; color: #444; border: .6pt solid #777; border-radius: 3mm; padding: 0 1.6mm; margin-left: 1.5mm; line-height: 1.5; vertical-align: .2mm; white-space: nowrap; }
-:is(.ys, .y2, .jg) .yq.wr { flex-wrap: wrap; }
-:is(.ys, .y2, .jg) .yq.wr .yqt::before { content: '書こう'; font-size: 7.5pt; font-weight: 700; color: #fff; background: #111; border-radius: 1mm; padding: .2mm 1.4mm; margin-right: 1.6mm; vertical-align: .3mm; }
-:is(.ys, .y2, .jg) .yq.wr .lines { flex: 0 0 calc(100% - 8mm); margin-left: 8mm; height: 17mm; background: repeating-linear-gradient(#fff 0 7.6mm, #999 7.6mm 8.1mm); border: 1pt solid #111; border-radius: 1mm; }
-:is(.ys, .y2, .jg) .yhide { margin-top: 1.2mm; font-size: 8.5pt; font-weight: 700; background: #eee; border-radius: 1mm; padding: .9mm 2.4mm; }
+:is(.ys, .y2, .jg, .kp) .yqh { font-size: 10pt; font-weight: 700; border-left: 2.2mm solid #111; padding-left: 2mm; margin-bottom: .6mm; }
+:is(.ys, .y2, .jg, .kp) .yq { display: flex; align-items: center; gap: 2mm; min-height: 11mm; border-bottom: .5pt solid #c8c8c8; padding: .8mm 0; line-height: 1.6; }
+:is(.ys, .y2, .jg, .kp) .yq .qn { font-family: var(--font-num); font-weight: 700; flex: 0 0 6mm; text-align: right; }
+:is(.ys, .y2, .jg, .kp) .yq .yqt { flex: 1; }
+:is(.ys, .y2, .jg, .kp) .yq .ab { flex: 0 0 48mm; height: 9mm; }
+:is(.ys, .y2, .jg, .kp) .yq.fill .yqt { line-height: 2.1; }
+:is(.ys, .y2, .jg, .kp) .yb { display: inline-block; height: 7.2mm; vertical-align: middle; border: 1pt solid #111; border-radius: 1mm; background: #fff; margin: 0 1mm; }
+:is(.ys, .y2, .jg, .kp) .yh { display: inline-block; font-size: 7.5pt; color: #444; border: .6pt solid #777; border-radius: 3mm; padding: 0 1.6mm; margin-left: 1.5mm; line-height: 1.5; vertical-align: .2mm; white-space: nowrap; }
+:is(.ys, .y2, .jg, .kp) .yq.wr { flex-wrap: wrap; }
+:is(.ys, .y2, .jg, .kp) .yq.wr .yqt::before { content: '書こう'; font-size: 7.5pt; font-weight: 700; color: #fff; background: #111; border-radius: 1mm; padding: .2mm 1.4mm; margin-right: 1.6mm; vertical-align: .3mm; }
+:is(.ys, .y2, .jg, .kp) .yq.wr .lines { flex: 0 0 calc(100% - 8mm); margin-left: 8mm; height: 17mm; background: repeating-linear-gradient(#fff 0 7.6mm, #999 7.6mm 8.1mm); border: 1pt solid #111; border-radius: 1mm; }
+:is(.ys, .y2, .jg, .kp) .yhide { margin-top: 1.2mm; font-size: 8.5pt; font-weight: 700; background: #eee; border-radius: 1mm; padding: .9mm 2.4mm; }
 /* 中2向け 読んで解く（A4両面：表＝本文→問題、うら＝続きの本文→問題→まとめ） */
 .y2 { height: 276mm; display: flex; flex-direction: column; gap: 3mm; }
 .y2 .ytext { font-size: 12.5pt; line-height: 1.95; display: flex; flex-direction: column; gap: 2mm; text-align: justify; }
@@ -347,6 +347,34 @@ rt:empty { display: none; }
 .jg .jfuri b { margin-right: 2mm; }
 .jg .jfuri .jline { height: 8mm; border-bottom: .6pt solid #888; }
 .jg .cols3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5mm 3mm; }
+.kp { height: 276mm; display: flex; flex-direction: column; gap: 2.4mm; font-size: 11.5pt; line-height: 1.6; overflow: hidden; }
+.kp .klegend { font-size: 7.5pt; color: #555; text-align: right; margin-top: -1.6mm; }
+.kp .yt small { white-space: nowrap; }
+.kp .klegend b { font-weight: 700; }
+.kp .klegend b.bd { color: #2c5f86; } .kp .klegend b.wn { color: #c0392b; } .kp .klegend b.ts { color: #6b4c8a; }
+.kp .jgoal { border: 1.2pt solid #111; border-radius: 2mm; padding: 1mm 3mm; font-size: 1em; }
+.kp .jgoal b { background: #111; color: #fff; border-radius: 1mm; padding: .2mm 1.8mm; margin-right: 2mm; font-size: .85em; }
+.kp .kprep { font-size: .95em; background: #f3f1ec; border-radius: 1.5mm; padding: 1mm 3mm; }
+.kp .kprep b { margin-right: 2mm; }
+.kp .ksec { border: .8pt solid #999; border-radius: 2mm; padding: 1.2mm 2.6mm 1.4mm; display: flex; flex-direction: column; gap: .8mm; }
+.kp .ksec h3 { margin: 0 0 .4mm; font-size: 1.1em; display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1pt solid #111; padding-bottom: .4mm; }
+.kp .ksd { font-size: .7em; font-weight: 400; color: #555; margin-left: 2mm; }
+.kp .ktm { font-family: var(--font-num); font-size: .85em; background: #111; color: #fff; border-radius: 1mm; padding: 0 2mm; }
+.kp .kans { font-size: .82em; color: #333; line-height: 1.5; }
+.kp .kans b { margin-right: 1.5mm; }
+.kp .kans span { display: inline-block; margin-right: 2.4mm; }
+.kp .kans i { font-style: normal; font-family: var(--font-num); font-size: .8em; border: .6pt solid #777; border-radius: .6mm; padding: 0 .8mm; margin-right: .8mm; }
+.kp .ki { display: flex; gap: 2mm; align-items: baseline; }
+.kp .ki .kl { flex: 0 0 11mm; text-align: center; font-size: .75em; font-weight: 700; border: .8pt solid #111; border-radius: 1mm; line-height: 1.5; }
+.kp .ki > div { flex: 1; min-width: 0; }
+.kp .ki.q .kl { background: #111; color: #fff; }
+.kp .ki .ka { font-weight: 700; color: #c0392b; }
+.kp .ki.bd .kl { border-color: #2c5f86; color: #2c5f86; } .kp .ki.bd > div { color: #2c5f86; font-weight: 700; }
+.kp .ki.wn .kl { border-color: #c0392b; background: #c0392b; color: #fff; }
+.kp .ki.ts .kl { border-color: #6b4c8a; background: #6b4c8a; color: #fff; } .kp .ki.ts > div { color: #6b4c8a; }
+.kp .yside { font-size: 8pt; font-weight: 700; color: #fff; background: #c0392b; border-radius: 1mm; padding: .3mm 2mm; margin-left: 2mm; vertical-align: .4mm; }
+.kp .kmemo { flex: 1; min-height: 0; border: .8pt dashed #999; border-radius: 2mm; padding: 1mm 3mm; font-size: .75em; color: #777; }
+.kp .kend { font-size: .9em; border-top: 1pt solid #111; padding-top: 1mm; }
 .ya .jans { display: grid; grid-template-columns: 1fr 1fr; column-gap: 6mm; }
 .ya .jans .yai.wide { grid-column: 1 / -1; }
 .y2 .ymemo { margin-top: 2mm; border: .8pt dashed #888; border-radius: 2mm; padding: 1.5mm 3mm; font-size: 8.5pt; color: #666; min-height: 0; overflow: hidden; }
@@ -740,8 +768,29 @@ function jgAnsPage(unit, idx) {
     return `<div class="ysec"><h3>No.${i + 1}　${esc(s.t)}</h3><div class="jans">${s.ans.map(([n, a, w]) => `<div class="yai${w ? ' wide' : ''}"><b class="n">${n}</b><div><span class="yaa">${w ? '（例）' : ''}${a}</span>${w ? '<span class="yaw">同じような内容が書けていれば正解。</span>' : ''}</div></div>`).join('')}</div></div>`; }).join('');
   return pageShell(`${head}<div class="ya compact">${secs}</div>`, `${unitLabel(unit)}　答え`);
 }
+function kanpePages(unit, i) {
+  const s = unit.jugyo.sheets[i], k = s.kanpe; let t0 = 0;
+  const LB = { '説': '話す', '問': '聞く', '板': '板書', '注': '注意', 'テ': 'テスト' };
+  const item = ([tag, a, b]) => tag === '問' ? `<div class="ki q"><span class="kl">${LB[tag]}</span><div>${esc(a)}<div class="ka">→ ${esc(b)}</div></div></div>` : `<div class="ki ${tag === '板' ? 'bd' : tag === '注' ? 'wn' : tag === 'テ' ? 'ts' : ''}"><span class="kl">${LB[tag]}</span><div>${esc(a)}</div></div>`;
+  const sec = c => { const a = t0, b = (t0 += c.min);
+    return `<div class="ksec"><h3><span>${esc(c.t)}<span class="ksd">プリント${c.side}</span></span><span class="ktm">${a}〜${b}分（${c.min}分）</span></h3>${c.ans.length ? `<div class="kans"><b>空らんの答え</b>${c.ans.map(([n, x, w]) => `<span><i>${n}</i>${w ? '（例）' + x : x}</span>`).join('')}</div>` : ''}${c.items.map(item).join('')}</div>`; };
+  const head = side => `<div class="yhead"><div class="yt"><small>${SUBJECTS[unit.subject].name}　${esc(unit.title)}　授業プリント No.${i + 1}　先生用カンペ<span class="yside tch">${side}</span></small>${esc(s.t)}</div></div><div class="klegend">話す／聞く→答え／<b class="bd">板書</b>／<b class="wn">注意</b>＝まちがえやすい所／<b class="ts">テスト</b>＝よく出る所</div>`;
+  // 2ページの分量がだいたい同じになる所で分ける（段落の途中では切らない）
+  const len = c => c.items.reduce((a, x) => a + x.slice(1).join('').length + 30, 60) + c.ans.length * 6;
+  const tot = k.secs.reduce((a, c) => a + len(c), 0) + 120; let acc = 120, cut = 1, best = 1e9;
+  k.secs.forEach((c, j) => { acc += len(c); if (j < k.secs.length - 1 && Math.abs(tot - 2 * acc) < best) { best = Math.abs(tot - 2 * acc); cut = j + 1; } });
+  const fs = k.secs.slice(0, cut), bs = k.secs.slice(cut);
+  const p1 = `<div class="kp">${head('1/2')}<div class="jgoal"><b>めあて</b>${s.goal}</div><div class="kprep"><b>準備</b>${esc(k.prep)}</div>${fs.map(sec).join('')}<div class="kmemo">メモ</div></div>`;
+  const p2 = `<div class="kp">${head('2/2')}${bs.map(sec).join('')}<div class="kmemo">メモ</div><div class="kend">最後の1分：ふりかえり欄に「今日わかったこと」を1つ書かせて終わり。</div></div>`;
+  return [pageShell(p1, `${unitLabel(unit)}　No.${i + 1}　カンペ1`), pageShell(p2, `${unitLabel(unit)}　No.${i + 1}　カンペ2`)];
+}
+function kanpeFit() {
+  document.querySelectorAll('#sheets .kp').forEach(el => { el.style.fontSize = ''; let f = parseFloat(getComputedStyle(el).fontSize);
+    while (el.scrollHeight > el.clientHeight + 1 && f > 12) { f -= 0.3; el.style.fontSize = f + 'px'; } });
+}
 function jgOut(unit) {
   const out = [], idx = unit.jugyo.sheets.map((_, i) => i).filter(i => state.sel['Y' + i]);
+  if (state.jmode === 'k') { idx.forEach(i => { const [a, b] = kanpePages(unit, i); out.push([`No.${i + 1} カンペ1`, a], [`No.${i + 1} カンペ2`, b]); }); return out; }
   idx.forEach(i => { const [f, b] = jgPages(unit, i); out.push([`No.${i + 1} 表`, f], [`No.${i + 1} うら`, b]); });
   if (state.yans !== 'none' && idx.length) out.push(['答え（別の紙）', jgAnsPage(unit, idx)]);
   return out;
@@ -751,12 +800,12 @@ function renderJugyoBar(unit, pk) {
   $('#bar').innerHTML = `
     <h1><small>${SUBJECTS[unit.subject].name}　${esc(unit.title)}　授業用プリント（A4両面・40分）</small>${esc(unit.jugyo.name)}</h1>
     <div class="ctrl"><span class="ctrl-label">プリント</span><div class="picks">${unit.jugyo.sheets.map((s, i) => pk('Y' + i, `No.${i + 1}　${esc(s.t)}`)).join('')}</div></div>
-    <div class="ctrl"><span class="ctrl-label">向け</span><div class="row-btns"><select class="btn" id="jteach" aria-label="生徒用か先生用か"><option value="0" ${!state.jteach ? 'selected' : ''}>生徒用（空らん）</option><option value="1" ${state.jteach ? 'selected' : ''}>先生用（答えを赤で入れる）</option></select>
+    <div class="ctrl"><span class="ctrl-label">向け</span><div class="row-btns"><select class="btn" id="jteach" aria-label="生徒用か先生用か"><option value="s" ${!state.jmode || state.jmode === 's' ? 'selected' : ''}>生徒用（空らん）</option><option value="t" ${state.jmode === 't' ? 'selected' : ''}>先生用（答えを赤で入れる）</option><option value="k" ${state.jmode === 'k' ? 'selected' : ''}>先生用カンペ（授業の進め方）</option></select>
       <select class="btn" id="yans" aria-label="答えの入れ方"><option value="end" ${state.yans === 'end' ? 'selected' : ''}>答えは別の紙（最後に）</option><option value="none" ${state.yans === 'none' ? 'selected' : ''}>答えなし</option></select></div></div>
     <div class="print-box"><button class="btn primary" id="b-print">選んだページを印刷</button><span class="hint" id="count"></span></div>`;
   $('#bar').querySelectorAll('.pick input').forEach(cb => cb.onchange = () => { state.sel[cb.id.slice(3)] = cb.checked; renderSheets(); });
   $('#yans').onchange = e => { state.yans = e.target.value; renderSheets(); };
-  $('#jteach').onchange = e => { state.jteach = e.target.value === '1'; renderSheets(); };
+  $('#jteach').onchange = e => { state.jmode = e.target.value; state.jteach = state.jmode === 't'; renderSheets(); };
   $('#b-print').onclick = () => window.print();
 }
 
@@ -984,7 +1033,7 @@ function renderSheets() {
   }
   host.innerHTML = out.length ? out.map(([tag, html]) => `<div class="sheet-wrap"><span class="sheet-tag">${tag}</span>${html}</div>`).join('') : `<p class="empty">印刷するページを上で選んでください。</p>`;
   const c = $('#count'); if (c) c.textContent = out.length ? `A4 ${out.length}ページ。${(unit.yomu && state.yans === 'back') || unit.yomu2 || unit.jugyo ? '「両面印刷（長辺とじ）」で印刷してください。' : ''}${IS_SAFARI ? '印刷画面で「背景をプリント」にチェック、「ヘッダとフッタをプリント」のチェックを外してください。' : '印刷画面で「余白：なし」「背景のグラフィック：オン」にするときれいに出ます。'}` : '';
-  yomu2Fit();
+  yomu2Fit(); kanpeFit();
   document.querySelectorAll('#sheets .jmemo').forEach(m => m.classList.toggle('off', m.offsetHeight < m.closest('.jg').offsetHeight * 0.06));
   shrinkToFit();
   yomuFit();

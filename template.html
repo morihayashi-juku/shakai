@@ -305,6 +305,8 @@ rt:empty { display: none; }
 .y2 .ylast .yqh { border: 0; padding: 0; }
 .y2 .ylast .note { font-size: 8.5pt; color: #333; }
 .y2 .yspacer { flex: 1; }
+.y2 .ymemo { margin-top: 2mm; border: .8pt dashed #888; border-radius: 2mm; padding: 1.5mm 3mm; font-size: 8.5pt; color: #666; min-height: 0; overflow: hidden; }
+.y2 .ymemo span { font-weight: 700; color: #111; margin-right: 2mm; }
 .y2 .yturn { text-align: right; font-size: 9pt; font-weight: 700; }
 
 .ya { font-size: 11pt; }
@@ -689,7 +691,7 @@ function yomu2Pages(unit, i) {
   const paras = (list, off) => `<div class="ytext">${list.map((p, k) => `<p><span class="pn">${CIRC(off + k + 1)}</span>${p}</p>`).join('')}</div>`;
   let n = 0;
   const qs = list => `<div class="yqs"><div class="yqh">問題　上の文を読んで答えよう</div>${list.map(q => y2Q(unit, q, ++n)).join('')}</div>`;
-  const front = `<div class="y2">${head('表')}${paras(s.front.paras, 0)}${qs(s.front.qs)}<div class="yspacer"></div><div class="yturn">うらへつづく →</div></div>`;
+  const front = `<div class="y2">${head('表')}${paras(s.front.paras, 0)}${qs(s.front.qs)}<div class="yspacer ymemo"><span>メモ・直し</span>大事な言葉を書き出したり、まちがえた問題を赤で直したりしよう。</div><div class="yturn">うらへつづく →</div></div>`;
   const backQs = qs(s.back.qs);
   const last = `<div class="ylast"><div class="yqh">まとめ</div><div class="note">ここからは、上の文を紙や手でかくして答えよう。最後の問題は、自分の言葉で書こう。</div>${s.last.map(q => y2Q(unit, q, ++n)).join('')}</div>`;
   const back = `<div class="y2">${head('うら')}${paras(s.back.paras, nf)}${backQs}<div class="yspacer"></div>${last}</div>`;
@@ -708,7 +710,7 @@ function yomu2AnsPage(unit, idx) {
 function yomu2Out(unit) {
   const out = [], idx = unit.yomu2.sheets.map((_, i) => i).filter(i => state.sel['Y' + i]);
   idx.forEach(i => { const [f, b] = yomu2Pages(unit, i); out.push([`No.${i + 1} 表`, f], [`No.${i + 1} うら`, b]); });
-  if (state.yans !== 'none' && idx.length) out.push(['答え（別の紙）', yomu2AnsPage(unit, idx)]);
+  if (state.yans !== 'none') for (let k = 0; k < idx.length; k += 2) { const g = idx.slice(k, k + 2); out.push([`答え（別の紙）${idx.length > 2 ? ' No.' + g.map(i => i + 1).join('・') : ''}`, yomu2AnsPage(unit, g)]); }
   return out;
 }
 function yomuAnsItems(unit, i) {

@@ -110,6 +110,20 @@ input:checked+.box::after{content:"";width:6px;height:11px;border:solid #fff;bor
 .dlg>div{background:var(--paper);border-radius:16px;padding:20px;max-width:360px;width:100%}
 .dlg p{margin:0 0 14px}
 .dlg .actions{margin-top:0}
+body.civ{--accent:#8a4b12;--accent-soft:#f5ece3}
+.figs{margin:10px -6px 14px;display:grid;gap:8px}
+.figs.many{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+.fg{position:relative;background:#f6f7f9;border-radius:10px;overflow:hidden;min-height:120px;cursor:zoom-in}
+.fg svg{display:block;width:100%;height:auto}
+.fg .fl{font-size:12.5px;font-weight:700;text-align:center;padding:3px 4px;background:var(--paper)}
+.fg .ld{position:absolute;inset:0;display:grid;place-items:center;color:var(--sub);font-size:14px}
+.zoomhint{font-size:12px;color:var(--sub);text-align:right;margin:-8px 0 8px}
+.lblbtn{margin-top:12px;font-size:14px;color:var(--accent);font-weight:700;padding:6px 0}
+.lblfig{margin-top:8px}
+.zoom{position:fixed;inset:0;background:#fff;z-index:10;overflow:auto;-webkit-overflow-scrolling:touch}
+.zoom .zin{width:max(180vw,900px);padding:56px 10px 20px}
+.zoom .zin svg{display:block;width:100%;height:auto}
+.zoom button{position:fixed;top:calc(10px + env(safe-area-inset-top));right:12px;background:var(--ink);color:#fff;border-radius:22px;padding:9px 18px;font-weight:700;z-index:11}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -125,6 +139,7 @@ input:checked+.box::after{content:"";width:6px;height:11px;border:solid #fff;bor
   <div class="dock">
     <div class="opts">
       <div class="opt"><span>出す問題</span><div class="seg" id="o-range"></div></div>
+      <div class="opt"><span>問題の形</span><div class="seg" id="o-kind"></div></div>
       <div class="opt"><span>答え方</span><div class="seg" id="o-how"></div></div>
       <div class="opt"><span>問題数</span><div class="seg" id="o-num"></div></div>
     </div>
@@ -144,10 +159,12 @@ input:checked+.box::after{content:"";width:6px;height:11px;border:solid #fff;bor
 </div>
 
 <div id="done" class="wrap" hidden></div>
+<div class="zoom" id="zoom" hidden><button type="button" id="zclose">閉じる</button><div class="zin" id="zin"></div></div>
 <div class="dlg" id="dlg" hidden><div><p id="dlgmsg"></p><div class="actions"><button type="button" id="dlgno">やめない</button><button type="button" class="bad" id="dlgyes"></button></div></div></div>
 
 <script>
 const DATA=/*__DATA__*/[];
+const LABELS=/*__LABELS__*/{};
 const KEY='shakai-anki-v1';
 let rec={},pref={};
 try{rec=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
@@ -159,8 +176,9 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
 const KANA='アイウエ';
 
-pref.subj=pref.subj||'geo'; pref.sel=pref.sel||{}; pref.range=pref.range||'all'; pref.how=pref.how||'card'; pref.num=pref.num||'20';
+pref.subj=pref.subj||'geo'; pref.sel=pref.sel||{}; pref.range=pref.range||'all'; pref.how=pref.how||'card'; pref.num=pref.num||'20'; pref.kind=pref.kind||'all';
 const RANGES=[['all','ぜんぶ'],['todo','まだの問題'],['miss','まちがえた問題']];
+const KINDS=[['all','ぜんぶ'],['fig','図の問題'],['text','文だけ']];
 const HOWS=[['card','めくって答える'],['pick','4択で答える']];
 const NUMS=[['10','10問'],['20','20問'],['50','50問'],['all','ぜんぶ']];
 
@@ -175,6 +193,8 @@ function seg(el,list,key){
 function pool(){
   const s=subj(),sel=pref.sel[s.id]||[];let items=[];
   for(const u of s.units) if(sel.includes(u.id)) for(const it of u.items) items.push(Object.assign({u},it));
+  if(pref.kind==='fig') items=items.filter(it=>it.g);
+  if(pref.kind==='text') items=items.filter(it=>!it.g);
   if(pref.range==='todo') items=items.filter(it=>st(it.i)!=='ok');
   if(pref.range==='miss') items=items.filter(it=>st(it.i)==='ng');
   return items;
@@ -194,11 +214,11 @@ function renderHome(){
   }).join('');
   $('sum').textContent=`覚えた問題 ${ok}／${tot}`;
   $('allbtn').textContent=sel.length===s.units.length?'選ぶのをやめる':'すべて選ぶ';
-  seg($('o-range'),RANGES,'range');seg($('o-how'),HOWS,'how');seg($('o-num'),NUMS,'num');
+  seg($('o-range'),RANGES,'range');seg($('o-kind'),KINDS,'kind');seg($('o-how'),HOWS,'how');seg($('o-num'),NUMS,'num');
   const p=pool().length,n=pref.num==='all'?p:Math.min(p,+pref.num);
   const b=$('start');
   b.disabled=!n;
-  b.textContent=!sel.length?'講を選んでください':!p?(pref.range==='miss'?'まちがえた問題はありません':'この範囲はぜんぶ覚えました'):`${n}問はじめる`;
+  b.textContent=!sel.length?'講を選んでください':!p?(pref.range==='miss'?'まちがえた問題はありません':pref.range==='todo'?'この範囲はぜんぶ覚えました':'この形の問題はありません'):`${n}問はじめる`;
 }
 $('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;pref.subj=b.dataset.s;savePref();renderHome()};
 $('units').onchange=e=>{const id=e.target.dataset.u,s=subj();let sel=pref.sel[s.id]||[];
@@ -219,6 +239,32 @@ $('start').onclick=()=>{let p=shuffle(pool());if(pref.num!=='all')p=p.slice(0,+p
 $('quit').onclick=()=>{if(res.length) ask(`ここまで${res.length}問解きました。やめますか？`,'やめる',finish);else home()};
 function home(){$('quiz').hidden=true;$('done').hidden=true;$('home').hidden=false;renderHome();window.scrollTo(0,0)}
 
+// ---------- 図（開いた問題の図だけ読みこむ） ----------
+const figCache={};
+function getFig(k){return figCache[k]||(figCache[k]=fetch('f/'+encodeURIComponent(k)+'.svg').then(r=>{if(!r.ok)throw 0;return r.text()}).catch(()=>{delete figCache[k];return null}))}
+function figHTML(it){
+  if(!it.g) return '';
+  return `<div class="figs${it.g.length>1?' many':''}">${it.g.map((k,j)=>`<div class="fg" data-f="${esc(k)}"><div class="ld">図を読みこみ中…</div>${it.gl&&it.gl[j]?`<div class="fl">${esc(it.gl[j])}</div>`:''}</div>`).join('')}</div><div class="zoomhint">図をタップすると大きくなります</div>`;
+}
+function fillFigs(root){
+  root.querySelectorAll('.fg[data-f]').forEach(el=>{const k=el.dataset.f;
+    getFig(k).then(svg=>{const ld=el.querySelector('.ld');if(!ld)return;
+      if(svg){ld.remove();el.insertAdjacentHTML('afterbegin',svg)}else ld.textContent='図を読みこめませんでした（通信を確認してね）'})});
+}
+document.addEventListener('click',e=>{const fg=e.target.closest('.fg');if(!fg||!fg.querySelector('svg'))return;
+  const sv=fg.querySelector('svg'),vb=(sv.getAttribute('viewBox')||'0 0 4 3').split(/[ ,]+/).map(Number);
+  $('zin').style.width=vb[2]>vb[3]*1.1?'max(180vw,900px)':'100vw';
+  $('zin').innerHTML=sv.outerHTML;$('zoom').hidden=false;$('zoom').scrollTo(0,0);$('zclose').focus()});
+$('zclose').onclick=()=>{$('zoom').hidden=true;$('zin').innerHTML=''};
+function labelBtn(it){
+  const l=it.g&&it.g.length===1&&LABELS[it.g[0]];
+  return l?`<button type="button" class="lblbtn" data-l="${esc(l)}">答えの入った図を見る</button>`:'';
+}
+document.addEventListener('click',e=>{const b=e.target.closest('.lblbtn');if(!b)return;
+  b.insertAdjacentHTML('afterend',`<div class="lblfig"><div class="fg" data-f="${esc(b.dataset.l)}"><div class="ld">図を読みこみ中…</div></div></div>`);
+  fillFigs(b.parentNode);b.remove()});
+const SYM=/^[A-ZＡ-Ｚア-コ①-⑳1-9PQR]{1,2}$|^[A-Zア-コ①-⑳1-9](・[A-Zア-コ①-⑳1-9])+$/;
+
 // 4択の選択肢：同じ講の答えから、答えの終わり方が似ているものを優先して3つ選ぶ
 function distract(it){
   const strip=c=>c.replace(/（.*?）/g,'');
@@ -228,22 +274,24 @@ function distract(it){
   const ok=c=>{const t=strip(c);if(c===ans||ans.includes(t)||t.includes(A)||/→|^[アイウエ○×]$/.test(c)||t.length>14)return false;
     const n=/^[0-9０-９]/.test(t);if(num!==n)return false;if(num&&t.replace(/^[0-9０-９,.・〜]+/,'')!==unit)return false;return true};
   const mine=new Set(it.u.items.map(x=>x.a));
+  const sib=new Set(it.s?it.u.items.filter(x=>x.s===it.s).map(x=>x.a):[]);
   const cueOf=new Map();
   const all=subj().units.flatMap(u=>u.items).filter(x=>x.t==='k'&&ok(x.a));
   for(const x of all){if(!cueOf.has(x.a))cueOf.set(x.a,new Set());cueOf.get(x.a).add(cue(x.q))}
-  const cands=[...cueOf.keys()];
-  const sc=c=>{const t=strip(c);let v=mine.has(c)?3:0;
+  const cands=()=>[...cueOf.keys()];
+  for(const c of sib) if(!cueOf.has(c)&&ok(c)) cueOf.set(c,new Set());
+  const sc=c=>{const t=strip(c);let v=(mine.has(c)?3:0)+(sib.has(c)?12:0);
     if(qc&&qc!=='何か'&&qc!=='何という'&&cueOf.get(c).has(qc))v+=6;
     if(t.slice(-1)===A.slice(-1))v+=4; if(t.slice(-2)===A.slice(-2))v+=4;
     v-=Math.abs(t.length-A.length)*.4; return v+Math.random()*2.5};
-  return cands.map(c=>[c,sc(c)]).sort((a,b)=>b[1]-a[1]).slice(0,3).map(x=>x[0]);
+  return cands().map(c=>[c,sc(c)]).sort((a,b)=>b[1]-a[1]).slice(0,3).map(x=>x[0]);
 }
 // 数字の選択肢（年など）は小さい順、それ以外はシャッフル
 function order(pairs){
   if(pairs.every(([c])=>/^[0-9０-９]/.test(c))) return pairs.slice().sort((x,y)=>parseFloat(x[0].replace(/[^0-9.]/g,''))-parseFloat(y[0].replace(/[^0-9.]/g,'')));
   return shuffle(pairs);
 }
-function head(it){return `<div class="tag">${esc(it.u.label)} ${esc(it.u.title)}</div>${it.n?`<div class="note">${esc(it.n)}</div>`:''}<p class="q">${esc(it.q)}</p>`}
+function head(it){return `<div class="tag">${esc(it.u.label)} ${esc(it.u.title)}</div>${figHTML(it)}${it.n?`<div class="note">${esc(it.n)}</div>`:''}<p class="q">${esc(it.q)}</p>`}
 function mark(it,ok){rec[it.i]=ok?1:0;save();res.push({it,ok})}
 function nextBtn(){return `<div class="actions one"><button type="button" class="next" id="nx">${qi+1<Q.length?'次の問題':'結果を見る'}</button></div>`}
 function bindNext(){const b=$('nx');b.onclick=()=>{qi++;qi<Q.length?show():finish()};b.focus()}
@@ -252,17 +300,17 @@ function show(){
   $('pbar').style.width=(qi/Q.length*100)+'%';$('pcount').textContent=`${qi+1}／${Q.length}`;
   const card=$('card'),ctrl=$('ctrl');
   let mode=it.t;
-  if(mode==='k'&&pref.how==='pick'&&!/→/.test(it.a)){const d=distract(it);if(d.length===3){mode='pk';it._c=[it.a,...d];}}
+  if(mode==='k'&&pref.how==='pick'&&!/→/.test(it.a)&&!SYM.test(it.a)){const d=distract(it);if(d.length===3){mode='pk';it._c=[it.a,...d];}}
   if(mode==='m'||mode==='pk'){
     const cs=order(mode==='m'?it.c.map((c,k)=>[c,k]):it._c.map(c=>[c,c===it.a?it.a:-1]));
     const right=it.a;
-    card.innerHTML=head(it)+`<div class="choices">${cs.map(([c,k],j)=>`<button type="button" data-k="${esc(k)}"><span class="k">${KANA[j]}</span><span>${esc(c)}</span></button>`).join('')}</div><div id="vd"></div>`;
+    card.innerHTML=head(it)+`<div class="choices">${cs.map(([c,k],j)=>`<button type="button" data-k="${esc(k)}"><span>${esc(c)}</span></button>`).join('')}</div><div id="vd"></div>`;
     ctrl.innerHTML='';
     card.querySelector('.choices').onclick=e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
       const ok=String(b.dataset.k)===String(right);
       card.querySelectorAll('.choices button').forEach(x=>{x.disabled=true;if(String(x.dataset.k)===String(right))x.classList.add('right')});
       if(!ok)b.classList.add('wrong');
-      $('vd').innerHTML=`<div class="verdict ${ok?'ok':'ng'}">${ok?'正解！':'ざんねん'}</div>`;
+      $('vd').innerHTML=`<div class="verdict ${ok?'ok':'ng'}">${ok?'正解！':'ざんねん'}</div>${labelBtn(it)}`;
       mark(it,ok);ctrl.innerHTML=nextBtn();bindNext()};
   }else if(mode==='t'){
     card.innerHTML=head(it)+`<div class="tf"><button type="button" data-v="○" aria-label="正しい">○</button><button type="button" data-v="×" aria-label="まちがい">×</button></div><div id="vd"></div>`;
@@ -271,15 +319,17 @@ function show(){
       const ok=b.dataset.v===it.a;
       card.querySelectorAll('.tf button').forEach(x=>{x.disabled=true;if(x.dataset.v===it.a)x.classList.add('right')});
       if(!ok)b.classList.add('wrong');
-      $('vd').innerHTML=`<div class="verdict ${ok?'ok':'ng'}">${ok?'正解！':'ざんねん'}　答えは ${it.a}</div>`;
+      $('vd').innerHTML=`<div class="verdict ${ok?'ok':'ng'}">${ok?'正解！':'ざんねん'}　答えは ${it.a}</div>${labelBtn(it)}`;
       mark(it,ok);ctrl.innerHTML=nextBtn();bindNext()};
   }else{
-    card.innerHTML=head(it)+`<div class="ans" id="ans" hidden><div class="a${it.a.length>16?' long':''}">${esc(it.a)}</div>${it.x?`<div class="ex">${esc(it.x)}</div>`:''}</div>`;
+    card.innerHTML=head(it)+`<div class="ans" id="ans" hidden><div class="a${it.a.length>16?' long':''}">${esc(it.a)}</div>${it.x?`<div class="ex">${esc(it.x)}</div>`:''}${labelBtn(it)}</div>`;
     ctrl.innerHTML=`<div class="actions one"><button type="button" class="show" id="sh">答えを見る</button></div><p class="hint">${it.t==='e'?'自分の言葉で言えるか、頭の中で答えてからめくろう':'頭の中で答えてからめくろう'}</p>`;
     $('sh').onclick=()=>{$('ans').hidden=false;
       ctrl.innerHTML=`<div class="actions"><button type="button" class="bad" id="ng">まだ</button><button type="button" class="good" id="ok">覚えてた</button></div>`;
       $('ok').onclick=()=>{mark(it,true);go()};$('ng').onclick=()=>{mark(it,false);go()};$('ok').focus()};
   }
+  fillFigs(card);
+  if(Q[qi+1]&&Q[qi+1].g) Q[qi+1].g.forEach(getFig);
   function go(){qi++;qi<Q.length?show():finish()}
 }
 function finish(){

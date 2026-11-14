@@ -139,14 +139,12 @@ body.civ{--accent:#8a4b12;--accent-soft:#f5ece3}
   <ul class="units" id="units"></ul>
   <div class="dock">
     <div class="opts">
-      <div class="opt"><span>出す問題</span><div class="seg" id="o-range"></div></div>
       <div class="opt"><span>問題の形</span><div class="seg" id="o-kind"></div></div>
       <div class="opt"><span>答え方</span><div class="seg" id="o-how"></div></div>
       <div class="opt"><span>問題数</span><div class="seg" id="o-num"></div></div>
     </div>
     <button class="start" id="start" type="button"></button>
   </div>
-  <p class="foot">覚えたかどうかは、この端末だけに記録されます。<button id="reset" type="button">記録を消す</button></p>
 </div>
 
 <div id="quiz" class="wrap" hidden>
@@ -167,24 +165,21 @@ body.civ{--accent:#8a4b12;--accent-soft:#f5ece3}
 const DATA=/*__DATA__*/[];
 const LABELS=/*__LABELS__*/{};
 const KEY='shakai-anki-v1';
-let rec={},pref={};
-try{rec=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
+let pref={};
+try{localStorage.removeItem(KEY)}catch(e){} // 以前の「覚えた・まちがえた」の記録を消す（記録は残さない）
 try{pref=JSON.parse(localStorage.getItem(KEY+'-pref')||'{}')}catch(e){}
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(rec))}catch(e){}};
 const savePref=()=>{try{localStorage.setItem(KEY+'-pref',JSON.stringify(pref))}catch(e){}};
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
 const KANA='アイウエ';
 
-pref.subj=pref.subj||'geo'; pref.sel=pref.sel||{}; pref.range=pref.range||'all'; pref.how=pref.how||'card'; pref.num=pref.num||'20'; pref.kind=pref.kind||'all';
-const RANGES=[['all','ぜんぶ'],['todo','まだの問題'],['miss','まちがえた問題']];
+pref.subj=pref.subj||'geo'; pref.sel=pref.sel||{}; pref.how=pref.how||'card'; pref.num=pref.num||'20'; pref.kind=pref.kind||'all';
 const KINDS=[['all','ぜんぶ'],['fig','図の問題'],['text','文だけ']];
 const HOWS=[['card','めくって答える'],['pick','4択で答える']];
 const NUMS=[['10','10問'],['20','20問'],['50','50問'],['all','ぜんぶ']];
 
 // 覚えた＝最後に正解。まちがえた＝最後に不正解。
-const st=id=>rec[id]===1?'ok':rec[id]===0?'ng':'';
 const subj=()=>DATA.find(s=>s.id===pref.subj)||DATA[0];
 
 function seg(el,list,key){
@@ -196,36 +191,31 @@ function pool(){
   for(const u of s.units) if(sel.includes(u.id)) for(const it of u.items) items.push(Object.assign({u},it));
   if(pref.kind==='fig') items=items.filter(it=>it.g);
   if(pref.kind==='text') items=items.filter(it=>!it.g);
-  if(pref.range==='todo') items=items.filter(it=>st(it.i)!=='ok');
-  if(pref.range==='miss') items=items.filter(it=>st(it.i)==='ng');
   return items;
 }
 function renderHome(){
   const s=subj(); document.body.className=s.id;
   $('tabs').innerHTML=DATA.map(x=>`<button type="button" role="tab" data-s="${x.id}" aria-selected="${x.id===s.id}">${x.name}</button>`).join('');
   const sel=pref.sel[s.id]||[];
-  let tot=0,ok=0;
+  let tot=0;
   $('units').innerHTML=s.units.map(u=>{
-    const n=u.items.length,k=u.items.filter(it=>st(it.i)==='ok').length,m=u.items.filter(it=>st(it.i)==='ng').length;
-    tot+=n;ok+=k;
-    const pct=Math.round(k/n*100);
+    const n=u.items.length;tot+=n;
     return `<li><label><input type="checkbox" data-u="${u.id}" ${sel.includes(u.id)?'checked':''}><span class="box"></span>
       <span class="uname"><small>${esc(u.label)}</small><b>${esc(u.title)}</b></span>
-      <span class="meter${k===n?' done':''}">${k===n?'ぜんぶ覚えた':`${k}／${n}`}${m?`<br><span style="color:var(--ng)">×${m}</span>`:''}<i><span style="width:${pct}%"></span></i></span></label></li>`;
+      <span class="meter">${n}問</span></label></li>`;
   }).join('');
-  $('sum').textContent=`覚えた問題 ${ok}／${tot}`;
+  $('sum').textContent=`ぜんぶで ${tot}問`;
   $('allbtn').textContent=sel.length===s.units.length?'選ぶのをやめる':'すべて選ぶ';
-  seg($('o-range'),RANGES,'range');seg($('o-kind'),KINDS,'kind');seg($('o-how'),HOWS,'how');seg($('o-num'),NUMS,'num');
+  seg($('o-kind'),KINDS,'kind');seg($('o-how'),HOWS,'how');seg($('o-num'),NUMS,'num');
   const p=pool().length,n=pref.num==='all'?p:Math.min(p,+pref.num);
   const b=$('start');
   b.disabled=!n;
-  b.textContent=!sel.length?'講を選んでください':!p?(pref.range==='miss'?'まちがえた問題はありません':pref.range==='todo'?'この範囲はぜんぶ覚えました':'この形の問題はありません'):`${n}問はじめる`;
+  b.textContent=!sel.length?'講を選んでください':!p?'この形の問題はありません':`${n}問はじめる`;
 }
 $('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;pref.subj=b.dataset.s;savePref();renderHome()};
 $('units').onchange=e=>{const id=e.target.dataset.u,s=subj();let sel=pref.sel[s.id]||[];
   sel=e.target.checked?[...sel,id]:sel.filter(x=>x!==id);pref.sel[s.id]=sel;savePref();renderHome()};
 $('allbtn').onclick=()=>{const s=subj(),sel=pref.sel[s.id]||[];pref.sel[s.id]=sel.length===s.units.length?[]:s.units.map(u=>u.id);savePref();renderHome()};
-$('reset').onclick=()=>ask('覚えた・まちがえたの記録をすべて消しますか？','消す',()=>{rec={};save();renderHome()});
 
 function ask(msg,yes,fn){$('dlgmsg').textContent=msg;$('dlgyes').textContent=yes;$('dlg').hidden=false;
   $('dlgyes').onclick=()=>{$('dlg').hidden=true;fn()};$('dlgno').onclick=()=>{$('dlg').hidden=true};$('dlgno').focus()}
@@ -295,7 +285,7 @@ function order(pairs){
   return shuffle(pairs);
 }
 function head(it){return `<div class="tag">${esc(it.u.label)} ${esc(it.u.title)}</div>${figHTML(it)}${it.n?`<div class="note">${esc(it.n)}</div>`:''}<p class="q">${esc(it.q)}</p>`}
-function mark(it,ok){rec[it.i]=ok?1:0;save();res.push({it,ok})}
+function mark(it,ok){res.push({it,ok})}
 function nextBtn(){return `<div class="actions one"><button type="button" class="next" id="nx">${qi+1<Q.length?'次の問題':'結果を見る'}</button></div>`}
 function bindNext(){const b=$('nx');b.onclick=()=>{qi++;qi<Q.length?show():finish()};b.focus()}
 function show(){

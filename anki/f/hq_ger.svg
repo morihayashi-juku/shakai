@@ -1,0 +1,8 @@
+<svg viewBox="0 0 220 170" xmlns="http://www.w3.org/2000/svg" font-family="inherit"><rect x="0.5" y="0.5" width="219" height="169" rx="4" fill="#fff" stroke="#999"/>
+    <line x1="10" y1="132" x2="210" y2="132" stroke="#1d2a33" stroke-width="1.5"/>
+    <path d="M40 132 L40 82 L180 82 L180 132 Z" fill="#f5f2ea" stroke="#1d2a33"/>
+    <path d="M32 84 Q110 30 188 84 Z" fill="#ece6d8" stroke="#1d2a33"/>
+    <rect x="102" y="38" width="16" height="8" fill="#ece6d8" stroke="#1d2a33"/>
+    <line x1="40" y1="96" x2="180" y2="96" stroke="#9b3b2f" stroke-width="3"/><line x1="40" y1="118" x2="180" y2="118" stroke="#9b3b2f" stroke-width="3"/>
+    <rect x="98" y="96" width="24" height="36" fill="#c24a33" stroke="#1d2a33"/>
+    <path d="M36 82 L60 60 M184 82 L160 60" stroke="#9b3b2f" stroke-width="2"/><circle cx="20" cy="20" r="13" fill="#fff" stroke="#1d2a33" stroke-width="1.4"/><text x="20" y="20.5" font-size="16" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#1d2a33">エ</text></svg>

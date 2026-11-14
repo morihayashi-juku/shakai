@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>中学社会 暗記カード</title>
+<title>中学 社会・理科 暗記カード</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&display=swap" rel="stylesheet">
@@ -110,6 +110,7 @@ input:checked+.box::after{content:"";width:6px;height:11px;border:solid #fff;bor
 .dlg>div{background:var(--paper);border-radius:16px;padding:20px;max-width:360px;width:100%}
 .dlg p{margin:0 0 14px}
 .dlg .actions{margin-top:0}
+body.sci{--accent:#5b46a8;--accent-soft:#ece9f7}
 body.civ{--accent:#8a4b12;--accent-soft:#f5ece3}
 .figs{margin:10px -6px 14px;display:grid;gap:8px}
 .figs.many{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
@@ -130,7 +131,7 @@ body.civ{--accent:#8a4b12;--accent-soft:#f5ece3}
 <body>
 <div id="home" class="wrap">
   <header class="top">
-    <h1>中学社会 暗記カード</h1>
+    <h1>中学 社会・理科 暗記カード</h1>
     <p>講を選んで、問題をどんどん解いて覚えよう</p>
   </header>
   <div class="tabs" role="tablist" id="tabs"></div>
@@ -269,19 +270,21 @@ const SYM=/^[A-ZＡ-Ｚア-コ①-⑳1-9PQR]{1,2}$|^[A-Zア-コ①-⑳1-9](・[A
 function distract(it){
   const strip=c=>c.replace(/（.*?）/g,'');
   const ans=it.a,A=strip(ans),num=/^[0-9０-９]/.test(A),unit=num?A.replace(/^[0-9０-９,.・〜]+/,''):'';
-  const cue=q=>{const m=q.match(/(だれ|どこ|何年|何世紀|何時代|何県|何市|何州|何川|何山脈|何平野|何という|何か|いくつ|何割|何%)/g);return m?m[m.length-1]:''};
-  const qc=cue(it.q);
+  const cue=q=>{const m=q.match(/(だれ|どこ|何年|何世紀|何時代|何県|何市|何州|何川|何山脈|何平野|単位|化学式|元素記号|電離を表す式|化学反応式|求める式|理由|何色|何倍|方位|どうなるか|何という|何か|いくつ|何割|何%)/g);return m?m[m.length-1]:''};
+  const qc=cue(it.q),JP=/[ぁ-んァ-ヶ一-龠]/;
   const ok=c=>{const t=strip(c);if(c===ans||ans.includes(t)||t.includes(A)||/→|^[アイウエ○×]$/.test(c)||t.length>14)return false;
-    const n=/^[0-9０-９]/.test(t);if(num!==n)return false;if(num&&t.replace(/^[0-9０-９,.・〜]+/,'')!==unit)return false;return true};
+    const n=/^[0-9０-９]/.test(t);if(num!==n)return false;if(JP.test(t)!==JP.test(A))return false;if(num&&t.replace(/^[0-9０-９,.・〜]+/,'')!==unit)return false;return true};
   const mine=new Set(it.u.items.map(x=>x.a));
   const sib=new Set(it.s?it.u.items.filter(x=>x.s===it.s).map(x=>x.a):[]);
   const cueOf=new Map();
   const all=subj().units.flatMap(u=>u.items).filter(x=>x.t==='k'&&ok(x.a));
-  for(const x of all){if(!cueOf.has(x.a))cueOf.set(x.a,new Set());cueOf.get(x.a).add(cue(x.q))}
+  const tail2=q=>q.replace(/[（(][^（）()]*[）)]$/,'').replace(/[。？?]$/,'').slice(-2);const qt2=tail2(it.q),endOf=new Map();
+  for(const x of all){if(!cueOf.has(x.a)){cueOf.set(x.a,new Set());endOf.set(x.a,new Set())}cueOf.get(x.a).add(cue(x.q));endOf.get(x.a).add(tail2(x.q))}
   const cands=()=>[...cueOf.keys()];
-  for(const c of sib) if(!cueOf.has(c)&&ok(c)) cueOf.set(c,new Set());
+  for(const c of sib) if(!cueOf.has(c)&&ok(c)){cueOf.set(c,new Set());endOf.set(c,new Set())}
   const sc=c=>{const t=strip(c);let v=(mine.has(c)?3:0)+(sib.has(c)?12:0);
     if(qc&&qc!=='何か'&&qc!=='何という'&&cueOf.get(c).has(qc))v+=6;
+    if(!/[かるだ]$/.test(qt2)&&endOf.get(c).has(qt2))v+=5;
     if(t.slice(-1)===A.slice(-1))v+=4; if(t.slice(-2)===A.slice(-2))v+=4;
     v-=Math.abs(t.length-A.length)*.4; return v+Math.random()*2.5};
   return cands().map(c=>[c,sc(c)]).sort((a,b)=>b[1]-a[1]).slice(0,3).map(x=>x[0]);
@@ -300,7 +303,9 @@ function show(){
   $('pbar').style.width=(qi/Q.length*100)+'%';$('pcount').textContent=`${qi+1}／${Q.length}`;
   const card=$('card'),ctrl=$('ctrl');
   let mode=it.t;
-  if(mode==='k'&&pref.how==='pick'&&!/→/.test(it.a)&&!SYM.test(it.a)){const d=distract(it);if(d.length===3){mode='pk';it._c=[it.a,...d];}}
+  if(mode==='k'&&pref.how==='pick'&&!/→/.test(it.a)&&!SYM.test(it.a)){const d=distract(it);const inq=(it.q.match(/（([^（）]+・[^（）]+)）/)||[])[1];
+    if(inq&&inq.split('・').includes(it.a)){mode='pk';it._c=inq.split('・');}
+    else if(d.length===3){mode='pk';it._c=[it.a,...d];}}
   if(mode==='m'||mode==='pk'){
     const cs=order(mode==='m'?it.c.map((c,k)=>[c,k]):it._c.map(c=>[c,c===it.a?it.a:-1]));
     const right=it.a;

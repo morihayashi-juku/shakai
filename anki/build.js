@@ -67,10 +67,33 @@ const subjects=[
  {id:'civ',name:'公民',units:Array.from({length:13},(_,k)=>'civ'+String(k+1).padStart(2,'0')).concat(['civ90'])},
 ];
 let total=0,nfig=0;
-const data=subjects.map(s=>({id:s.id,name:s.name,units:s.units.filter(id=>U[id]&&U[id].sheets&&U[id].sheets.length).map(id=>{
+let data=subjects.map(s=>({id:s.id,name:s.name,units:s.units.filter(id=>U[id]&&U[id].sheets&&U[id].sheets.length).map(id=>{
   const u=U[id], items=conv(u); total+=items.length; nfig+=items.filter(x=>x.g).length;
   return {id,label:typeof u.no==='number'?`第${u.no}講`:'受験',title:u.title,items};
 })})).filter(s=>s.units.length);
+
+// 理科：rika/*.txt（@ID|学年 分野|単元名 / k|問題|答え / m|問題|正解|ちがう… / t|文|○×）
+const RIKA=path.join(__dirname,'rika');
+if(fs.existsSync(RIKA)){
+  const units=[];let cur=null;const errs=[];
+  for(const f of fs.readdirSync(RIKA).filter(f=>/\.txt$/.test(f)).sort())
+    fs.readFileSync(path.join(RIKA,f),'utf8').split('\n').forEach((ln,n)=>{
+      ln=ln.trim(); if(!ln||ln.startsWith('#')) return;
+      const p=ln.split('|');
+      if(p[0].startsWith('@')){cur={id:p[0].slice(1),label:p[1],title:p[2],items:[],seen:new Set()};units.push(cur);return}
+      const [t,q,...r]=p; let o;
+      if(t==='k'&&r.length===1) o={t:r[0].length>16?'e':'k',q,a:r[0]};
+      else if(t==='m'&&r.length>=3) o={t:'m',q,c:r,a:0};
+      else if(t==='t'&&/^[○×]$/.test(r[0])) o={t:'t',q,a:r[0]};
+      else {errs.push(f+':'+(n+1)+' '+ln);return}
+      const key=q+'|'+r[0]; if(cur.seen.has(key)) {errs.push('重複 '+ln);return} cur.seen.add(key);
+      o.i=hash(cur.id+key); cur.items.push(o);
+    });
+  if(errs.length) throw new Error('理科の書き方エラー:\n'+errs.join('\n'));
+  units.forEach(u=>delete u.seen);
+  const n=units.reduce((a,u)=>a+u.items.length,0); total+=n;
+  data.push({id:'sci',name:'理科',units}); console.log('理科',units.length+'単元',n+'問');
+}
 
 // 図を1枚ずつのファイルにする（答えの入った「〜Label」図もあれば一緒に）
 const missing=[...used].filter(k=>!FIGS[k]);

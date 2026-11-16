@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 280" font-family="inherit" font-size="14">
+<line x1="120" y1="20" x2="280" y2="20" stroke="#333" stroke-width="4"/>
+<line x1="200" y1="20" x2="95" y2="160" stroke="#999" stroke-width="1.5" stroke-dasharray="5 4"/>
+<line x1="200" y1="20" x2="200" y2="215" stroke="#333" stroke-width="2"/>
+<line x1="200" y1="20" x2="305" y2="160" stroke="#999" stroke-width="1.5" stroke-dasharray="5 4"/>
+<path d="M95 160 Q200 260 305 160" fill="none" stroke="#bbb" stroke-dasharray="3 4"/>
+<circle cx="95" cy="160" r="15" fill="#e3effb" stroke="#999" stroke-width="2"/>
+<circle cx="200" cy="215" r="15" fill="#90caf9" stroke="#333" stroke-width="2"/>
+<circle cx="305" cy="160" r="15" fill="#e3effb" stroke="#999" stroke-width="2"/>
+<text x="70" y="165" font-size="18" font-weight="700" text-anchor="middle" fill="#1d2433">A</text><text x="200" y="262" font-size="18" font-weight="700" text-anchor="middle" fill="#1d2433">B</text><text x="332" y="165" font-size="18" font-weight="700" text-anchor="middle" fill="#1d2433">C</text></svg>

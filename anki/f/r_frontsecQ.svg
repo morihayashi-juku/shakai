@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 470 230" font-family="inherit" font-size="14">
+<rect x="15" y="20" width="210" height="160" fill="#fdeaea" stroke="#bbb"/>
+<path d="M15 180 L15 120 Q60 120 120 180 Z" fill="#dce9f8" stroke="#2b6cb0" stroke-width="2"/>
+<path d="M95 150 Q90 60 125 40 Q160 30 165 70 Q170 110 140 150 Z" fill="#fff" stroke="#888" stroke-width="2"/>
+<path d="M60 160 l20 0 M50 145 l20 0" stroke="#2b6cb0" stroke-width="3"/><path d="M70 155 l10 5 l-10 5 z M60 140 l10 5 l-10 5 z" fill="#2b6cb0"/>
+<path d="M150 140 l0 -40" stroke="#c0392b" stroke-width="3"/><path d="M145 105 l5 -10 l5 10 z" fill="#c0392b"/>
+<text x="40" y="40" font-size="13" fill="#2b6cb0">寒気</text><text x="175" y="40" font-size="13" fill="#c0392b">暖気</text>
+<rect x="245" y="20" width="210" height="160" fill="#fdeaea" stroke="#bbb"/>
+<path d="M455 180 L455 110 Q360 130 255 180 Z" fill="#dce9f8" stroke="#2b6cb0" stroke-width="2"/>
+<path d="M265 160 Q330 120 440 92 Q445 80 420 78 Q340 82 290 120 Q262 140 265 160 Z" fill="#fff" stroke="#888" stroke-width="2"/>
+<path d="M280 150 l60 -30" stroke="#c0392b" stroke-width="3"/><path d="M336 114 l10 1 l-6 9 z" fill="#c0392b"/>
+<text x="400" y="165" font-size="13" fill="#2b6cb0">寒気</text><text x="265" y="45" font-size="13" fill="#c0392b">暖気</text>
+<text x="120" y="212" font-size="18" font-weight="700" text-anchor="middle" fill="#1d2433">ア</text><text x="350" y="212" font-size="18" font-weight="700" text-anchor="middle" fill="#1d2433">イ</text></svg>

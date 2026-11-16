@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 470 200" font-family="inherit" font-size="14">
+<path d="M20 150 Q50 150 70 80 Q85 40 100 80 Q120 150 150 150 Z" fill="#e8e1d6" stroke="#333" stroke-width="2"/>
+<path d="M170 150 L235 55 L245 55 L310 150 Z" fill="#b9a993" stroke="#333" stroke-width="2"/>
+<path d="M320 150 Q390 105 455 150 Z" fill="#6f6257" stroke="#333" stroke-width="2"/>
+<text x="85" y="185" font-size="18" font-weight="700" text-anchor="middle" fill="#1d2433">ア</text><text x="240" y="185" font-size="18" font-weight="700" text-anchor="middle" fill="#1d2433">イ</text><text x="388" y="185" font-size="18" font-weight="700" text-anchor="middle" fill="#1d2433">ウ</text></svg>

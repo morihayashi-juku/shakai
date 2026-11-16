@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260" font-family="inherit" font-size="14">
+<rect x="40" y="200" width="320" height="14" fill="#cfe6f7" stroke="#333" stroke-width="2"/>
+<line x1="200" y1="40" x2="200" y2="200" stroke="#777" stroke-width="1.5" stroke-dasharray="6 5"/>
+<line x1="90" y1="70" x2="200" y2="200" stroke="#e0a800" stroke-width="4"/>
+<line x1="200" y1="200" x2="310" y2="70" stroke="#e0a800" stroke-width="4"/>
+<path d="M140 130 l8 -12 l3 12 z" fill="#e0a800"/><path d="M262 130 l3 -14 l7 10 z" fill="#e0a800"/>
+<path d="M200 140 A60 60 0 0 0 161 154" fill="none" stroke="#333"/>
+<path d="M200 140 A60 60 0 0 1 239 154" fill="none" stroke="#333"/>
+<path d="M130 200 A70 70 0 0 1 155 147" fill="none" stroke="#999" stroke-dasharray="3 3"/>
+<text x="48" y="235" font-size="13" fill="#444" text-anchor="start">鏡</text><text x="80" y="60" font-size="13" fill="#444" text-anchor="middle">入る光</text><text x="320" y="60" font-size="13" fill="#444" text-anchor="middle">反射した光</text><text x="122" y="190" font-size="18" font-weight="700" text-anchor="middle" fill="#1d2433">ウ</text><circle cx="180" cy="118" r="12" fill="#fff" stroke="#c8372d" stroke-width="2"/><text x="180" y="123" text-anchor="middle" font-size="15" font-weight="700" fill="#c8372d">A</text><circle cx="220" cy="118" r="12" fill="#fff" stroke="#c8372d" stroke-width="2"/><text x="220" y="123" text-anchor="middle" font-size="15" font-weight="700" fill="#c8372d">B</text></svg>

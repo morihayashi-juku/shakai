@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 200" font-family="inherit" font-size="14">
+<path d="M20 60 Q70 20 120 60 T220 60 L220 150 Q170 110 120 150 T20 150 Z" fill="#f1e2b6" stroke="#333" stroke-width="2"/>
+<path d="M20 90 Q70 50 120 90 T220 90" fill="none" stroke="#333" stroke-width="2"/><path d="M20 120 Q70 80 120 120 T220 120" fill="none" stroke="#333" stroke-width="2"/>
+<path d="M250 50 L330 50 L350 160 L250 160 Z" fill="#f1e2b6" stroke="#333" stroke-width="2"/>
+<path d="M330 80 L440 80 L440 190 L350 190 Z" fill="#e8d8c3" stroke="#333" stroke-width="2"/>
+<line x1="250" y1="85" x2="336" y2="85" stroke="#333" stroke-width="2"/><line x1="250" y1="120" x2="343" y2="120" stroke="#333" stroke-width="2"/>
+<line x1="336" y1="115" x2="440" y2="115" stroke="#333" stroke-width="2"/><line x1="343" y1="150" x2="440" y2="150" stroke="#333" stroke-width="2"/>
+<line x1="325" y1="25" x2="358" y2="200" stroke="#c0392b" stroke-width="3"/><text x="120" y="190" text-anchor="middle" font-size="14.5" font-weight="700" fill="#c8372d" stroke="#fff" stroke-width="4" stroke-linejoin="round" paint-order="stroke">しゅう曲</text><text x="290" y="190" text-anchor="middle" font-size="14.5" font-weight="700" fill="#c8372d" stroke="#fff" stroke-width="4" stroke-linejoin="round" paint-order="stroke">断層</text></svg>

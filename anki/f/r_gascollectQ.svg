@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 250" font-family="inherit" font-size="14">
+<rect x="15" y="140" width="135" height="65" fill="#dbeefc" stroke="#333" stroke-width="2"/>
+<rect x="68" y="70" width="42" height="112" fill="#fff" stroke="#333" stroke-width="2"/><rect x="70" y="118" width="38" height="62" fill="#dbeefc"/>
+<path d="M0 105 L40 105 L40 192 L88 192 L88 168" stroke="#555" stroke-width="4" fill="none"/>
+<rect x="215" y="55" width="50" height="115" fill="#fff" stroke="#333" stroke-width="2"/><rect x="221" y="168" width="38" height="6" fill="#fff"/>
+<path d="M240 235 L240 70" stroke="#555" stroke-width="4" fill="none"/>
+<path d="M375 70 L375 185 L425 185 L425 70" fill="#fff" stroke="#333" stroke-width="2"/>
+<path d="M400 15 L400 172" stroke="#555" stroke-width="4" fill="none"/><circle cx="82" cy="232" r="12" fill="#fff" stroke="#c8372d" stroke-width="2"/><text x="82" y="237" text-anchor="middle" font-size="15" font-weight="700" fill="#c8372d">A</text><circle cx="290" cy="232" r="12" fill="#fff" stroke="#c8372d" stroke-width="2"/><text x="290" y="237" text-anchor="middle" font-size="15" font-weight="700" fill="#c8372d">B</text><circle cx="440" cy="232" r="12" fill="#fff" stroke="#c8372d" stroke-width="2"/><text x="440" y="237" text-anchor="middle" font-size="15" font-weight="700" fill="#c8372d">C</text></svg>

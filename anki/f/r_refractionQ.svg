@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 280" font-family="inherit" font-size="14">
+<rect x="20" y="140" width="360" height="130" fill="#dbeefc"/>
+<line x1="20" y1="140" x2="380" y2="140" stroke="#333" stroke-width="2"/>
+<line x1="200" y1="20" x2="200" y2="270" stroke="#777" stroke-width="1.5" stroke-dasharray="6 5"/>
+<line x1="90" y1="40" x2="200" y2="140" stroke="#e0a800" stroke-width="4"/>
+<line x1="200" y1="140" x2="250" y2="260" stroke="#e0a800" stroke-width="4"/>
+<path d="M200 90 A50 50 0 0 0 163 106" fill="none" stroke="#333"/>
+<path d="M200 200 A60 60 0 0 0 223 195" fill="none" stroke="#333"/>
+<text x="30" y="130" font-size="13" fill="#444" text-anchor="start">空気</text><text x="30" y="165" font-size="13" fill="#444" text-anchor="start">水</text><circle cx="175" cy="70" r="12" fill="#fff" stroke="#c8372d" stroke-width="2"/><text x="175" y="75" text-anchor="middle" font-size="15" font-weight="700" fill="#c8372d">A</text><circle cx="225" cy="220" r="12" fill="#fff" stroke="#c8372d" stroke-width="2"/><text x="225" y="225" text-anchor="middle" font-size="15" font-weight="700" fill="#c8372d">B</text></svg>

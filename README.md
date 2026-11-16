@@ -20,7 +20,7 @@
 |---|---|
 | `template.html` | アプリ本体（画面・印刷レイアウト・スマホの読む画面）。`build.py` が単元・図・フォントを埋めこむ |
 | `build.py` | ビルド。`FILES` に入れる単元の一覧がある |
-| `units/*.js` | 単元データ。`geo01–21` 地理、`his01–19` 歴史（`his19` は年表）、`geo90`/`his90` 受験用総まとめ（12セット・解説つき）、`his04y–his07y` 中1向け「読んで解く」 |
+| `units/*.js` | 単元データ。`geo01–21` 地理、`his01–19` 歴史（`his19` は年表）、`geo90`/`his90` 受験用総まとめ（12セット・解説つき）、`his04y–his07y` 中1向け「読んで解く」、`civ01–13` 公民 |
 | `figs*.json`, `gen_figs*.mjs`, `gen_climate*.py`, `data/` | 図（SVG）と、その作成スクリプト・地図データ |
 | `flows/` | 歴史各講の「この講の流れ」年表データ |
 | `fonts/` | BIZ UDPゴシック等（SIL Open Font License） |
@@ -67,3 +67,10 @@
   - `k|問題|答え` … 一問一答（4択モードでは、ほかの答えから選択肢を自動で作る。問題文に「（高い・低い）」があればその中から選ぶ）
   - `m|問題|正解|ちがう選択肢|ちがう選択肢…` … 選択問題（正解を最初に書く。表示するときに並べかえる）
   - `t|文|○` … ○×問題
+
+## 公民（civ01〜civ13）
+
+- 地理・歴史と同じ形（講座＋問題6枚・パターンA〜D）。単元データは `units/civNN.js` に直接書いている。
+- 図：`python3 tools/gen_figs_civ.py` → `figs_civ.json`（説明用 `〜Label` と問題用 `〜Q`。Pythonだけで作れる）。
+- 確認：`python3 tools/civcheck.py civ01 civ02 …`（ページの余白・縮小・パターンごとの答えの一致、`tmp_civ/` にPDF）。
+- 講座のページ分け：`python3 tools/civ_repack.py civ02 3,3`（section を前から3つ・3つのページに分け直す）。

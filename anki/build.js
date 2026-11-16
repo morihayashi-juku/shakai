@@ -67,32 +67,61 @@ const subjects=[
  {id:'civ',name:'公民',units:Array.from({length:13},(_,k)=>'civ'+String(k+1).padStart(2,'0')).concat(['civ90'])},
 ];
 let total=0,nfig=0;
-let data=subjects.map(s=>({id:s.id,name:s.name,units:s.units.filter(id=>U[id]&&U[id].sheets&&U[id].sheets.length).map(id=>{
+let data=subjects.map(s=>({id:s.id,name:s.name,grp:'社会',units:s.units.filter(id=>U[id]&&U[id].sheets&&U[id].sheets.length).map(id=>{
   const u=U[id], items=conv(u); total+=items.length; nfig+=items.filter(x=>x.g).length;
   return {id,label:typeof u.no==='number'?`第${u.no}講`:'受験',title:u.title,items};
 })})).filter(s=>s.units.length);
 
 // 理科：rika/*.txt（@ID|学年 分野|単元名 / k|問題|答え / m|問題|正解|ちがう… / t|文|○×）
+//   図の問題：g|図の名前|指示文 → 図のラベル（A,B…）の名前を答える問題を自動で作る。
+//   その後の k/m/t 行も同じ図を使う。g|- で図の問題をおわる。図は rika/figs.js に書く。
 const RIKA=path.join(__dirname,'rika');
+const FIELDS=[['phy','物理'],['che','化学'],['bio','生物'],['ear','地学']];
+function renderFig(f,mode){
+  let s=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${f.w} ${f.h}" font-family="inherit" font-size="14">`+f.body;
+  for(const l of f.labels||[]){
+    if(l.px!=null) s+=`<line x1="${l.x}" y1="${l.y}" x2="${l.px}" y2="${l.py}" stroke="#555" stroke-width="1.3"/><circle cx="${l.px}" cy="${l.py}" r="2.6" fill="#555"/>`;
+    if(mode==='Q') s+=`<circle cx="${l.x}" cy="${l.y}" r="12" fill="#fff" stroke="#c8372d" stroke-width="2"/><text x="${l.x}" y="${l.y+5}" text-anchor="middle" font-size="15" font-weight="700" fill="#c8372d">${l.id}</text>`;
+    else s+=`<text x="${l.x}" y="${l.y+5}" text-anchor="${l.a||'middle'}" font-size="14.5" font-weight="700" fill="#c8372d" stroke="#fff" stroke-width="4" stroke-linejoin="round" paint-order="stroke">${l.name}</text>`;
+  }
+  return s+'</svg>';
+}
 if(fs.existsSync(RIKA)){
-  const units=[];let cur=null;const errs=[];
+  const RF=fs.existsSync(path.join(RIKA,'figs.js'))?require(path.join(RIKA,'figs.js')):{};
+  for(const [k,f] of Object.entries(RF)){ FIGS['r_'+k+'Q']=renderFig(f,'Q'); if((f.labels||[]).length) FIGS['r_'+k+'Label']=renderFig(f,'L'); }
+  const units=[],byId={};let cur=null,fig=null;const errs=[];
   for(const f of fs.readdirSync(RIKA).filter(f=>/\.txt$/.test(f)).sort())
     fs.readFileSync(path.join(RIKA,f),'utf8').split('\n').forEach((ln,n)=>{
       ln=ln.trim(); if(!ln||ln.startsWith('#')) return;
-      const p=ln.split('|');
-      if(p[0].startsWith('@')){cur={id:p[0].slice(1),label:p[1],title:p[2],items:[],seen:new Set()};units.push(cur);return}
-      const [t,q,...r]=p; let o;
-      if(t==='k'&&r.length===1) o={t:r[0].length>16?'e':'k',q,a:r[0]};
-      else if(t==='m'&&r.length>=3) o={t:'m',q,c:r,a:0};
-      else if(t==='t'&&/^[○×]$/.test(r[0])) o={t:'t',q,a:r[0]};
-      else {errs.push(f+':'+(n+1)+' '+ln);return}
-      const key=q+'|'+r[0]; if(cur.seen.has(key)) {errs.push('重複 '+ln);return} cur.seen.add(key);
-      o.i=hash(cur.id+key); cur.items.push(o);
+      const p=ln.split('|'); const where=f+':'+(n+1)+' ';
+      if(p[0].startsWith('@')){ const id=p[0].slice(1); fig=null;
+        if(byId[id]){cur=byId[id];return}
+        const field=FIELDS.find(([,nm])=>p[1].includes(nm));
+        if(!field){errs.push(where+'分野が分からない '+ln);return}
+        cur={id,field:field[0],label:p[1].replace(field[1],'').trim(),title:p[2],items:[],seen:new Set()};units.push(cur);byId[id]=cur;return}
+      if(!cur){errs.push(where+'単元がない '+ln);return}
+      const add=(o,key)=>{ key+='|'+(fig?fig.key:''); if(cur.seen.has(key)){errs.push(where+'重複 '+ln);return} cur.seen.add(key);
+        if(fig){o.g=['r_'+fig.key+'Q'];o.s=fig.s;used.add(o.g[0]);}
+        o.i=hash(cur.id+key); cur.items.push(o); };
+      const [t,q,...r]=p;
+      if(t==='g'){
+        if(q==='-'){fig=null;return}
+        const F=RF[q]; if(!F){errs.push(where+'図がない '+q);return}
+        fig={key:q,s:cur.id+'.'+q};
+        for(const l of F.labels||[]) add({t:'k',q:l.id,a:l.ans||l.name,...(r[0]?{n:r[0]}:{})},l.id+'|'+(l.ans||l.name));
+        return;
+      }
+      if(t==='k'&&r.length===1) add({t:r[0].length>16?'e':'k',q,a:r[0]},q+'|'+r[0]);
+      else if(t==='m'&&r.length>=2) add({t:'m',q,c:r,a:0},q+'|'+r[0]);
+      else if(t==='t'&&/^[○×]$/.test(r[0])) add({t:'t',q,a:r[0]},q+'|'+r[0]);
+      else errs.push(where+'書き方 '+ln);
     });
   if(errs.length) throw new Error('理科の書き方エラー:\n'+errs.join('\n'));
-  units.forEach(u=>delete u.seen);
-  const n=units.reduce((a,u)=>a+u.items.length,0); total+=n;
-  data.push({id:'sci',name:'理科',units}); console.log('理科',units.length+'単元',n+'問');
+  for(const [fid,fname] of FIELDS){
+    const us=units.filter(u=>u.field===fid).map(u=>{delete u.seen;delete u.field;return u});
+    const n=us.reduce((a,u)=>a+u.items.length,0); total+=n; nfig+=us.reduce((a,u)=>a+u.items.filter(x=>x.g).length,0);
+    data.push({id:fid,name:fname,grp:'理科',units:us}); console.log(fname,us.length+'単元',n+'問','図'+us.reduce((a,u)=>a+u.items.filter(x=>x.g).length,0));
+  }
 }
 
 // 図を1枚ずつのファイルにする（答えの入った「〜Label」図もあれば一緒に）

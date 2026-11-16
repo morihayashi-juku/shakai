@@ -28,8 +28,11 @@ button:focus-visible,input:focus-visible+span,select:focus-visible{outline:3px s
 header.top{padding:22px 0 10px}
 header.top h1{font-size:23px;margin:0;letter-spacing:.02em}
 header.top p{margin:2px 0 0;color:var(--sub);font-size:14px}
-.tabs{display:flex;gap:6px;margin:14px 0 12px;background:#dfe2e8;padding:4px;border-radius:12px}
-.tabs button{flex:1;padding:10px 0;border-radius:9px;font-weight:700;color:var(--sub)}
+.grp{display:flex;gap:0;margin:16px 0 0;border-bottom:2px solid var(--line)}
+.grp button{flex:1;padding:10px 0 9px;font-weight:700;font-size:18px;color:var(--sub);border-bottom:3px solid transparent;margin-bottom:-2px}
+.grp button[aria-pressed=true]{color:var(--ink);border-bottom-color:var(--accent)}
+.tabs{display:flex;gap:6px;margin:12px 0 12px;background:#dfe2e8;padding:4px;border-radius:12px}
+.tabs button{flex:1;padding:10px 0;white-space:nowrap;border-radius:9px;font-weight:700;color:var(--sub)}
 .tabs button[aria-selected=true]{background:var(--paper);color:var(--accent);box-shadow:0 1px 2px rgba(29,36,51,.15)}
 .listhead{display:flex;justify-content:space-between;align-items:center;margin:4px 2px 8px;font-size:14px;color:var(--sub)}
 .listhead button{color:var(--accent);font-weight:700;padding:4px 6px}
@@ -110,7 +113,10 @@ input:checked+.box::after{content:"";width:6px;height:11px;border:solid #fff;bor
 .dlg>div{background:var(--paper);border-radius:16px;padding:20px;max-width:360px;width:100%}
 .dlg p{margin:0 0 14px}
 .dlg .actions{margin-top:0}
-body.sci{--accent:#5b46a8;--accent-soft:#ece9f7}
+body.phy{--accent:#b8321f;--accent-soft:#f9e8e5}
+body.che{--accent:#6a3fa0;--accent-soft:#efe8f7}
+body.bio{--accent:#2e7d32;--accent-soft:#e6f2e6}
+body.ear{--accent:#8a6100;--accent-soft:#f5eedc}
 body.civ{--accent:#8a4b12;--accent-soft:#f5ece3}
 .figs{margin:10px -6px 14px;display:grid;gap:8px}
 .figs.many{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
@@ -134,6 +140,7 @@ body.civ{--accent:#8a4b12;--accent-soft:#f5ece3}
     <h1>中学 社会・理科 暗記カード</h1>
     <p>講を選んで、問題をどんどん解いて覚えよう</p>
   </header>
+  <div class="grp" id="grp"></div>
   <div class="tabs" role="tablist" id="tabs"></div>
   <div class="listhead"><span id="sum"></span><button id="allbtn" type="button">すべて選ぶ</button></div>
   <ul class="units" id="units"></ul>
@@ -195,7 +202,9 @@ function pool(){
 }
 function renderHome(){
   const s=subj(); document.body.className=s.id;
-  $('tabs').innerHTML=DATA.map(x=>`<button type="button" role="tab" data-s="${x.id}" aria-selected="${x.id===s.id}">${x.name}</button>`).join('');
+  const GRPS=[...new Set(DATA.map(x=>x.grp))];
+  $('grp').innerHTML=GRPS.map(g=>`<button type="button" data-g="${g}" aria-pressed="${g===s.grp}">${g}</button>`).join('');
+  $('tabs').innerHTML=DATA.filter(x=>x.grp===s.grp).map(x=>`<button type="button" role="tab" data-s="${x.id}" aria-selected="${x.id===s.id}">${x.name}</button>`).join('');
   const sel=pref.sel[s.id]||[];
   let tot=0;
   $('units').innerHTML=s.units.map(u=>{
@@ -212,7 +221,9 @@ function renderHome(){
   b.disabled=!n;
   b.textContent=!sel.length?'講を選んでください':!p?'この形の問題はありません':`${n}問はじめる`;
 }
-$('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;pref.subj=b.dataset.s;savePref();renderHome()};
+$('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;pref.subj=b.dataset.s;pref['last'+subj().grp]=pref.subj;savePref();renderHome()};
+$('grp').onclick=e=>{const b=e.target.closest('button');if(!b)return;const g=b.dataset.g;const last=pref['last'+g];
+  pref.subj=DATA.some(x=>x.id===last&&x.grp===g)?last:DATA.find(x=>x.grp===g).id;savePref();renderHome()};
 $('units').onchange=e=>{const id=e.target.dataset.u,s=subj();let sel=pref.sel[s.id]||[];
   sel=e.target.checked?[...sel,id]:sel.filter(x=>x!==id);pref.sel[s.id]=sel;savePref();renderHome()};
 $('allbtn').onclick=()=>{const s=subj(),sel=pref.sel[s.id]||[];pref.sel[s.id]=sel.length===s.units.length?[]:s.units.map(u=>u.id);savePref();renderHome()};
@@ -265,7 +276,7 @@ function distract(it){
   const ok=c=>{const t=strip(c);if(c===ans||ans.includes(t)||t.includes(A)||/→|^[アイウエ○×]$/.test(c)||t.length>14)return false;
     const n=/^[0-9０-９]/.test(t);if(num!==n)return false;if(JP.test(t)!==JP.test(A))return false;if(num&&t.replace(/^[0-9０-９,.・〜]+/,'')!==unit)return false;return true};
   const mine=new Set(it.u.items.map(x=>x.a));
-  const sib=new Set(it.s?it.u.items.filter(x=>x.s===it.s).map(x=>x.a):[]);
+  const sib=new Set(it.s?it.u.items.filter(x=>x.s===it.s&&(x.t==='k'||x.t==='e')&&typeof x.a==='string').map(x=>x.a):[]);
   const cueOf=new Map();
   const all=subj().units.flatMap(u=>u.items).filter(x=>x.t==='k'&&ok(x.a));
   const tail2=q=>q.replace(/[（(][^（）()]*[）)]$/,'').replace(/[。？?]$/,'').slice(-2);const qt2=tail2(it.q),endOf=new Map();

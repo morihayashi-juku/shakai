@@ -277,7 +277,9 @@ function distract(it){
     if(!/[かるだ]$/.test(qt2)&&endOf.get(c).has(qt2))v+=5;
     if(t.slice(-1)===A.slice(-1))v+=4; if(t.slice(-2)===A.slice(-2))v+=4;
     v-=Math.abs(t.length-A.length)*.4; return v+Math.random()*2.5};
-  return cands().map(c=>[c,sc(c)]).sort((a,b)=>b[1]-a[1]).slice(0,3).map(x=>x[0]);
+  const out=[],seenS=new Set([A]);
+  for(const [c] of cands().map(c=>[c,sc(c)]).sort((a,b)=>b[1]-a[1])){const t=strip(c).trim();if(seenS.has(t))continue;seenS.add(t);out.push(c);if(out.length===3)break}
+  return out;
 }
 // 数字の選択肢（年など）は小さい順、それ以外はシャッフル
 function order(pairs){

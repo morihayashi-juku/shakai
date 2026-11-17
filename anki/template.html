@@ -241,9 +241,11 @@ function start(items){
 }
 // 図の「A」「B」…を答える問題は、同じ図のものをまとめて、記号の順に続けて出す
 const isLab=it=>!!(it.g&&/^[A-Za-zＡ-Ｚア-ン①-⑳0-9]{1,2}$/.test(it.q));
+// 「①の州名」「Aの国」「地点ア」のような、記号で図の場所を聞く問題もまとめて出す
+const isGrp=it=>!!(it.g&&(isLab(it)||/^(地点|都市)?[A-Za-zＡ-Ｚア-ン①-⑳0-9]{1,2}(の[ぁ-んァ-ヶ一-龠ー]{1,4})?$/.test(it.q)));
 function groupLabels(list,all){const out=[],done=new Set();
   for(const it of list){if(done.has(it))continue;
-    if(isLab(it)&&it.s){const mates=all.filter(x=>x.s===it.s&&x.u===it.u&&isLab(x)).sort((a,b)=>a.q.localeCompare(b.q,'ja'));
+    if(isGrp(it)&&it.s){const mates=all.filter(x=>x.s===it.s&&x.u===it.u&&isGrp(x)).sort((a,b)=>a.q.localeCompare(b.q,'ja'));
       mates.forEach((m,k)=>{if(done.has(m))return;m._last=(k===mates.length-1);out.push(m);done.add(m)});}
     else{out.push(it);done.add(it)}}
   return out;}
@@ -273,7 +275,7 @@ $('zclose').onclick=()=>{$('zoom').hidden=true;$('zin').innerHTML=''};
 function labelBtn(it){
   const l=it.g&&it.g.length===1&&LABELS[it.g[0]];
   if(!l) return '';
-  if(isLab(it)) return it._last===false?'':`<div class="lblfig"><div class="lbt">答えの入った図</div><div class="fg" data-f="${esc(l)}"><div class="ld">図を読みこみ中…</div></div></div>`;
+  if(isGrp(it)) return it._last===false?'':`<div class="lblfig"><div class="lbt">答えの入った図</div><div class="fg" data-f="${esc(l)}"><div class="ld">図を読みこみ中…</div></div></div>`;
   return `<button type="button" class="lblbtn" data-l="${esc(l)}">答えの入った図を見る</button>`;
 }
 document.addEventListener('click',e=>{const b=e.target.closest('.lblbtn');if(!b)return;
@@ -290,7 +292,7 @@ function distract(it){
   const ok=c=>{const t=strip(c);if(c===ans||ans.includes(t)||t.includes(A)||/→|^[アイウエ○×]$/.test(c)||t.length>14)return false;
     const n=/^[0-9０-９]/.test(t);if(num!==n)return false;if(JP.test(t)!==JP.test(A))return false;if(num&&t.replace(/^[0-9０-９,.・〜]+/,'')!==unit)return false;return true};
   const mine=new Set(it.u.items.map(x=>x.a));
-  const sib=new Set(it.s&&isLab(it)?it.u.items.filter(x=>x.s===it.s&&isLab(x)&&typeof x.a==='string').map(x=>x.a):[]);
+  const sib=new Set(it.s&&isGrp(it)?it.u.items.filter(x=>x.s===it.s&&isGrp(x)&&typeof x.a==='string').map(x=>x.a):[]);
   const cueOf=new Map();
   const all=subj().units.flatMap(u=>u.items).filter(x=>x.t==='k'&&ok(x.a));
   const tail2=q=>q.replace(/[（(][^（）()]*[）)]$/,'').replace(/[。？?]$/,'').slice(-2);const qt2=tail2(it.q),endOf=new Map();

@@ -1,0 +1,99 @@
+{
+ "_memo": "組の順番 tracks（タブの順）、プリント一覧のファイル libraries、単元・ステップ（学年ごと・教材ライブラリの順番）。新しい単元・ステップはここに足す。最終更新日は各ファイルの updated から自動で出るので、ここには書かない。",
+ "tracks": [
+  "chu2"
+ ],
+ "libraries": [
+  "library-c2"
+ ],
+ "units": [
+  {
+   "id": "c2-sekai",
+   "name": "地理（世界）",
+   "grade": "中2",
+   "steps": [
+    {
+     "id": "c2-sekai-sugata",
+     "name": "世界の姿"
+    },
+    {
+     "id": "c2-sekai-kikou",
+     "name": "世界の気候と人々の暮らし"
+    },
+    {
+     "id": "c2-sekai-asia",
+     "name": "アジア州"
+    },
+    {
+     "id": "c2-sekai-europe",
+     "name": "ヨーロッパ州"
+    },
+    {
+     "id": "c2-sekai-africa",
+     "name": "アフリカ州"
+    },
+    {
+     "id": "c2-sekai-namerica",
+     "name": "北アメリカ州"
+    },
+    {
+     "id": "c2-sekai-samerica-oceania",
+     "name": "南アメリカ州・オセアニア州"
+    }
+   ]
+  },
+  {
+   "id": "c2-nihon",
+   "name": "地理（日本）",
+   "grade": "中2",
+   "steps": [
+    {
+     "id": "c2-nihon-sugata",
+     "name": "日本の姿・自然・人口"
+    },
+    {
+     "id": "c2-nihon-sangyou",
+     "name": "資源・産業・交通"
+    },
+    {
+     "id": "c2-nihon-chiiki-w",
+     "name": "日本の諸地域（九州〜中部）"
+    },
+    {
+     "id": "c2-nihon-chiiki-e",
+     "name": "日本の諸地域（関東〜北海道）"
+    }
+   ]
+  },
+  {
+   "id": "c2-rekishi",
+   "name": "歴史（近世まで）",
+   "grade": "中2",
+   "steps": [
+    {
+     "id": "c2-rekishi-kodai",
+     "name": "古代まで（文明のおこり〜平安）"
+    },
+    {
+     "id": "c2-rekishi-chusei",
+     "name": "中世（鎌倉〜室町）"
+    },
+    {
+     "id": "c2-rekishi-kinsei",
+     "name": "近世（戦国〜江戸）"
+    }
+   ]
+  },
+  {
+   "id": "c2-matome",
+   "name": "まとめ",
+   "grade": "中2",
+   "steps": [
+    {
+     "id": "c2-matome-all",
+     "name": "地理と歴史のまとめ"
+    }
+   ]
+  }
+ ]
+}

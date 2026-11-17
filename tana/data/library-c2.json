@@ -1,0 +1,21 @@
+{
+ "_memo": "教材ライブラリ（中2）：中2のプリントはすべてここに1回だけ書く。step は data/common.json のステップ id。こたえは ans: true。組の JSON からは file 名で呼ぶ。ファイル名は c2_ から始める。",
+ "updated": "2026-11-17",
+ "items": [
+  {
+   "file": "c2_hw01_sekai_sugata.pdf",
+   "step": "c2-sekai-sugata",
+   "title": "宿題① 世界の姿",
+   "pages": 2,
+   "note": "A4両面1枚。表＝要点・世界地図（大陸と海洋）・地球儀（緯度と経度）、裏＝ことばの問題20問（計34問）"
+  },
+  {
+   "file": "c2_hw01_sekai_sugata_ans.pdf",
+   "step": "c2-sekai-sugata",
+   "title": "宿題① 世界の姿 こたえ",
+   "pages": 2,
+   "note": "問題と同じ形に赤で答え",
+   "ans": true
+  }
+ ]
+}

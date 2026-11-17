@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="社会教材棚">
+<title>社会 教材棚</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Zen+Maru+Gothic:wght@700;900&display=swap">
+<link rel="stylesheet" href="assets/app.css?v=20261117a">
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <a class="brand" href="#">社会 教材棚</a>
+    <nav class="tabs" id="tabs" aria-label="画面の切りかえ">
+      <a href="#lib" data-tab="lib">教材ライブラリ</a>
+    </nav>
+  </div>
+</header>
+
+<main id="app" class="wrap" aria-live="polite"><p class="muted">読みこみ中…</p></main>
+
+<footer class="foot wrap"><span id="updated"></span>　先生用のページです（生徒には見せない）。</footer>
+
+<!-- ページ内ビューア -->
+<dialog id="viewer" aria-labelledby="v-title">
+  <div class="v-bar">
+    <div class="v-name"><b id="v-title"></b><span id="v-pages" class="muted"></span></div>
+    <div class="v-btns">
+      <span class="zoom" role="group" aria-label="大きさ"><button type="button" id="v-zout" aria-label="小さく">−</button><span id="v-zl">100%</span><button type="button" id="v-zin" aria-label="大きく">＋</button></span>
+      <button type="button" class="btn" id="v-print">印刷</button>
+      <a class="btn" id="v-dl" download>PDFをダウンロード</a>
+      <a class="btn" id="v-open" target="_blank" rel="noopener">別のタブで開く</a>
+      <button type="button" class="btn icon" id="v-close" aria-label="閉じる">✕</button>
+    </div>
+  </div>
+  <div class="v-jump" id="v-jump" hidden></div>
+  <div class="v-body" id="v-body"></div>
+</dialog>
+
+<!-- まとめて印刷 -->
+<dialog id="setprint" aria-labelledby="sp-title">
+  <form method="dialog" class="sp">
+    <h2 id="sp-title"></h2>
+    <p class="muted" id="sp-sub">印刷するものと部数をえらんでください。</p>
+    <ul class="sp-list" id="sp-list"></ul>
+    <div class="sp-foot">
+      <span id="sp-total"></span>
+      <button type="button" class="btn" value="cancel" id="sp-cancel">やめる</button>
+      <button type="button" class="btn primary" id="sp-go">印刷する</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- 印刷の準備中 -->
+<dialog id="progress" aria-labelledby="pg-title">
+  <div class="pg">
+    <b id="pg-title">印刷の準備をしています</b>
+    <div class="bar"><span id="pg-bar"></span></div>
+    <p class="muted" id="pg-text"></p>
+    <div class="pg-btns" id="pg-btns" hidden>
+      <button type="button" class="btn primary" id="pg-again">印刷画面を開く</button>
+      <button type="button" class="btn" id="pg-share" hidden>PDFで印刷（共有 → プリント）</button>
+      <button type="button" class="btn" id="pg-close">閉じる</button>
+    </div>
+  </div>
+</dialog>
+
+<div id="print-root" aria-hidden="true"></div>
+
+<script src="lib/pdfjs/pdf.min.js"></script>
+<script src="assets/app.js?v=20261117a"></script>
+</body>
+</html>

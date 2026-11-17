@@ -1,0 +1,73 @@
+{
+ "_memo": "中2の社会の宿題と記録。sets の最後に足し、前の cur を消して新しいほうに \"cur\": true。groups に \"day\"（mon / thu）を書く。kind は hw（宿題）／teacher（こたえ・先生用）／lesson（授業）。items は library-c2.json の file 名。log は新しいものを上に。",
+ "updated": "2026-11-17",
+ "name": "中2",
+ "badge": "中2",
+ "longName": "中2（木曜に宿題）",
+ "grade": "中2",
+ "days": [
+  "thu"
+ ],
+ "about": [
+  "冬休み明けの実力テストに向けて、基本事項の復習を宿題で出す（11/19〜冬休み前まで。範囲は地理全部＋歴史は近世まで）。",
+  "1回分＝A4両面1枚（表＝要点と図の問題、裏＝ことばの問題）。こたえは iPad で見ながら丸つけ。"
+ ],
+ "checks": [
+  [
+   "print",
+   "印刷した"
+  ],
+  [
+   "give",
+   "宿題を出した"
+  ],
+  [
+   "maru",
+   "丸つけ済"
+  ]
+ ],
+ "now": {
+  "step": "c2-sekai-sugata",
+  "text": "実力テスト対策の復習宿題：①世界の姿から"
+ },
+ "log": [
+  {
+   "date": "2026-11-17",
+   "text": "社会の教材棚を作成。宿題①（世界の姿）を追加。11/19（木）から出す。"
+  }
+ ],
+ "sets": [
+  {
+   "id": "c2hw01",
+   "label": "①",
+   "steps": [
+    "c2-sekai-sugata"
+   ],
+   "title": "実力テスト対策 宿題① 世界の姿",
+   "cur": true,
+   "note": "11/19（木）に出す。A4両面1枚（表＝要点と図、裏＝ことばの問題）。",
+   "groups": [
+    {
+     "kind": "hw",
+     "label": "木曜（宿題）",
+     "day": "thu",
+     "items": [
+      {
+       "file": "c2_hw01_sekai_sugata.pdf"
+      }
+     ]
+    },
+    {
+     "kind": "teacher",
+     "label": "こたえ（丸つけ用）",
+     "day": "thu",
+     "items": [
+      {
+       "file": "c2_hw01_sekai_sugata_ans.pdf"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

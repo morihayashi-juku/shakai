@@ -1,0 +1,4 @@
+tools/out/
+__pycache__/
+tools/figs/node_modules/
+tools/figs/package*.json

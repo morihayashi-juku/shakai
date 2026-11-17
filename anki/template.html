@@ -125,6 +125,8 @@ body.civ{--accent:#8a4b12;--accent-soft:#f5ece3}
 .fg .fl{font-size:12.5px;font-weight:700;text-align:center;padding:3px 4px;background:var(--paper)}
 .fg .ld{position:absolute;inset:0;display:grid;place-items:center;color:var(--sub);font-size:14px}
 .zoomhint{font-size:12px;color:var(--sub);text-align:right;margin:-8px 0 8px}
+.q .sym{display:inline-grid;place-items:center;min-width:1.6em;height:1.6em;padding:0 .2em;border:2.5px solid #c8372d;border-radius:1em;color:#c8372d;margin:0 .15em;line-height:1}
+.lblfig .lbt{font-size:13px;color:var(--sub);margin:12px 0 4px}
 .lblbtn{margin-top:12px;font-size:14px;color:var(--accent);font-weight:700;padding:6px 0}
 .lblfig{margin-top:8px}
 .zoom{position:fixed;inset:0;background:#fff;z-index:10;overflow:auto;-webkit-overflow-scrolling:touch}
@@ -174,16 +176,16 @@ const LABELS=/*__LABELS__*/{};
 const KEY='shakai-anki-v1';
 let pref={};
 try{localStorage.removeItem(KEY)}catch(e){} // 以前の「覚えた・まちがえた」の記録を消す（記録は残さない）
-try{pref=JSON.parse(localStorage.getItem(KEY+'-pref')||'{}')}catch(e){}
-const savePref=()=>{try{localStorage.setItem(KEY+'-pref',JSON.stringify(pref))}catch(e){}};
+try{localStorage.removeItem(KEY+'-pref');pref=JSON.parse(localStorage.getItem(KEY+'-pref2')||'{}')}catch(e){}
+const savePref=()=>{try{localStorage.setItem(KEY+'-pref2',JSON.stringify(pref))}catch(e){}};
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
 const KANA='アイウエ';
 
-pref.subj=pref.subj||'geo'; pref.sel=pref.sel||{}; pref.how=pref.how||'card'; pref.num=pref.num||'20'; pref.kind=pref.kind||'all';
+pref.subj=pref.subj||'geo'; pref.sel=pref.sel||{}; pref.how=pref.how||'pick'; pref.num=pref.num||'20'; pref.kind=pref.kind||'all';
 const KINDS=[['all','ぜんぶ'],['fig','図の問題'],['text','文だけ']];
-const HOWS=[['card','めくって答える'],['pick','4択で答える']];
+const HOWS=[['pick','4択で答える'],['card','めくって答える']];
 const NUMS=[['10','10問'],['20','20問'],['50','50問'],['all','ぜんぶ']];
 
 // 覚えた＝最後に正解。まちがえた＝最後に不正解。
@@ -237,7 +239,15 @@ function start(items){
   Q=items;qi=0;res=[];
   $('home').hidden=true;$('done').hidden=true;$('quiz').hidden=false;window.scrollTo(0,0);show();
 }
-$('start').onclick=()=>{let p=shuffle(pool());if(pref.num!=='all')p=p.slice(0,+pref.num);start(p)};
+// 図の「A」「B」…を答える問題は、同じ図のものをまとめて、記号の順に続けて出す
+const isLab=it=>!!(it.g&&/^[A-Za-zＡ-Ｚア-ン①-⑳0-9]{1,2}$/.test(it.q));
+function groupLabels(list,all){const out=[],done=new Set();
+  for(const it of list){if(done.has(it))continue;
+    if(isLab(it)&&it.s){const mates=all.filter(x=>x.s===it.s&&x.u===it.u&&isLab(x)).sort((a,b)=>a.q.localeCompare(b.q,'ja'));
+      mates.forEach((m,k)=>{if(done.has(m))return;m._last=(k===mates.length-1);out.push(m);done.add(m)});}
+    else{out.push(it);done.add(it)}}
+  return out;}
+$('start').onclick=()=>{const all=pool();let p=shuffle(all);if(pref.num!=='all')p=p.slice(0,+pref.num);start(groupLabels(p,all))};
 $('quit').onclick=()=>{if(res.length) ask(`ここまで${res.length}問解きました。やめますか？`,'やめる',finish);else home()};
 function home(){$('quiz').hidden=true;$('done').hidden=true;$('home').hidden=false;renderHome();window.scrollTo(0,0)}
 
@@ -246,12 +256,14 @@ const figCache={};
 function getFig(k){return figCache[k]||(figCache[k]=fetch('f/'+encodeURIComponent(k)+'.svg').then(r=>{if(!r.ok)throw 0;return r.text()}).catch(()=>{delete figCache[k];return null}))}
 function figHTML(it){
   if(!it.g) return '';
-  return `<div class="figs${it.g.length>1?' many':''}">${it.g.map((k,j)=>`<div class="fg" data-f="${esc(k)}"><div class="ld">図を読みこみ中…</div>${it.gl&&it.gl[j]?`<div class="fl">${esc(it.gl[j])}</div>`:''}</div>`).join('')}</div><div class="zoomhint">図をタップすると大きくなります</div>`;
+  const hl=isLab(it)?` data-hl="${esc(it.q)}"`:'';
+  return `<div class="figs${it.g.length>1?' many':''}">${it.g.map((k,j)=>`<div class="fg" data-f="${esc(k)}"${hl}><div class="ld">図を読みこみ中…</div>${it.gl&&it.gl[j]?`<div class="fl">${esc(it.gl[j])}</div>`:''}</div>`).join('')}</div><div class="zoomhint">図をタップすると大きくなります</div>`;
 }
 function fillFigs(root){
   root.querySelectorAll('.fg[data-f]').forEach(el=>{const k=el.dataset.f;
     getFig(k).then(svg=>{const ld=el.querySelector('.ld');if(!ld)return;
-      if(svg){ld.remove();el.insertAdjacentHTML('afterbegin',svg)}else ld.textContent='図を読みこめませんでした（通信を確認してね）'})});
+      if(svg){ld.remove();el.insertAdjacentHTML('afterbegin',svg);const hl=el.dataset.hl;
+        if(hl&&el.querySelector('[data-l="'+hl+'"]'))el.querySelectorAll('[data-l]').forEach(g=>{if(g.dataset.l!==hl)g.style.opacity='.3'})}else ld.textContent='図を読みこめませんでした（通信を確認してね）'})});
 }
 document.addEventListener('click',e=>{const fg=e.target.closest('.fg');if(!fg||!fg.querySelector('svg'))return;
   const sv=fg.querySelector('svg'),vb=(sv.getAttribute('viewBox')||'0 0 4 3').split(/[ ,]+/).map(Number);
@@ -260,7 +272,9 @@ document.addEventListener('click',e=>{const fg=e.target.closest('.fg');if(!fg||!
 $('zclose').onclick=()=>{$('zoom').hidden=true;$('zin').innerHTML=''};
 function labelBtn(it){
   const l=it.g&&it.g.length===1&&LABELS[it.g[0]];
-  return l?`<button type="button" class="lblbtn" data-l="${esc(l)}">答えの入った図を見る</button>`:'';
+  if(!l) return '';
+  if(isLab(it)) return it._last===false?'':`<div class="lblfig"><div class="lbt">答えの入った図</div><div class="fg" data-f="${esc(l)}"><div class="ld">図を読みこみ中…</div></div></div>`;
+  return `<button type="button" class="lblbtn" data-l="${esc(l)}">答えの入った図を見る</button>`;
 }
 document.addEventListener('click',e=>{const b=e.target.closest('.lblbtn');if(!b)return;
   b.insertAdjacentHTML('afterend',`<div class="lblfig"><div class="fg" data-f="${esc(b.dataset.l)}"><div class="ld">図を読みこみ中…</div></div></div>`);
@@ -276,7 +290,7 @@ function distract(it){
   const ok=c=>{const t=strip(c);if(c===ans||ans.includes(t)||t.includes(A)||/→|^[アイウエ○×]$/.test(c)||t.length>14)return false;
     const n=/^[0-9０-９]/.test(t);if(num!==n)return false;if(JP.test(t)!==JP.test(A))return false;if(num&&t.replace(/^[0-9０-９,.・〜]+/,'')!==unit)return false;return true};
   const mine=new Set(it.u.items.map(x=>x.a));
-  const sib=new Set(it.s?it.u.items.filter(x=>x.s===it.s&&(x.t==='k'||x.t==='e')&&typeof x.a==='string').map(x=>x.a):[]);
+  const sib=new Set(it.s&&isLab(it)?it.u.items.filter(x=>x.s===it.s&&isLab(x)&&typeof x.a==='string').map(x=>x.a):[]);
   const cueOf=new Map();
   const all=subj().units.flatMap(u=>u.items).filter(x=>x.t==='k'&&ok(x.a));
   const tail2=q=>q.replace(/[（(][^（）()]*[）)]$/,'').replace(/[。？?]$/,'').slice(-2);const qt2=tail2(it.q),endOf=new Map();
@@ -297,7 +311,7 @@ function order(pairs){
   if(pairs.every(([c])=>/^[0-9０-９]/.test(c))) return pairs.slice().sort((x,y)=>parseFloat(x[0].replace(/[^0-9.]/g,''))-parseFloat(y[0].replace(/[^0-9.]/g,'')));
   return shuffle(pairs);
 }
-function head(it){return `<div class="tag">${esc(it.u.label)} ${esc(it.u.title)}</div>${figHTML(it)}${it.n?`<div class="note">${esc(it.n)}</div>`:''}<p class="q">${esc(it.q)}</p>`}
+function head(it){return `<div class="tag">${esc(it.u.label)} ${esc(it.u.title)}</div>${figHTML(it)}${it.n?`<div class="note">${esc(it.n)}</div>`:''}<p class="q">${isLab(it)?`図の<span class="sym">${esc(it.q)}</span>にあてはまるものは？`:esc(it.q)}</p>`}
 function mark(it,ok){res.push({it,ok})}
 function nextBtn(){return `<div class="actions one"><button type="button" class="next" id="nx">${qi+1<Q.length?'次の問題':'結果を見る'}</button></div>`}
 function bindNext(){const b=$('nx');b.onclick=()=>{qi++;qi<Q.length?show():finish()};b.focus()}
@@ -318,7 +332,7 @@ function show(){
       const ok=String(b.dataset.k)===String(right);
       card.querySelectorAll('.choices button').forEach(x=>{x.disabled=true;if(String(x.dataset.k)===String(right))x.classList.add('right')});
       if(!ok)b.classList.add('wrong');
-      $('vd').innerHTML=`<div class="verdict ${ok?'ok':'ng'}">${ok?'正解！':'ざんねん'}</div>${labelBtn(it)}`;
+      $('vd').innerHTML=`<div class="verdict ${ok?'ok':'ng'}">${ok?'正解！':'ざんねん'}</div>${labelBtn(it)}`;fillFigs($('vd'));
       mark(it,ok);ctrl.innerHTML=nextBtn();bindNext()};
   }else if(mode==='t'){
     card.innerHTML=head(it)+`<div class="tf"><button type="button" data-v="○" aria-label="正しい">○</button><button type="button" data-v="×" aria-label="まちがい">×</button></div><div id="vd"></div>`;
@@ -327,7 +341,7 @@ function show(){
       const ok=b.dataset.v===it.a;
       card.querySelectorAll('.tf button').forEach(x=>{x.disabled=true;if(x.dataset.v===it.a)x.classList.add('right')});
       if(!ok)b.classList.add('wrong');
-      $('vd').innerHTML=`<div class="verdict ${ok?'ok':'ng'}">${ok?'正解！':'ざんねん'}　答えは ${it.a}</div>${labelBtn(it)}`;
+      $('vd').innerHTML=`<div class="verdict ${ok?'ok':'ng'}">${ok?'正解！':'ざんねん'}　答えは ${it.a}</div>${labelBtn(it)}`;fillFigs($('vd'));
       mark(it,ok);ctrl.innerHTML=nextBtn();bindNext()};
   }else{
     card.innerHTML=head(it)+`<div class="ans" id="ans" hidden><div class="a${it.a.length>16?' long':''}">${esc(it.a)}</div>${it.x?`<div class="ex">${esc(it.x)}</div>`:''}${labelBtn(it)}</div>`;

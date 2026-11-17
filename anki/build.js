@@ -80,9 +80,11 @@ const FIELDS=[['phy','物理'],['che','化学'],['bio','生物'],['ear','地学'
 function renderFig(f,mode){
   let s=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${f.w} ${f.h}" font-family="inherit" font-size="14">`+f.body;
   for(const l of f.labels||[]){
+    s+=`<g data-l="${l.id}">`;
     if(l.px!=null) s+=`<line x1="${l.x}" y1="${l.y}" x2="${l.px}" y2="${l.py}" stroke="#555" stroke-width="1.3"/><circle cx="${l.px}" cy="${l.py}" r="2.6" fill="#555"/>`;
     if(mode==='Q') s+=`<circle cx="${l.x}" cy="${l.y}" r="12" fill="#fff" stroke="#c8372d" stroke-width="2"/><text x="${l.x}" y="${l.y+5}" text-anchor="middle" font-size="15" font-weight="700" fill="#c8372d">${l.id}</text>`;
     else s+=`<text x="${l.x}" y="${l.y+5}" text-anchor="${l.a||'middle'}" font-size="14.5" font-weight="700" fill="#c8372d" stroke="#fff" stroke-width="4" stroke-linejoin="round" paint-order="stroke">${l.name}</text>`;
+    s+='</g>';
   }
   return s+'</svg>';
 }

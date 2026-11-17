@@ -3,14 +3,16 @@
  "updated": "2026-11-17",
  "name": "中2",
  "badge": "中2",
- "longName": "中2（木曜に宿題）",
+ "longName": "中2（木・月に宿題を渡す）",
  "grade": "中2",
  "days": [
-  "thu"
+  "thu",
+  "mon"
  ],
  "about": [
-  "冬休み明けの実力テストに向けて、基本事項の復習を宿題で出す（11/19〜冬休み前まで。範囲は地理全部＋歴史は近世まで）。",
-  "1回分＝A4両面1枚（表＝要点と図の問題、裏＝ことばの問題）。こたえは iPad で見ながら丸つけ。"
+  "冬休み明けの実力テストに向けた基本の復習を、毎日1枚の宿題で出す（11/19〜12/23の5週間・No.1〜35。範囲は地理全部＋歴史は近世まで）。",
+  "1枚＝A4両面（表＝要点と図、裏＝ことばの問題12問）。各週の7枚目は要点なしの復習の日。",
+  "木曜に4枚（木〜日の分）、月曜に3枚（月〜水の分）を渡す。月曜に木曜分を、木曜に月曜分を回収して丸つけ（こたえは iPad で）。"
  ],
  "checks": [
   [
@@ -28,9 +30,13 @@
  ],
  "now": {
   "step": "c2-sekai-sugata",
-  "text": "実力テスト対策の復習宿題：①世界の姿から"
+  "text": "第1週（No.1〜7）：世界の姿・気候・アジア州"
  },
  "log": [
+  {
+   "date": "2026-11-17",
+   "text": "1日1枚・週7回（木4枚・月3枚）に決定。第1週 No.1〜7 を作成。"
+  },
   {
    "date": "2026-11-17",
    "text": "社会の教材棚を作成。宿題①（世界の姿）を追加。11/19（木）から出す。"
@@ -38,32 +44,85 @@
  ],
  "sets": [
   {
-   "id": "c2hw01",
+   "id": "c2w1",
    "label": "①",
    "steps": [
-    "c2-sekai-sugata"
+    "c2-sekai-sugata",
+    "c2-sekai-kikou",
+    "c2-sekai-asia",
+    "c2-fukushu-week"
    ],
-   "title": "実力テスト対策 宿題① 世界の姿",
+   "title": "第1週 11/19（木）〜11/25（水）　No.1〜7",
    "cur": true,
-   "note": "11/19（木）に出す。A4両面1枚（表＝要点と図、裏＝ことばの問題）。",
+   "note": "木曜に No.1〜4、月曜に No.5〜7 を渡す。11/23（月）が休みなら、11/19 に7枚まとめて渡す。",
    "groups": [
     {
      "kind": "hw",
-     "label": "木曜（宿題）",
+     "label": "木曜に渡す（No.1〜4）",
      "day": "thu",
      "items": [
       {
-       "file": "c2_hw01_sekai_sugata.pdf"
+       "file": "c2_hw01_tairiku.pdf"
+      },
+      {
+       "file": "c2_hw02_ido_keido.pdf"
+      },
+      {
+       "file": "c2_hw03_kikoutai.pdf"
+      },
+      {
+       "file": "c2_hw04_kurashi.pdf"
       }
      ]
     },
     {
      "kind": "teacher",
-     "label": "こたえ（丸つけ用）",
+     "label": "月曜の丸つけ用こたえ（No.1〜4）",
+     "day": "mon",
+     "items": [
+      {
+       "file": "c2_hw01_tairiku_ans.pdf"
+      },
+      {
+       "file": "c2_hw02_ido_keido_ans.pdf"
+      },
+      {
+       "file": "c2_hw03_kikoutai_ans.pdf"
+      },
+      {
+       "file": "c2_hw04_kurashi_ans.pdf"
+      }
+     ]
+    },
+    {
+     "kind": "hw",
+     "label": "月曜に渡す（No.5〜7）",
+     "day": "mon",
+     "items": [
+      {
+       "file": "c2_hw05_higashi_asia.pdf"
+      },
+      {
+       "file": "c2_hw06_asia_minami.pdf"
+      },
+      {
+       "file": "c2_hw07_fukushu1.pdf"
+      }
+     ]
+    },
+    {
+     "kind": "teacher",
+     "label": "木曜の丸つけ用こたえ（No.5〜7）",
      "day": "thu",
      "items": [
       {
-       "file": "c2_hw01_sekai_sugata_ans.pdf"
+       "file": "c2_hw05_higashi_asia_ans.pdf"
+      },
+      {
+       "file": "c2_hw06_asia_minami_ans.pdf"
+      },
+      {
+       "file": "c2_hw07_fukushu1_ans.pdf"
       }
      ]
     }

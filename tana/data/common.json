@@ -85,10 +85,14 @@
    ]
   },
   {
-   "id": "c2-matome",
-   "name": "まとめ",
+   "id": "c2-fukushu",
+   "name": "復習・まとめ",
    "grade": "中2",
    "steps": [
+    {
+     "id": "c2-fukushu-week",
+     "name": "週の復習（要点なし）"
+    },
     {
      "id": "c2-matome-all",
      "name": "地理と歴史のまとめ"

@@ -1,0 +1,136 @@
+"""中2 社会 毎日の宿題プリント（No.1〜35）の共通部品。
+1回分＝A4両面1枚：表＝要点（3〜4項目）＋図1つと図の問題、裏＝ことばの問題（10〜12問・1列で書く欄を広く）。
+復習の日は要点なし（points=None）。
+
+  sheet(no, sub, points, fig, figq, qa, out)
+    fig  : 図の HTML（svg）。figq : [(記号, ヒント, 答え)] 図の下の書く欄。qa : [(問題, 答え)]
+  build([sheet, ...])  まとめて PDF（問題と _ans）にする
+  mapsvg(spec) : figs/region.mjs で地図の SVG を作って返す
+  uonzu(...) : 雨温図の SVG
+"""
+import json
+import subprocess
+import tempfile
+from pathlib import Path
+from playwright.sync_api import sync_playwright
+
+HERE = Path(__file__).resolve().parent
+PDF = HERE.parent / "pdf"
+FIGS = HERE / "figs"
+
+CSS = """
+@page{size:A4;margin:10mm 13mm}
+*{box-sizing:border-box}
+body{font-family:'Noto Sans CJK JP',sans-serif;font-size:11pt;color:#111;margin:0}
+.head{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid #222;padding-bottom:2.5mm;margin-bottom:4mm}
+.head h1{font-size:16pt;margin:0}.head .sub{font-size:13pt;margin-left:10px}
+.head .no{display:inline-block;background:#222;color:#fff;border-radius:2mm;padding:0 2.5mm;margin-left:2mm}
+.name{font-size:10.5pt;white-space:nowrap}.name span{display:inline-block;border-bottom:1px solid #222;width:40mm;margin-left:2mm}
+.pts{border:1.5px solid #333;border-radius:3mm;padding:3mm 4mm;margin-bottom:4mm;background:#f6f6f6}
+.pts h2{font-size:10.5pt;margin:0 0 2mm}
+.pts p{margin:0 0 2mm;font-size:10.5pt;line-height:1.6}.pts p b{background:#ffe9a8}
+.pts .t{display:inline-block;background:#333;color:#fff;border-radius:1.5mm;padding:0 2mm;margin-right:2mm;font-size:9.5pt}
+.memo{border:1.5px dashed #888;border-radius:3mm;padding:3mm 4mm;margin-bottom:4mm;font-size:10.5pt}
+.fig{border:1px solid #bbb;border-radius:2mm;padding:2.5mm;page-break-inside:avoid;margin-bottom:3mm}
+.figt{font-weight:bold;font-size:11pt;margin-bottom:2mm}.figt span{font-weight:normal;font-size:10pt}
+.fig svg{display:block;width:100%;height:auto}
+.fq{display:grid;grid-template-columns:repeat(3,1fr);gap:3mm 5mm;margin-top:3mm}
+.fq.c2{grid-template-columns:repeat(2,1fr)}.fq.c1{grid-template-columns:1fr}
+.fq div{display:flex;align-items:flex-end;font-size:10.5pt;gap:1.5mm;min-height:9mm}
+.fq b{flex:none}.fq small{flex:none;font-size:8.5pt;color:#444}
+.fq .l{flex:1;border-bottom:1px solid #222;height:7mm;color:#c00;font-weight:bold;font-size:10.5pt;line-height:7mm;min-width:20mm}
+.pb{page-break-before:always}
+.h2{font-size:12pt;font-weight:bold;border-left:5px solid #222;padding-left:2mm;margin:0 0 3mm}
+.h2 span{font-weight:normal;font-size:10pt}
+.q{display:flex;gap:3mm;align-items:flex-end;border-bottom:1px dotted #aaa;padding:4.6mm 0}
+.n{flex:none;width:7mm;height:7mm;border:1.3px solid #222;border-radius:50%;text-align:center;font-size:10pt;line-height:6mm;align-self:center}
+.q .txt{flex:1;font-size:11pt;line-height:1.5;align-self:center}
+.q .l{flex:none;width:58mm;border-bottom:1.2px solid #222;height:9mm;color:#c00;font-weight:bold;font-size:11pt;line-height:9mm;padding-left:1mm}
+"""
+
+
+def figq_html(figq, ans, cols=3):
+    cls = {1: " c1", 2: " c2"}.get(cols, "")
+    return f"<div class='fq{cls}'>" + "".join(
+        f"<div><b>{k}</b>{f'<small>{h}</small>' if h else ''}<span class='l'>{a if ans else ''}</span></div>" for k, h, a in figq) + "</div>"
+
+
+def page(s, ans):
+    name = "" if ans else "<div class='name'>名前<span></span></div>"
+    top = (f"<div class='pts'><h2>要点（ここを見ながら解いてOK）</h2>"
+           + "".join(f"<p><span class='t'>{t}</span>{b}</p>" for t, b in s["points"]) + "</div>") if s["points"] else \
+          f"<div class='memo'>{s.get('memo', '')}</div>"
+    figs = "".join(
+        f"<div class='fig'><div class='figt'>{f['title']} <span>{f.get('hint', '')}</span></div>{f['svg'](ans) if callable(f['svg']) else f['svg']}"
+        f"{figq_html(f['q'], ans, f.get('cols', 3)) if f.get('q') else ''}</div>" for f in s["figs"])
+    rows = "".join(f"<div class='q'><div class='n'>{i}</div><div class='txt'>{q}</div><span class='l'>{a if ans else ''}</span></div>"
+                   for i, (q, a) in enumerate(s["qa"], 1))
+    back_hint = "表面の要点と図を見ながら解いてOK" if s["points"] else "分からなかったら、前のプリントで確かめよう"
+    return f"""<html><head><meta charset='utf-8'><style>{CSS}</style></head><body>
+<div class='head'><h1>社会 宿題<span class='no'>No.{s['no']}</span><span class='sub'>{s['sub']}{'【解答】' if ans else ''}</span></h1>{name}</div>
+{top}{figs}
+<div class='pb'></div>
+<div class='h2'>ことばの問題　<span>全{len(s['qa'])}問　{back_hint}</span></div>
+{rows}
+</body></html>"""
+
+
+def sheet(no, sub, points, figs, qa, out, memo=""):
+    return {"no": no, "sub": sub, "points": points, "figs": figs, "qa": qa, "out": out, "memo": memo}
+
+
+def build(sheets):
+    PDF.mkdir(exist_ok=True)
+    res = {}
+    with sync_playwright() as p:
+        b = p.chromium.launch()
+        for s in sheets:
+            for fn, ans in ((f"{s['out']}.pdf", False), (f"{s['out']}_ans.pdf", True)):
+                pg = b.new_page()
+                pg.set_content(page(s, ans))
+                pg.pdf(path=str(PDF / fn), format="A4", print_background=True)
+                pg.close()
+                n = subprocess.run(["pdfinfo", str(PDF / fn)], capture_output=True, text=True).stdout
+                res[fn] = int(n.split("Pages:")[1].split()[0])
+        b.close()
+    return res
+
+
+def mapsvg(spec):
+    with tempfile.TemporaryDirectory() as d:
+        sp, out = Path(d) / "s.json", Path(d) / "o.svg"
+        sp.write_text(json.dumps(spec, ensure_ascii=False))
+        subprocess.run(["node", "region.mjs", str(sp), str(out)], cwd=FIGS, check=True)
+        return out.read_text()
+
+
+def uonzu(temp, rain, label, tmin=-30, tmax=30, rmax=500, W=200, H=170):
+    """雨温図。折れ線＝気温（左の目盛り）、棒＝降水量（右の目盛り）。"""
+    L, R, T, B = 30, 34, 22, 22
+    pw, ph = W - L - R, H - T - B
+    ty = lambda t: T + ph * (tmax - t) / (tmax - tmin)
+    ry = lambda r: T + ph * (1 - r / rmax)
+    bw = pw / 12
+    s = f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" font-family="Noto Sans CJK JP">'
+    s += f'<text x="{W/2}" y="14" text-anchor="middle" font-size="15" font-weight="bold">{label}</text>'
+    for t in range(tmin, tmax + 1, 10):
+        y = ty(t)
+        s += f'<line x1="{L}" y1="{y}" x2="{L+pw}" y2="{y}" stroke="#ccc" stroke-width="0.6"/>'
+        s += f'<text x="{L-3}" y="{y+3}" text-anchor="end" font-size="8" fill="#c00">{t}</text>'
+    for r in range(0, rmax + 1, 100):
+        s += f'<text x="{L+pw+3}" y="{ry(r)+3}" font-size="8" fill="#1a5fd0">{r}</text>'
+    s += f'<text x="{L-3}" y="{T-6}" text-anchor="end" font-size="8" fill="#c00">℃</text>'
+    s += f'<text x="{L+pw+3}" y="{T-6}" font-size="8" fill="#1a5fd0">mm</text>'
+    for i, r in enumerate(rain):
+        x = L + i * bw + bw * 0.15
+        s += f'<rect x="{x}" y="{ry(r)}" width="{bw*0.7}" height="{T+ph-ry(r)}" fill="#7fb2ea"/>'
+    s += f'<polyline points="{" ".join(f"{L+i*bw+bw/2},{ty(t)}" for i, t in enumerate(temp))}" fill="none" stroke="#d22" stroke-width="2"/>'
+    for i, t in enumerate(temp):
+        s += f'<circle cx="{L+i*bw+bw/2}" cy="{ty(t)}" r="1.8" fill="#d22"/>'
+    if tmin < 0 < tmax:
+        s += f'<line x1="{L}" y1="{ty(0)}" x2="{L+pw}" y2="{ty(0)}" stroke="#888" stroke-width="0.8"/>'
+    s += f'<rect x="{L}" y="{T}" width="{pw}" height="{ph}" fill="none" stroke="#333" stroke-width="1"/>'
+    for m in (1, 4, 7, 10, 12):
+        s += f'<text x="{L+(m-1)*bw+bw/2}" y="{T+ph+11}" text-anchor="middle" font-size="8">{m}</text>'
+    s += f'<text x="{L+pw}" y="{T+ph+20}" text-anchor="end" font-size="7.5" fill="#555">（月）</text>'
+    return s + "</svg>"

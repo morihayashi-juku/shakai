@@ -14,9 +14,10 @@ const countries = topojson.feature(topo, topo.objects.countries);
 const borders = topojson.mesh(topo, topo.objects.countries, (a, b) => a !== b);
 const land = topojson.feature(topo, topo.objects.land);
 
-let proj = S.proj.type === "mercator" ? d3.geoMercator() : d3.geoEquirectangular();
+let proj = S.proj.type === "mercator" ? d3.geoMercator() : S.proj.type === "azeq" ? d3.geoAzimuthalEquidistant() : d3.geoEquirectangular();
 if (S.proj.rotate) proj.rotate(S.proj.rotate);
-if (S.proj.bbox) {
+if (S.proj.scale) proj.scale(S.proj.scale).translate(S.proj.translate);
+else if (S.proj.bbox) {
   const [[a, b], [c, d]] = S.proj.bbox;
   proj.fitExtent([[2, 2], [W - 2, H - 2]], {type: "Polygon", coordinates: [[[a, b], [a, d], [c, d], [c, b], [a, b]]]});
 } else proj.fitExtent([[4, 4], [W - 4, H - 4]], {type: "Sphere"});

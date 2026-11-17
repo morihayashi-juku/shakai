@@ -1,9 +1,8 @@
 """中2 社会 毎日の宿題プリント（No.1〜35）の共通部品。
-1回分＝A4両面1枚：表＝要点（3〜4項目）＋図1つと図の問題、裏＝ことばの問題（10〜12問・1列で書く欄を広く）。
-復習の日は要点なし（points=None）。
+1回分＝A4両面1枚。表も裏も「前半＝解説、後半＝問題」（先生の希望・11/17）。復習の日は解説なし（memo）。
 
-  sheet(no, sub, points, fig, figq, qa, out)
-    fig  : 図の HTML（svg）。figq : [(記号, ヒント, 答え)] 図の下の書く欄。qa : [(問題, 答え)]
+  sheet(no, sub, [表, 裏], out)  各ページ {kai, kfig, figs, qa, memo}
+    figs の q : [(記号, ヒント, 答え)] 図の下の書く欄。qa : [(問題, 答え)]（番号は表から通し）
   build([sheet, ...])  まとめて PDF（問題と _ans）にする
   mapsvg(spec) : figs/region.mjs で地図の SVG を作って返す
   uonzu(...) : 雨温図の SVG
@@ -40,9 +39,14 @@ body{font-family:'Noto Sans CJK JP',sans-serif;font-size:11pt;color:#111;margin:
 .fq b{flex:none}.fq small{flex:none;font-size:8.5pt;color:#444}
 .fq .l{flex:1;border-bottom:1px solid #222;height:7mm;color:#c00;font-weight:bold;font-size:10.5pt;line-height:7mm;min-width:20mm}
 .pb{page-break-before:always}
+.head2{font-size:11pt;font-weight:bold;color:#444;border-bottom:1.5px solid #888;padding-bottom:1.5mm;margin-bottom:4mm}
+.kfig{margin-top:2mm;background:#fff;border-radius:2mm;padding:1mm}.kfig svg{display:block;width:100%;height:auto}
+.mon{border-top:2.5px solid #222;padding-top:2.5mm}
+.mon .fig{border:none;padding:0 0 2mm;margin:0}
+.rel{border-collapse:collapse;width:100%;font-size:10pt;margin-top:1mm;background:#fff}.rel th,.rel td{border:1px solid #888;padding:1.2mm 2mm;text-align:left}.rel th{background:#eee}
 .h2{font-size:12pt;font-weight:bold;border-left:5px solid #222;padding-left:2mm;margin:0 0 3mm}
 .h2 span{font-weight:normal;font-size:10pt}
-.q{display:flex;gap:3mm;align-items:flex-end;border-bottom:1px dotted #aaa;padding:4.6mm 0}
+.q{display:flex;gap:3mm;align-items:flex-end;border-bottom:1px dotted #aaa;padding:2.4mm 0}
 .n{flex:none;width:7mm;height:7mm;border:1.3px solid #222;border-radius:50%;text-align:center;font-size:10pt;line-height:6mm;align-self:center}
 .q .txt{flex:1;font-size:11pt;line-height:1.5;align-self:center}
 .q .l{flex:none;width:58mm;border-bottom:1.2px solid #222;height:9mm;color:#c00;font-weight:bold;font-size:11pt;line-height:9mm;padding-left:1mm}
@@ -55,28 +59,40 @@ def figq_html(figq, ans, cols=3):
         f"<div><b>{k}</b>{f'<small>{h}</small>' if h else ''}<span class='l'>{a if ans else ''}</span></div>" for k, h, a in figq) + "</div>"
 
 
-def page(s, ans):
-    name = "" if ans else "<div class='name'>名前<span></span></div>"
-    top = (f"<div class='pts'><h2>要点（ここを見ながら解いてOK）</h2>"
-           + "".join(f"<p><span class='t'>{t}</span>{b}</p>" for t, b in s["points"]) + "</div>") if s["points"] else \
-          f"<div class='memo'>{s.get('memo', '')}</div>"
+def side(pg, ans, start, first):
+    """1ページ分：前半＝解説（kai）、後半＝問題（図の書く欄＋ことばの問題）。"""
+    top = ""
+    if pg.get("kai"):
+        top = ("<div class='pts'><h2>解説</h2>" + "".join(f"<p><span class='t'>{t}</span>{b}</p>" for t, b in pg["kai"])
+               + "".join(f"<div class='kfig'>{k(ans) if callable(k) else k}</div>" for k in pg.get("kfig", [])) + "</div>")
+    elif pg.get("memo"):
+        top = f"<div class='memo'>{pg['memo']}</div>"
     figs = "".join(
         f"<div class='fig'><div class='figt'>{f['title']} <span>{f.get('hint', '')}</span></div>{f['svg'](ans) if callable(f['svg']) else f['svg']}"
-        f"{figq_html(f['q'], ans, f.get('cols', 3)) if f.get('q') else ''}</div>" for f in s["figs"])
+        f"{figq_html(f['q'], ans, f.get('cols', 3)) if f.get('q') else ''}</div>" for f in pg.get("figs", []))
     rows = "".join(f"<div class='q'><div class='n'>{i}</div><div class='txt'>{q}</div><span class='l'>{a if ans else ''}</span></div>"
-                   for i, (q, a) in enumerate(s["qa"], 1))
-    back_hint = "表面の要点と図を見ながら解いてOK" if s["points"] else "分からなかったら、前のプリントで確かめよう"
+                   for i, (q, a) in enumerate(pg.get("qa", []), start))
+    hint = "上の解説を見ながら解いてOK" if pg.get("kai") else "分からなかったら、前のプリントで確かめよう"
+    return (top + f"<div class='mon'><div class='h2'>問題　<span>{hint}</span></div>{figs}{rows}</div>",
+            start + len(pg.get("qa", [])))
+
+
+def page(s, ans):
+    name = "" if ans else "<div class='name'>名前<span></span></div>"
+    p1, n = side(s["pages"][0], ans, 1, True)
+    p2, _ = side(s["pages"][1], ans, n, False)
     return f"""<html><head><meta charset='utf-8'><style>{CSS}</style></head><body>
 <div class='head'><h1>社会 宿題<span class='no'>No.{s['no']}</span><span class='sub'>{s['sub']}{'【解答】' if ans else ''}</span></h1>{name}</div>
-{top}{figs}
+{p1}
 <div class='pb'></div>
-<div class='h2'>ことばの問題　<span>全{len(s['qa'])}問　{back_hint}</span></div>
-{rows}
+<div class='head2'>No.{s['no']}　{s['sub']}（うら）</div>
+{p2}
 </body></html>"""
 
 
-def sheet(no, sub, points, figs, qa, out, memo=""):
-    return {"no": no, "sub": sub, "points": points, "figs": figs, "qa": qa, "out": out, "memo": memo}
+def sheet(no, sub, pages, out):
+    """pages＝[表, 裏]。各ページ {kai:[(見出し, 本文)], kfig:[解説の中の図], figs:[問題の図], qa:[(問題, 答え)], memo}"""
+    return {"no": no, "sub": sub, "pages": pages, "out": out}
 
 
 def build(sheets):

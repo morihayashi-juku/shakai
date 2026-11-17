@@ -59,6 +59,14 @@ async function loadData() {
     g.kind = KIND_ALIAS[g.kind] || g.kind;
     if (g.day) g.day = [].concat(g.day);                    // day は "mon" でも ["mon","thu"] でもよい
   }
+  // 回に from（YYYY-MM-DD）があれば、今日までに始まった最後の回を「今ここ」にする（社会：週ごとに自動で切りかえ）
+  const today = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+  for (const t of TRACKS) {
+    const ss = D.s[t].sets.filter(s => s.from);
+    if (!ss.length) continue;
+    const now = ss.filter(s => s.from <= today).pop() || ss[0];
+    for (const s of D.s[t].sets) s.cur = s === now;
+  }
   for (const u of common.units) for (const st of u.steps) STEPS.set(st.id, {step: st, unit: u});
   if (common.jitsu) for (const st of common.jitsu.steps) STEPS.set(st.id, {step: st, unit: {name: common.jitsu.name}});   // 実力テストのタブ（学年の単元とは別）
   for (const it of library.items) ITEMS.set(it.file, it);

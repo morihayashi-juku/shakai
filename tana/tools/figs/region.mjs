@@ -11,8 +11,17 @@ const S = JSON.parse(fs.readFileSync(specFile, "utf8"));
 const W = S.w || 720, H = S.h || 400, res = S.res || "50m";
 const topo = JSON.parse(fs.readFileSync(`node_modules/world-atlas/countries-${res}.json`));
 const countries = topojson.feature(topo, topo.objects.countries);
+// 向きが逆の多角形（地球のほとんどを覆うと判定されるもの）は、点の順番を逆にする
+const rev = g => g.type === "Polygon" ? {...g, coordinates: g.coordinates.map(r => [...r].reverse())}
+  : g.type === "MultiPolygon" ? {...g, coordinates: g.coordinates.map(p => p.map(r => [...r].reverse()))} : g;
+for (const f of countries.features) {
+  if (!f.geometry) continue;
+  if (f.geometry.type === "MultiPolygon") {
+    f.geometry.coordinates = f.geometry.coordinates.map(p => d3.geoArea({type: "Polygon", coordinates: p}) > 2 * Math.PI ? p.map(r => [...r].reverse()) : p);
+  } else if (d3.geoArea(f) > 2 * Math.PI) f.geometry = rev(f.geometry);
+}
 const borders = topojson.mesh(topo, topo.objects.countries, (a, b) => a !== b);
-const land = topojson.feature(topo, topo.objects.land);
+const coast = topojson.mesh(topo, topo.objects.countries, (a, b) => a === b);
 
 let proj = S.proj.type === "mercator" ? d3.geoMercator() : S.proj.type === "azeq" ? d3.geoAzimuthalEquidistant() : d3.geoEquirectangular();
 if (S.proj.rotate) proj.rotate(S.proj.rotate);
@@ -28,13 +37,12 @@ let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" font-fa
 s += `<rect width="${W}" height="${H}" fill="#e8f2fb"/>`;
 if (S.proj.sphere) s += `<path d="${path({type: "Sphere"})}" fill="#e8f2fb" stroke="#333" stroke-width="1.5"/>`;
 if (S.graticule) s += `<path d="${path(d3.geoGraticule().step([30, 30])())}" fill="none" stroke="#9bb8d3" stroke-width="0.6"/>`;
-s += `<path d="${path(land)}" fill="#f4ecd6"/>`;
 for (const f of countries.features) {
-  const c = (S.fill || {})[f.properties.name];
-  if (c) s += `<path d="${path(f)}" fill="${c}"/>`;
+  const c = (S.fill || {})[f.properties.name] || "#f4ecd6";
+  s += `<path d="${path(f)}" fill="${c}"/>`;
 }
 if (S.borders !== false) s += `<path d="${path(borders)}" fill="none" stroke="#999" stroke-width="0.6"/>`;
-s += `<path d="${path(land)}" fill="none" stroke="#555" stroke-width="0.8"/>`;
+s += `<path d="${path(coast)}" fill="none" stroke="#555" stroke-width="0.8"/>`;
 for (const L of S.lines || []) {
   s += `<path d="${path({type: "LineString", coordinates: L.c})}" fill="none" stroke="${L.color || "#1a5fd0"}" stroke-width="${L.w || 2.5}"${L.dash ? ` stroke-dasharray="${L.dash}"` : ""} stroke-linejoin="round"/>`;
 }

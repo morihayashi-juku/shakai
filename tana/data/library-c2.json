@@ -95,14 +95,434 @@
   {
    "file": "c2_hw07_fukushu1.pdf",
    "step": "c2-fukushu-week",
-   "title": "No.7 復習1（No.1〜6）",
+   "title": "No.7 復習1 No.1〜6のまとめ",
    "pages": 2,
-   "note": "A4両面1枚。解説なしの復習の日。表＝世界地図＋雨温図、裏＝ことばの問題12問"
+   "note": "A4両面1枚。解説なしの復習の日"
   },
   {
    "file": "c2_hw07_fukushu1_ans.pdf",
    "step": "c2-fukushu-week",
-   "title": "No.7 復習1（No.1〜6） こたえ",
+   "title": "No.7 復習1 No.1〜6のまとめ こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c2_hw08_europe1.pdf",
+   "step": "c2-sekai-europe",
+   "title": "No.8 ヨーロッパ州① 自然・文化・EU",
+   "pages": 2,
+   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+  },
+  {
+   "file": "c2_hw08_europe1_ans.pdf",
+   "step": "c2-sekai-europe",
+   "title": "No.8 ヨーロッパ州① 自然・文化・EU こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c2_hw09_europe2.pdf",
+   "step": "c2-sekai-europe",
+   "title": "No.9 ヨーロッパ州② 農業・工業・環境",
+   "pages": 2,
+   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+  },
+  {
+   "file": "c2_hw09_europe2_ans.pdf",
+   "step": "c2-sekai-europe",
+   "title": "No.9 ヨーロッパ州② 農業・工業・環境 こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c2_hw10_africa.pdf",
+   "step": "c2-sekai-africa",
+   "title": "No.10 アフリカ州",
+   "pages": 2,
+   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+  },
+  {
+   "file": "c2_hw10_africa_ans.pdf",
+   "step": "c2-sekai-africa",
+   "title": "No.10 アフリカ州 こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c2_hw11_namerica1.pdf",
+   "step": "c2-sekai-namerica",
+   "title": "No.11 北アメリカ州① 自然・人々・農業",
+   "pages": 2,
+   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+  },
+  {
+   "file": "c2_hw11_namerica1_ans.pdf",
+   "step": "c2-sekai-namerica",
+   "title": "No.11 北アメリカ州① 自然・人々・農業 こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c2_hw12_namerica2.pdf",
+   "step": "c2-sekai-namerica",
+   "title": "No.12 北アメリカ州② 工業と生活",
+   "pages": 2,
+   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+  },
+  {
+   "file": "c2_hw12_namerica2_ans.pdf",
+   "step": "c2-sekai-namerica",
+   "title": "No.12 北アメリカ州② 工業と生活 こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c2_hw13_samerica_oceania.pdf",
+   "step": "c2-sekai-samerica-oceania",
+   "title": "No.13 南アメリカ州・オセアニア州",
+   "pages": 2,
+   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+  },
+  {
+   "file": "c2_hw13_samerica_oceania_ans.pdf",
+   "step": "c2-sekai-samerica-oceania",
+   "title": "No.13 南アメリカ州・オセアニア州 こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c2_hw14_fukushu2.pdf",
+   "step": "c2-fukushu-week",
+   "title": "No.14 復習2 No.8〜13のまとめ",
+   "pages": 2,
+   "note": "A4両面1枚。解説なしの復習の日"
+  },
+  {
+   "file": "c2_hw14_fukushu2_ans.pdf",
+   "step": "c2-fukushu-week",
+   "title": "No.14 復習2 No.8〜13のまとめ こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c2_hw15_nihon_sugata.pdf",
+   "step": "c2-nihon-sugata",
+   "title": "No.15 日本の姿 位置・時差・領域",
+   "pages": 2,
+   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+  },
+  {
+   "file": "c2_hw15_nihon_sugata_ans.pdf",
+   "step": "c2-nihon-sugata",
+   "title": "No.15 日本の姿 位置・時差・領域 こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c2_hw16_nihon_shizen.pdf",
+   "step": "c2-nihon-sugata",
+   "title": "No.16 日本の自然 地形・気候・災害",
+   "pages": 2,
+   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+  },
+  {
+   "file": "c2_hw16_nihon_shizen_ans.pdf",
+   "step": "c2-nihon-sugata",
+   "title": "No.16 日本の自然 地形・気候・災害 こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c2_hw17_jinkou_shigen.pdf",
+   "step": "c2-nihon-sangyou",
+   "title": "No.17 日本の人口・資源・エネルギー",
+   "pages": 2,
+   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+  },
+  {
+   "file": "c2_hw17_jinkou_shigen_ans.pdf",
+   "step": "c2-nihon-sangyou",
+   "title": "No.17 日本の人口・資源・エネルギー こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c2_hw18_sangyou.pdf",
+   "step": "c2-nihon-sangyou",
+   "title": "No.18 日本の産業と交通",
+   "pages": 2,
+   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+  },
+  {
+   "file": "c2_hw18_sangyou_ans.pdf",
+   "step": "c2-nihon-sangyou",
+   "title": "No.18 日本の産業と交通 こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c2_hw19_kyushu_chushi.pdf",
+   "step": "c2-nihon-chiiki-w",
+   "title": "No.19 九州地方・中国四国地方",
+   "pages": 2,
+   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+  },
+  {
+   "file": "c2_hw19_kyushu_chushi_ans.pdf",
+   "step": "c2-nihon-chiiki-w",
+   "title": "No.19 九州地方・中国四国地方 こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c2_hw20_kinki_chubu.pdf",
+   "step": "c2-nihon-chiiki-w",
+   "title": "No.20 近畿地方・中部地方",
+   "pages": 2,
+   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+  },
+  {
+   "file": "c2_hw20_kinki_chubu_ans.pdf",
+   "step": "c2-nihon-chiiki-w",
+   "title": "No.20 近畿地方・中部地方 こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c2_hw21_fukushu3.pdf",
+   "step": "c2-fukushu-week",
+   "title": "No.21 復習3 No.15〜20のまとめ",
+   "pages": 2,
+   "note": "A4両面1枚。解説なしの復習の日"
+  },
+  {
+   "file": "c2_hw21_fukushu3_ans.pdf",
+   "step": "c2-fukushu-week",
+   "title": "No.21 復習3 No.15〜20のまとめ こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c2_hw22_kanto.pdf",
+   "step": "c2-nihon-chiiki-e",
+   "title": "No.22 関東地方",
+   "pages": 2,
+   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+  },
+  {
+   "file": "c2_hw22_kanto_ans.pdf",
+   "step": "c2-nihon-chiiki-e",
+   "title": "No.22 関東地方 こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c2_hw23_tohoku_hokkaido.pdf",
+   "step": "c2-nihon-chiiki-e",
+   "title": "No.23 東北地方・北海道地方",
+   "pages": 2,
+   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+  },
+  {
+   "file": "c2_hw23_tohoku_hokkaido_ans.pdf",
+   "step": "c2-nihon-chiiki-e",
+   "title": "No.23 東北地方・北海道地方 こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c2_hw24_rekishi_kodai1.pdf",
+   "step": "c2-rekishi-kodai",
+   "title": "No.24 歴史① 文明のおこり〜古墳時代",
+   "pages": 2,
+   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+  },
+  {
+   "file": "c2_hw24_rekishi_kodai1_ans.pdf",
+   "step": "c2-rekishi-kodai",
+   "title": "No.24 歴史① 文明のおこり〜古墳時代 こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c2_hw25_rekishi_kodai2.pdf",
+   "step": "c2-rekishi-kodai",
+   "title": "No.25 歴史② 飛鳥・奈良・平安時代",
+   "pages": 2,
+   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+  },
+  {
+   "file": "c2_hw25_rekishi_kodai2_ans.pdf",
+   "step": "c2-rekishi-kodai",
+   "title": "No.25 歴史② 飛鳥・奈良・平安時代 こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c2_hw26_rekishi_kamakura.pdf",
+   "step": "c2-rekishi-chusei",
+   "title": "No.26 歴史③ 鎌倉時代",
+   "pages": 2,
+   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+  },
+  {
+   "file": "c2_hw26_rekishi_kamakura_ans.pdf",
+   "step": "c2-rekishi-chusei",
+   "title": "No.26 歴史③ 鎌倉時代 こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c2_hw27_rekishi_muromachi.pdf",
+   "step": "c2-rekishi-chusei",
+   "title": "No.27 歴史④ 南北朝・室町時代",
+   "pages": 2,
+   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+  },
+  {
+   "file": "c2_hw27_rekishi_muromachi_ans.pdf",
+   "step": "c2-rekishi-chusei",
+   "title": "No.27 歴史④ 南北朝・室町時代 こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c2_hw28_fukushu4.pdf",
+   "step": "c2-fukushu-week",
+   "title": "No.28 復習4 No.22〜27のまとめ",
+   "pages": 2,
+   "note": "A4両面1枚。解説なしの復習の日"
+  },
+  {
+   "file": "c2_hw28_fukushu4_ans.pdf",
+   "step": "c2-fukushu-week",
+   "title": "No.28 復習4 No.22〜27のまとめ こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c2_hw29_rekishi_sengoku.pdf",
+   "step": "c2-rekishi-kinsei",
+   "title": "No.29 歴史⑤ ヨーロッパ人の来航と全国統一",
+   "pages": 2,
+   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+  },
+  {
+   "file": "c2_hw29_rekishi_sengoku_ans.pdf",
+   "step": "c2-rekishi-kinsei",
+   "title": "No.29 歴史⑤ ヨーロッパ人の来航と全国統一 こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c2_hw30_rekishi_edo1.pdf",
+   "step": "c2-rekishi-kinsei",
+   "title": "No.30 歴史⑥ 江戸幕府の成立と鎖国",
+   "pages": 2,
+   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+  },
+  {
+   "file": "c2_hw30_rekishi_edo1_ans.pdf",
+   "step": "c2-rekishi-kinsei",
+   "title": "No.30 歴史⑥ 江戸幕府の成立と鎖国 こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c2_hw31_rekishi_edo2.pdf",
+   "step": "c2-rekishi-kinsei",
+   "title": "No.31 歴史⑦ 江戸時代の産業・改革・文化",
+   "pages": 2,
+   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+  },
+  {
+   "file": "c2_hw31_rekishi_edo2_ans.pdf",
+   "step": "c2-rekishi-kinsei",
+   "title": "No.31 歴史⑦ 江戸時代の産業・改革・文化 こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c2_hw32_chiri_matome.pdf",
+   "step": "c2-matome-all",
+   "title": "No.32 地理のまとめ 世界と日本",
+   "pages": 2,
+   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+  },
+  {
+   "file": "c2_hw32_chiri_matome_ans.pdf",
+   "step": "c2-matome-all",
+   "title": "No.32 地理のまとめ 世界と日本 こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c2_hw33_rekishi_matome.pdf",
+   "step": "c2-matome-all",
+   "title": "No.33 歴史のまとめ 時代の流れと人物",
+   "pages": 2,
+   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+  },
+  {
+   "file": "c2_hw33_rekishi_matome_ans.pdf",
+   "step": "c2-matome-all",
+   "title": "No.33 歴史のまとめ 時代の流れと人物 こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c2_hw34_mini_test.pdf",
+   "step": "c2-matome-all",
+   "title": "No.34 全範囲ミニテスト",
+   "pages": 2,
+   "note": "A4両面1枚。解説なしのミニテスト（15分）"
+  },
+  {
+   "file": "c2_hw34_mini_test_ans.pdf",
+   "step": "c2-matome-all",
+   "title": "No.34 全範囲ミニテスト こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c2_hw35_fukushu5.pdf",
+   "step": "c2-fukushu-week",
+   "title": "No.35 復習5 No.29〜33のまとめ",
+   "pages": 2,
+   "note": "A4両面1枚。解説なしの復習の日"
+  },
+  {
+   "file": "c2_hw35_fukushu5_ans.pdf",
+   "step": "c2-fukushu-week",
+   "title": "No.35 復習5 No.29〜33のまとめ こたえ",
    "pages": 2,
    "note": "同じ形に赤で答え",
    "ans": true

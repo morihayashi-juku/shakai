@@ -59,6 +59,11 @@ def figq_html(figq, ans, cols=3):
         f"<div><b>{k}</b>{f'<small>{h}</small>' if h else ''}<span class='l'>{a if ans else ''}</span></div>" for k, h, a in figq) + "</div>"
 
 
+def wrap(f, ans):
+    svg = f["svg"](ans) if callable(f["svg"]) else f["svg"]
+    return f"<div style='width:{f['w']};margin:0 auto'>{svg}</div>" if f.get("w") else svg
+
+
 def side(pg, ans, start, first):
     """1ページ分：前半＝解説（kai）、後半＝問題（図の書く欄＋ことばの問題）。"""
     top = ""
@@ -68,7 +73,7 @@ def side(pg, ans, start, first):
     elif pg.get("memo"):
         top = f"<div class='memo'>{pg['memo']}</div>"
     figs = "".join(
-        f"<div class='fig'><div class='figt'>{f['title']} <span>{f.get('hint', '')}</span></div>{f['svg'](ans) if callable(f['svg']) else f['svg']}"
+        f"<div class='fig'><div class='figt'>{f['title']} <span>{f.get('hint', '')}</span></div>{wrap(f, ans)}"
         f"{figq_html(f['q'], ans, f.get('cols', 3)) if f.get('q') else ''}</div>" for f in pg.get("figs", []))
     rows = "".join(f"<div class='q'><div class='n'>{i}</div><div class='txt'>{q}</div><span class='l'>{a if ans else ''}</span></div>"
                    for i, (q, a) in enumerate(pg.get("qa", []), start))
@@ -149,4 +154,46 @@ def uonzu(temp, rain, label, tmin=-30, tmax=30, rmax=500, W=200, H=170):
     for m in (1, 4, 7, 10, 12):
         s += f'<text x="{L+(m-1)*bw+bw/2}" y="{T+ph+11}" text-anchor="middle" font-size="8">{m}</text>'
     s += f'<text x="{L+pw}" y="{T+ph+20}" text-anchor="end" font-size="7.5" fill="#555">（月）</text>'
+    return s + "</svg>"
+
+
+def tbl(head, rows, widths=None):
+    """解説や問題の中に置く表。rows の文字は HTML（<b> など）を使ってよい。"""
+    cg = "".join(f"<col style='width:{w}'>" for w in widths) if widths else ""
+    return ("<table class='rel'>" + (f"<colgroup>{cg}</colgroup>" if cg else "")
+            + "<tr>" + "".join(f"<th>{h}</th>" for h in head) + "</tr>"
+            + "".join("<tr>" + "".join(f"<td>{c}</td>" for c in r) + "</tr>" for r in rows) + "</table>")
+
+
+def side_by_side(*parts, gap="5mm"):
+    return f"<div style='display:flex;gap:{gap};align-items:flex-start'>" + "".join(f"<div style='flex:1'>{p}</div>" for p in parts) + "</div>"
+
+
+def pyramid(widths, label, W=150, H=170):
+    """人口ピラミッドの形だけ（widths＝上から下へ、各年齢層の横はば 0〜1）。"""
+    n = len(widths); bh = (H - 30) / n; cx = W / 2
+    s = f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" font-family="Noto Sans CJK JP">'
+    s += f'<text x="{cx}" y="15" text-anchor="middle" font-size="15" font-weight="bold">{label}</text>'
+    for i, w in enumerate(widths):
+        y = 22 + i * bh; hw = w * (W / 2 - 8)
+        s += f'<rect x="{cx-hw}" y="{y}" width="{hw}" height="{bh-1}" fill="#7fb2ea"/><rect x="{cx}" y="{y}" width="{hw}" height="{bh-1}" fill="#f3a5a5"/>'
+    s += f'<line x1="{cx}" y1="20" x2="{cx}" y2="{H-6}" stroke="#333"/>'
+    s += f'<text x="8" y="30" font-size="8" fill="#555">高齢</text><text x="8" y="{H-10}" font-size="8" fill="#555">子ども</text>'
+    return s + "</svg>"
+
+
+def jisa_line(points, W=700, H=120, lo=-90, hi=180):
+    """経度の数直線（15度ごと）と都市。points＝[(経度, 名前)]（西経はマイナス）。"""
+    x = lambda d: 30 + (W - 60) * (d - lo) / (hi - lo)
+    s = f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" font-family="Noto Sans CJK JP">'
+    s += f'<line x1="{x(lo)}" y1="60" x2="{x(hi)}" y2="60" stroke="#333" stroke-width="2"/>'
+    for d in range(lo, hi + 1, 15):
+        big = d % 45 == 0
+        s += f'<line x1="{x(d)}" y1="{54 if big else 56}" x2="{x(d)}" y2="{66 if big else 64}" stroke="#333"/>'
+        if big:
+            t = "0°" if d == 0 else (f"東経{d}°" if d > 0 else f"西経{-d}°")
+            s += f'<text x="{x(d)}" y="82" text-anchor="middle" font-size="11">{t}</text>'
+    for d, nm in points:
+        s += f'<circle cx="{x(d)}" cy="60" r="6" fill="#d22"/><text x="{x(d)}" y="42" text-anchor="middle" font-size="14" font-weight="bold">{nm}</text>'
+    s += f'<text x="{x(hi)}" y="105" text-anchor="end" font-size="11" fill="#555">15度ごとに目もり（15度で1時間の時差）→ 東ほど時刻が早い</text>'
     return s + "</svg>"

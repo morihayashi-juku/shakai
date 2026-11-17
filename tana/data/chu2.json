@@ -11,7 +11,7 @@
  "about": [
   "冬休み明けの実力テストに向けた基本の復習を、毎日1枚の宿題で出す（11/19〜12/23の5週間・No.1〜35。範囲は地理全部＋歴史は近世まで）。",
   "1枚＝A4両面。表も裏も「前半＝解説、後半＝問題」。各週の7枚目は解説なしの復習の日。",
-  "毎週木曜に1週間分（7枚・木〜水）をまとめて渡し、次の木曜に回収して丸つけ（こたえは iPad で）。"
+  "毎週木曜に1週間分（7枚・木〜水）をまとめて渡し、次の木曜に回収して丸つけ（こたえは iPad で）。「今ここ」の週は日付で自動で切りかわる（金曜から次の週）。"
  ],
  "checks": [
   [
@@ -29,9 +29,13 @@
  ],
  "now": {
   "step": "c2-sekai-sugata",
-  "text": "第1週（No.1〜7）：世界の姿・気候・アジア州"
+  "text": "5週分（No.1〜35）作成ずみ。今週の分が「今ここ」に出る"
  },
  "log": [
+  {
+   "date": "2026-11-17",
+   "text": "第2〜5週（No.8〜35）を作成。週ごとの回に、渡す7枚と前の週のこたえ（回収・丸つけ用）を入れた。12/24（木）は回収だけの回。"
+  },
   {
    "date": "2026-11-17",
    "text": "1日1枚・週7回（木4枚・月3枚）に決定。第1週 No.1〜7 を作成。 表裏とも前半解説・後半問題の形にした。 木曜に1週間分（7枚）をまとめて渡す形にした。"
@@ -45,6 +49,7 @@
   {
    "id": "c2w1",
    "label": "①",
+   "from": "2026-11-17",
    "steps": [
     "c2-sekai-sugata",
     "c2-sekai-kikou",
@@ -52,8 +57,7 @@
     "c2-fukushu-week"
    ],
    "title": "第1週 11/19（木）〜11/25（水）　No.1〜7",
-   "cur": true,
-   "note": "11/19（木）に No.1〜7 をまとめて渡す（木〜水に1日1枚）。11/26（木）に回収して丸つけ。",
+   "note": "11/19（木）に No.1〜7 をまとめて渡す（1日1枚）。11/26（木）に回収して丸つけ（こたえは第2週の回にも入っています）。",
    "groups": [
     {
      "kind": "hw",
@@ -85,7 +89,7 @@
     },
     {
      "kind": "teacher",
-     "label": "こたえ（次の木曜に回収して丸つけ）",
+     "label": "こたえ（No.1〜7）",
      "day": "thu",
      "items": [
       {
@@ -108,6 +112,331 @@
       },
       {
        "file": "c2_hw07_fukushu1_ans.pdf"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "c2w2",
+   "label": "②",
+   "from": "2026-11-20",
+   "steps": [
+    "c2-fukushu-week",
+    "c2-sekai-europe",
+    "c2-sekai-africa",
+    "c2-sekai-namerica",
+    "c2-sekai-samerica-oceania"
+   ],
+   "title": "第2週 11/26（木）〜12/2（水）　No.8〜14",
+   "note": "11/26（木）に No.8〜14 をまとめて渡す（1日1枚）。同じ日に No.1〜7 を回収して丸つけ。",
+   "groups": [
+    {
+     "kind": "hw",
+     "label": "木曜に渡す（No.8〜14）",
+     "day": "thu",
+     "items": [
+      {
+       "file": "c2_hw08_europe1.pdf"
+      },
+      {
+       "file": "c2_hw09_europe2.pdf"
+      },
+      {
+       "file": "c2_hw10_africa.pdf"
+      },
+      {
+       "file": "c2_hw11_namerica1.pdf"
+      },
+      {
+       "file": "c2_hw12_namerica2.pdf"
+      },
+      {
+       "file": "c2_hw13_samerica_oceania.pdf"
+      },
+      {
+       "file": "c2_hw14_fukushu2.pdf"
+      }
+     ]
+    },
+    {
+     "kind": "teacher",
+     "label": "回収して丸つけ（No.1〜7 のこたえ）",
+     "day": "thu",
+     "items": [
+      {
+       "file": "c2_hw01_tairiku_ans.pdf"
+      },
+      {
+       "file": "c2_hw02_ido_keido_ans.pdf"
+      },
+      {
+       "file": "c2_hw03_kikoutai_ans.pdf"
+      },
+      {
+       "file": "c2_hw04_kurashi_ans.pdf"
+      },
+      {
+       "file": "c2_hw05_higashi_asia_ans.pdf"
+      },
+      {
+       "file": "c2_hw06_asia_minami_ans.pdf"
+      },
+      {
+       "file": "c2_hw07_fukushu1_ans.pdf"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "c2w3",
+   "label": "③",
+   "from": "2026-11-27",
+   "steps": [
+    "c2-fukushu-week",
+    "c2-nihon-sugata",
+    "c2-nihon-sangyou",
+    "c2-nihon-chiiki-w"
+   ],
+   "title": "第3週 12/3（木）〜12/9（水）　No.15〜21",
+   "note": "12/3（木）に No.15〜21 をまとめて渡す（1日1枚）。同じ日に No.8〜14 を回収して丸つけ。",
+   "groups": [
+    {
+     "kind": "hw",
+     "label": "木曜に渡す（No.15〜21）",
+     "day": "thu",
+     "items": [
+      {
+       "file": "c2_hw15_nihon_sugata.pdf"
+      },
+      {
+       "file": "c2_hw16_nihon_shizen.pdf"
+      },
+      {
+       "file": "c2_hw17_jinkou_shigen.pdf"
+      },
+      {
+       "file": "c2_hw18_sangyou.pdf"
+      },
+      {
+       "file": "c2_hw19_kyushu_chushi.pdf"
+      },
+      {
+       "file": "c2_hw20_kinki_chubu.pdf"
+      },
+      {
+       "file": "c2_hw21_fukushu3.pdf"
+      }
+     ]
+    },
+    {
+     "kind": "teacher",
+     "label": "回収して丸つけ（No.8〜14 のこたえ）",
+     "day": "thu",
+     "items": [
+      {
+       "file": "c2_hw08_europe1_ans.pdf"
+      },
+      {
+       "file": "c2_hw09_europe2_ans.pdf"
+      },
+      {
+       "file": "c2_hw10_africa_ans.pdf"
+      },
+      {
+       "file": "c2_hw11_namerica1_ans.pdf"
+      },
+      {
+       "file": "c2_hw12_namerica2_ans.pdf"
+      },
+      {
+       "file": "c2_hw13_samerica_oceania_ans.pdf"
+      },
+      {
+       "file": "c2_hw14_fukushu2_ans.pdf"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "c2w4",
+   "label": "④",
+   "from": "2026-12-04",
+   "steps": [
+    "c2-fukushu-week",
+    "c2-nihon-chiiki-e",
+    "c2-rekishi-kodai",
+    "c2-rekishi-chusei"
+   ],
+   "title": "第4週 12/10（木）〜12/16（水）　No.22〜28",
+   "note": "12/10（木）に No.22〜28 をまとめて渡す（1日1枚）。同じ日に No.15〜21 を回収して丸つけ。",
+   "groups": [
+    {
+     "kind": "hw",
+     "label": "木曜に渡す（No.22〜28）",
+     "day": "thu",
+     "items": [
+      {
+       "file": "c2_hw22_kanto.pdf"
+      },
+      {
+       "file": "c2_hw23_tohoku_hokkaido.pdf"
+      },
+      {
+       "file": "c2_hw24_rekishi_kodai1.pdf"
+      },
+      {
+       "file": "c2_hw25_rekishi_kodai2.pdf"
+      },
+      {
+       "file": "c2_hw26_rekishi_kamakura.pdf"
+      },
+      {
+       "file": "c2_hw27_rekishi_muromachi.pdf"
+      },
+      {
+       "file": "c2_hw28_fukushu4.pdf"
+      }
+     ]
+    },
+    {
+     "kind": "teacher",
+     "label": "回収して丸つけ（No.15〜21 のこたえ）",
+     "day": "thu",
+     "items": [
+      {
+       "file": "c2_hw15_nihon_sugata_ans.pdf"
+      },
+      {
+       "file": "c2_hw16_nihon_shizen_ans.pdf"
+      },
+      {
+       "file": "c2_hw17_jinkou_shigen_ans.pdf"
+      },
+      {
+       "file": "c2_hw18_sangyou_ans.pdf"
+      },
+      {
+       "file": "c2_hw19_kyushu_chushi_ans.pdf"
+      },
+      {
+       "file": "c2_hw20_kinki_chubu_ans.pdf"
+      },
+      {
+       "file": "c2_hw21_fukushu3_ans.pdf"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "c2w5",
+   "label": "⑤",
+   "from": "2026-12-11",
+   "steps": [
+    "c2-fukushu-week",
+    "c2-rekishi-kinsei",
+    "c2-matome-all"
+   ],
+   "title": "第5週 12/17（木）〜12/23（水）　No.29〜35",
+   "note": "12/17（木）に No.29〜35 をまとめて渡す（1日1枚）。同じ日に No.22〜28 を回収して丸つけ。",
+   "groups": [
+    {
+     "kind": "hw",
+     "label": "木曜に渡す（No.29〜35）",
+     "day": "thu",
+     "items": [
+      {
+       "file": "c2_hw29_rekishi_sengoku.pdf"
+      },
+      {
+       "file": "c2_hw30_rekishi_edo1.pdf"
+      },
+      {
+       "file": "c2_hw31_rekishi_edo2.pdf"
+      },
+      {
+       "file": "c2_hw32_chiri_matome.pdf"
+      },
+      {
+       "file": "c2_hw33_rekishi_matome.pdf"
+      },
+      {
+       "file": "c2_hw34_mini_test.pdf"
+      },
+      {
+       "file": "c2_hw35_fukushu5.pdf"
+      }
+     ]
+    },
+    {
+     "kind": "teacher",
+     "label": "回収して丸つけ（No.22〜28 のこたえ）",
+     "day": "thu",
+     "items": [
+      {
+       "file": "c2_hw22_kanto_ans.pdf"
+      },
+      {
+       "file": "c2_hw23_tohoku_hokkaido_ans.pdf"
+      },
+      {
+       "file": "c2_hw24_rekishi_kodai1_ans.pdf"
+      },
+      {
+       "file": "c2_hw25_rekishi_kodai2_ans.pdf"
+      },
+      {
+       "file": "c2_hw26_rekishi_kamakura_ans.pdf"
+      },
+      {
+       "file": "c2_hw27_rekishi_muromachi_ans.pdf"
+      },
+      {
+       "file": "c2_hw28_fukushu4_ans.pdf"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "c2w6",
+   "label": "⑥",
+   "from": "2026-12-18",
+   "steps": [
+    "c2-matome-all",
+    "c2-fukushu-week"
+   ],
+   "title": "12/24（木）　第5週の回収・丸つけ",
+   "note": "12/24（木）に No.29〜35 を回収して丸つけ。冬休み明けの実力テストの範囲が出たら、それに合わせて復習する。",
+   "groups": [
+    {
+     "kind": "teacher",
+     "label": "回収して丸つけ（No.29〜35 のこたえ）",
+     "day": "thu",
+     "items": [
+      {
+       "file": "c2_hw29_rekishi_sengoku_ans.pdf"
+      },
+      {
+       "file": "c2_hw30_rekishi_edo1_ans.pdf"
+      },
+      {
+       "file": "c2_hw31_rekishi_edo2_ans.pdf"
+      },
+      {
+       "file": "c2_hw32_chiri_matome_ans.pdf"
+      },
+      {
+       "file": "c2_hw33_rekishi_matome_ans.pdf"
+      },
+      {
+       "file": "c2_hw34_mini_test_ans.pdf"
+      },
+      {
+       "file": "c2_hw35_fukushu5_ans.pdf"
       }
      ]
     }

@@ -491,6 +491,16 @@ body.read { background: var(--paper); }
 .pmsg-in ol { margin: 6px 0; padding-left: 1.4em; }
 .pmsg-url { font-size: 12px; word-break: break-all; background: #f1efe9; border-radius: 6px; padding: 6px 8px; user-select: all; -webkit-user-select: all; }
 .pmsg-b { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.pmsg-in { max-height: calc(100vh - 32px); overflow: auto; }
+.pmsg-list { border-top: 1px solid var(--rule); margin-top: 8px; }
+.pmsg-unit { font-weight: 700; margin: 8px 0 2px; }
+.pmsg-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--rule); }
+.pmsg-row small { display: block; font-size: 11px; color: var(--mute); }
+.pmsg-row .btn { min-width: 6.5em; }
+.pmsg-row .btn.go { background: #2f6b3f; border-color: #2f6b3f; }
+.pmsg-wait { color: var(--mute); }
+.pmsg-more { margin-top: 10px; font-size: 13px; }
+.pmsg-more summary { cursor: pointer; color: var(--mute); }
 
 /* ---------- 印刷 ---------- */
 @page { size: A4; margin: 0; }
@@ -580,19 +590,30 @@ function save() { state.last[state.mode] = state.unit; try { localStorage.setIte
 // 単元を開く（読む画面・リンクからも使う）
 // ---------- 印刷 ----------
 // iPad・iPhone で「ホーム画面に追加」から開くと、アプリの形になり window.print() が動かない。
-// そのときは、Safari で開き直すための案内を出す（URL に ?p=単元 をつけると、その単元の印刷画面で開く）。
+// そのときは、前もって作ったPDF（pdf/単元/種類.pdf、tools/build_pdfs.py）を共有メニューで開き、「プリント」で印刷してもらう。
+// Safari で開き直す道も残す（URL に ?p=単元 をつけると、その単元の印刷画面で開く）。
 const IS_HOME_APP = navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
 function printUrl() { return location.origin + location.pathname + '?p=' + encodeURIComponent(state.unit); }
-function doPrint() {
+let PDF_INDEX = null;
+async function pdfList(id) {
+  if (!PDF_INDEX) { try { PDF_INDEX = await (await fetch('pdf/index.json', { cache: 'no-cache' })).json(); } catch (e) { PDF_INDEX = {}; } }
+  return PDF_INDEX[id] || [];
+}
+async function doPrint() {
   if (!IS_HOME_APP) { window.print(); return; }
-  const url = printUrl();
+  const id = state.unit, unit = UNITS[id], url = printUrl();
   const box = document.createElement('div'); box.className = 'pmsg';
   box.innerHTML = `<div class="pmsg-in" role="dialog" aria-modal="true" aria-labelledby="pmsg-t">
-    <h2 id="pmsg-t">ホーム画面から開いたときは、印刷できません</h2>
-    <p>iPad・iPhone の「ホーム画面」から開いたページは、印刷ボタンが使えません（Apple の決まりです）。<b>Safari で開くと印刷できます。</b></p>
-    <ol><li>下の「リンクをコピー」をおす</li><li>Safari を開いて、上のアドレス欄に貼りつけて開く</li><li>この単元の印刷画面が出るので「選んだページを印刷」をおす</li></ol>
-    <p class="pmsg-url">${esc(url)}</p>
-    <div class="pmsg-b"><button class="btn primary" id="pmsg-copy">リンクをコピー</button><button class="btn" id="pmsg-try">それでも印刷してみる</button><button class="btn" id="pmsg-close">閉じる</button></div>
+    <h2 id="pmsg-t">PDFにして印刷します</h2>
+    <p>ホーム画面から開いたときは、印刷ボタンが使えません（Apple の決まりです）。かわりに、できあがったPDFを開いて印刷します。</p>
+    <ol><li>印刷したいものをえらぶ</li><li>「プリントへ」をおす</li><li>出てきたメニューで<b>「プリント」</b>をえらぶ（両面印刷はそこで設定できます）</li></ol>
+    <div class="pmsg-list" id="pmsg-list"><p class="pmsg-wait">読みこみ中…</p></div>
+    <details class="pmsg-more"><summary>ほかの方法（Safariで開く）</summary>
+      <p>Safari で開くと、ふつうの印刷ボタンで、ページを細かくえらんで印刷できます。</p>
+      <p class="pmsg-url">${esc(url)}</p>
+      <div class="pmsg-b"><button class="btn" id="pmsg-copy">リンクをコピー</button><button class="btn" id="pmsg-try">それでも印刷してみる</button></div>
+    </details>
+    <div class="pmsg-b"><button class="btn" id="pmsg-close">閉じる</button></div>
   </div>`;
   document.body.appendChild(box);
   const close = () => box.remove();
@@ -607,6 +628,27 @@ function doPrint() {
     }
     e.target.textContent = ok ? 'コピーしました' : '上のリンクを長おししてコピー';
   };
+  const list = await pdfList(id), host = box.querySelector('#pmsg-list');
+  if (!list.length) { host.innerHTML = '<p class="pmsg-wait">この単元のPDFはまだありません。下の「ほかの方法」で Safari から印刷してください。</p>'; box.querySelector('.pmsg-more').open = true; return; }
+  host.innerHTML = `<p class="pmsg-unit">${esc(unit.title)}</p>` + list.map(([key, label, n], i) => `<div class="pmsg-row"><span>${esc(label)}<small>A4 ${n}ページ</small></span><button class="btn primary" data-i="${i}">えらぶ</button></div>`).join('');
+  host.querySelectorAll('button[data-i]').forEach(btn => btn.onclick = async () => {
+    const [key, label] = list[+btn.dataset.i], src = `pdf/${id}/${key}.pdf`;
+    if (btn.dataset.ready) {
+      const file = btn._file;
+      try {
+        if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: unit.title }); return; }
+      } catch (e) { if (e && e.name === 'AbortError') return; }
+      window.open(src, '_blank');   // 共有メニューが使えないときは、PDFをそのまま開く
+      return;
+    }
+    btn.disabled = true; btn.textContent = '準備中…';
+    try {
+      const blob = await (await fetch(src)).blob();
+      btn._file = new File([blob], `${unit.title}_${label.replace(/[（）　\s]/g, '')}.pdf`, { type: 'application/pdf' });
+      btn.dataset.ready = '1'; btn.textContent = 'プリントへ'; btn.classList.add('go');
+    } catch (e) { btn.textContent = '読みこめませんでした'; }
+    btn.disabled = false;
+  });
 }
 function openUnit(id) { state.unit = id; state.subject = UNITS[id].subject; state.mode = modeOf(id); state.sel = null; }
 // 今の画面（宿題／講座と問題）に出ている単元か

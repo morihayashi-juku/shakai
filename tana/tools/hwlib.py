@@ -82,11 +82,12 @@ def side(pg, ans, start, first):
             start + len(pg.get("qa", [])))
 
 
-def page(s, ans):
+def page(s, ans, zoom=1.0):
     name = "" if ans else "<div class='name'>名前<span></span></div>"
     p1, n = side(s["pages"][0], ans, 1, True)
     p2, _ = side(s["pages"][1], ans, n, False)
-    return f"""<html><head><meta charset='utf-8'><style>{CSS}</style></head><body>
+    z = f".fig{{zoom:{zoom}}}.pts p{{font-size:{10.5 if zoom >= 0.9 else 10}pt;line-height:{1.6 if zoom >= 0.9 else 1.5}}}"
+    return f"""<html><head><meta charset='utf-8'><style>{CSS}{z}</style></head><body>
 <div class='head'><h1>社会 宿題<span class='no'>No.{s['no']}</span><span class='sub'>{s['sub']}{'【解答】' if ans else ''}</span></h1>{name}</div>
 {p1}
 <div class='pb'></div>
@@ -101,18 +102,26 @@ def sheet(no, sub, pages, out):
 
 
 def build(sheets):
+    """2ページに入らないときは、図を少しずつ小さくする（解説が長い枚のため）。"""
     PDF.mkdir(exist_ok=True)
     res = {}
     with sync_playwright() as p:
         b = p.chromium.launch()
         for s in sheets:
-            for fn, ans in ((f"{s['out']}.pdf", False), (f"{s['out']}_ans.pdf", True)):
-                pg = b.new_page()
-                pg.set_content(page(s, ans))
-                pg.pdf(path=str(PDF / fn), format="A4", print_background=True)
-                pg.close()
-                n = subprocess.run(["pdfinfo", str(PDF / fn)], capture_output=True, text=True).stdout
-                res[fn] = int(n.split("Pages:")[1].split()[0])
+            for zoom in (1.0, 0.92, 0.85, 0.78, 0.72, 0.66, 0.6):
+                got = {}
+                for fn, ans in ((f"{s['out']}.pdf", False), (f"{s['out']}_ans.pdf", True)):
+                    pg = b.new_page()
+                    pg.set_content(page(s, ans, zoom))
+                    pg.pdf(path=str(PDF / fn), format="A4", print_background=True)
+                    pg.close()
+                    n = subprocess.run(["pdfinfo", str(PDF / fn)], capture_output=True, text=True).stdout
+                    got[fn] = int(n.split("Pages:")[1].split()[0])
+                if all(v == 2 for v in got.values()):
+                    break
+            if zoom < 1.0:
+                print(f"  No.{s['no']}: 図を {int(zoom*100)}% にして2ページに入れた")
+            res.update(got)
         b.close()
     return res
 

@@ -252,6 +252,9 @@ S.append(sheet(7, "復習1　No.1〜6のまとめ", [
             ("インドで発達している、コンピューターなどに関わる産業を何というか。", "ICT（情報通信技術）産業")]},
 ], "c2_hw07_fukushu1"))
 
+from c2_hints import apply  # 解説だけで解けるように：地図のヒント・語群・足りない内容（11/19）
+apply(S)
+
 if __name__ == "__main__":
     for f, n in build(S).items():
         print(f, n, "" if n == 2 else "  ← 2ページではない！")

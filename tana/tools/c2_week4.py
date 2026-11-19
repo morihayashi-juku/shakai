@@ -218,6 +218,9 @@ S.append(sheet(28, "復習4　No.22〜27のまとめ", [
             ("銀閣を建てた将軍はだれか。", "足利義政")]},
 ], "c2_hw28_fukushu4"))
 
+from c2_hints import apply  # 解説だけで解けるように：地図のヒント・語群・足りない内容（11/19）
+apply(S)
+
 if __name__ == "__main__":
     for f, n in build(S).items():
         print(f, n, "" if n == 2 else "  ← 2ページではない！")

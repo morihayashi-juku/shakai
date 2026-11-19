@@ -206,6 +206,9 @@ S.append(sheet(14, "復習2　No.8〜13のまとめ", [
             ("オーストラリアの先住民を何というか。", "アボリジニ")]},
 ], "c2_hw14_fukushu2"))
 
+from c2_hints import apply  # 解説だけで解けるように：地図のヒント・語群・足りない内容（11/19）
+apply(S)
+
 if __name__ == "__main__":
     for f, n in build(S).items():
         print(f, n, "" if n == 2 else "  ← 2ページではない！")

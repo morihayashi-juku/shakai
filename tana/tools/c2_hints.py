@@ -52,6 +52,59 @@ EXTRA = {
 }
 
 
+import html as _html
+import re as _re
+
+
+def _ptext(pg):
+    strip = lambda x: _html.unescape(_re.sub(r"<[^>]+>", "", x))
+    t = "".join(a + strip(b) for a, b in pg.get("kai", []))
+    t += "".join(strip(k if isinstance(k, str) else k(True)) for k in pg.get("kfig", []))
+    return t
+
+
+def _found(a, T):
+    a = a.replace("約", "")
+    return any(x.strip() and x in T for x in [a, a.replace("大陸", "")] + _re.split(r"[（）()・、]", a))
+
+
+def _sentences(pg):
+    out = []
+    for _, b in pg.get("kai", []):
+        for x in _re.split(r"。|<br>", b):
+            t = _html.unescape(_re.sub(r"<[^>]+>", "", x)).strip()
+            if t:
+                out.append(t)
+    return out
+
+
+def move_to_explained_side(s):
+    """答えが反対の面の解説にしか書いていない問題のために、その文を問題の面の解説にも書く（11/19：裏の問題の答えが表にあって解けなかった）。
+    文が見つからない（表の中にしかない）ときは、問題を反対の面へ移す。"""
+    pages = s["pages"]
+    if not all(pg.get("kai") for pg in pages):
+        return
+    T = [_ptext(pg) for pg in pages]
+    adds = [[], []]
+    for i in (0, 1):
+        keep, move = [], []
+        for q, a in pages[i].get("qa", []):
+            if _found(a, T[i]) or not _found(a, T[1 - i]):
+                keep.append((q, a)); continue
+            hit = [t for t in _sentences(pages[1 - i]) if _found(a, t)]
+            if hit:
+                if hit[0] not in adds[i]:
+                    adds[i].append(hit[0])
+                keep.append((q, a))
+            else:
+                move.append((q, a))
+        pages[i]["qa"] = keep
+        pages[1 - i]["qa"] = pages[1 - i].get("qa", []) + move
+    for i in (0, 1):
+        if adds[i]:
+            pages[i]["kai"].append(("表の解説から" if i == 1 else "裏の解説から", "。".join(adds[i]) + "。"))
+
+
 def apply(S):
     for s in S:
         no = s["no"]
@@ -72,6 +125,7 @@ def apply(S):
                             words.append(a)
                     words = sorted(words, key=lambda w: (hash_(w), w))
                     f["hint"] = f.get("hint", "") + "<br>【 " + "・".join(words) + " 】"
+        move_to_explained_side(s)
     return S
 
 

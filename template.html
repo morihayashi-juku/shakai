@@ -484,11 +484,19 @@ body.read { background: var(--paper); }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 
+/* ---------- 印刷できないときの案内（ホーム画面から開いたとき） ---------- */
+.pmsg { position: fixed; inset: 0; background: rgba(20, 28, 34, .45); display: grid; place-items: center; padding: 16px; z-index: 50; }
+.pmsg-in { background: var(--paper); color: var(--ink); border-radius: 12px; padding: 18px 20px; max-width: 520px; width: 100%; box-shadow: 0 8px 30px rgba(0,0,0,.25); font-size: 14px; line-height: 1.7; }
+.pmsg-in h2 { font-size: 16px; margin: 0 0 8px; }
+.pmsg-in ol { margin: 6px 0; padding-left: 1.4em; }
+.pmsg-url { font-size: 12px; word-break: break-all; background: #f1efe9; border-radius: 6px; padding: 6px 8px; user-select: all; -webkit-user-select: all; }
+.pmsg-b { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+
 /* ---------- 印刷 ---------- */
 @page { size: A4; margin: 0; }
 @media print {
   html, body { height: auto; background: #fff; }
-  .shelf, .bar, .sheet-tag { display: none !important; }
+  .shelf, .bar, .sheet-tag, .pmsg { display: none !important; }
   .desk { min-height: 0; }
   .app { display: block; height: auto; min-height: 0; }
   .desk, .preview { display: block; padding: 0; overflow: visible; height: auto; }
@@ -570,6 +578,36 @@ try { const s = JSON.parse(localStorage.getItem('shakai-print') || '{}'); if (s.
 if (UNITS[state.unit]) state.subject = UNITS[state.unit].subject;
 function save() { state.last[state.mode] = state.unit; try { localStorage.setItem('shakai-print', JSON.stringify({ mode: state.mode, subject: state.subject, unit: state.unit, last: state.last })); } catch (e) {} }
 // 単元を開く（読む画面・リンクからも使う）
+// ---------- 印刷 ----------
+// iPad・iPhone で「ホーム画面に追加」から開くと、アプリの形になり window.print() が動かない。
+// そのときは、Safari で開き直すための案内を出す（URL に ?p=単元 をつけると、その単元の印刷画面で開く）。
+const IS_HOME_APP = navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+function printUrl() { return location.origin + location.pathname + '?p=' + encodeURIComponent(state.unit); }
+function doPrint() {
+  if (!IS_HOME_APP) { window.print(); return; }
+  const url = printUrl();
+  const box = document.createElement('div'); box.className = 'pmsg';
+  box.innerHTML = `<div class="pmsg-in" role="dialog" aria-modal="true" aria-labelledby="pmsg-t">
+    <h2 id="pmsg-t">ホーム画面から開いたときは、印刷できません</h2>
+    <p>iPad・iPhone の「ホーム画面」から開いたページは、印刷ボタンが使えません（Apple の決まりです）。<b>Safari で開くと印刷できます。</b></p>
+    <ol><li>下の「リンクをコピー」をおす</li><li>Safari を開いて、上のアドレス欄に貼りつけて開く</li><li>この単元の印刷画面が出るので「選んだページを印刷」をおす</li></ol>
+    <p class="pmsg-url">${esc(url)}</p>
+    <div class="pmsg-b"><button class="btn primary" id="pmsg-copy">リンクをコピー</button><button class="btn" id="pmsg-try">それでも印刷してみる</button><button class="btn" id="pmsg-close">閉じる</button></div>
+  </div>`;
+  document.body.appendChild(box);
+  const close = () => box.remove();
+  box.onclick = e => { if (e.target === box) close(); };
+  box.querySelector('#pmsg-close').onclick = close;
+  box.querySelector('#pmsg-try').onclick = () => { close(); window.print(); };
+  box.querySelector('#pmsg-copy').onclick = async e => {
+    let ok = false;
+    try { await navigator.clipboard.writeText(url); ok = true; } catch (err) {
+      const r = document.createRange(); r.selectNodeContents(box.querySelector('.pmsg-url')); const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+      try { ok = document.execCommand('copy'); } catch (err2) {}
+    }
+    e.target.textContent = ok ? 'コピーしました' : '上のリンクを長おししてコピー';
+  };
+}
 function openUnit(id) { state.unit = id; state.subject = UNITS[id].subject; state.mode = modeOf(id); state.sel = null; }
 // 今の画面（宿題／講座と問題）に出ている単元か
 function inView(id) { const u = UNITS[id]; if (!u || modeOf(id) !== state.mode) return false; return state.mode !== 'kouza' || u.subject === state.subject; }
@@ -829,7 +867,7 @@ function renderJugyoBar(unit, pk) {
   $('#bar').querySelectorAll('.pick input').forEach(cb => cb.onchange = () => { state.sel[cb.id.slice(3)] = cb.checked; renderSheets(); });
   $('#yans').onchange = e => { state.jans = e.target.value; renderSheets(); };
   $('#jteach').onchange = e => { state.jmode = e.target.value; state.jteach = state.jmode === 't'; renderSheets(); };
-  $('#b-print').onclick = () => window.print();
+  $('#b-print').onclick = doPrint;
 }
 
 // ---------- 中2向け 読んで解く（A4両面1枚） ----------
@@ -1006,12 +1044,12 @@ function renderBar() {
     <div class="print-box"><button class="btn primary" id="b-print">選んだページを印刷</button><span class="hint" id="count"></span></div>`;
   $('#bar').querySelectorAll('.pick input').forEach(cb => cb.onchange = () => { state.sel[cb.id.slice(3)] = cb.checked; renderSheets(); });
   const setAll = f => { Object.keys(defaultSel(unit)).forEach(k => state.sel[k] = f(k)); renderBar(); renderSheets(); };
-  if (!unit.sheets.length) { $('#b-print').onclick = () => window.print(); return; }
+  if (!unit.sheets.length) { $('#b-print').onclick = doPrint; return; }
   $('#b-all').onclick = () => setAll(() => true);
   if ($('#b-lec')) $('#b-lec').onclick = () => setAll(k => k[0] === 'L');
   if ($('#b-q')) $('#b-q').onclick = () => setAll(k => k[0] !== 'L');
   $('#pattern').onchange = e => { state.pattern = +e.target.value; renderBar(); renderSheets(); };
-  $('#b-print').onclick = () => window.print();
+  $('#b-print').onclick = doPrint;
 }
 function renderYomu2Bar(unit, pk) {
   if (state.y2ans !== 'none') state.y2ans = 'end';
@@ -1022,7 +1060,7 @@ function renderYomu2Bar(unit, pk) {
     <div class="print-box"><button class="btn primary" id="b-print">選んだページを印刷</button><span class="hint" id="count"></span></div>`;
   $('#bar').querySelectorAll('.pick input').forEach(cb => cb.onchange = () => { state.sel[cb.id.slice(3)] = cb.checked; renderSheets(); });
   $('#yans').onchange = e => { state.y2ans = e.target.value; renderSheets(); };
-  $('#b-print').onclick = () => window.print();
+  $('#b-print').onclick = doPrint;
 }
 function renderYomuBar(unit) {
   const pk = (key, label) => `<label class="pick"><input type="checkbox" id="pk-${key}" ${state.sel[key] ? 'checked' : ''}>${label}</label>`;
@@ -1046,7 +1084,7 @@ function renderYomuBar(unit) {
   $('#b-all').onclick = () => setAll(true);
   $('#b-none').onclick = () => setAll(false);
   $('#yans').onchange = e => { state.yans = e.target.value; renderSheets(); };
-  $('#b-print').onclick = () => window.print();
+  $('#b-print').onclick = doPrint;
 }
 function yomuOut(unit) {
   const out = [], idx = unit.yomu.sheets.map((_, i) => i).filter(i => state.sel['Y' + i]);
@@ -1199,6 +1237,8 @@ $('#toRead').onclick = () => setView('read');
   const h = decodeURIComponent(location.hash.slice(1));
   let v = null; try { v = localStorage.getItem('shakai-view'); } catch (e) {}
   if (h && UNITS[h]) { openUnit(h); v = 'read'; }
+  const pq = new URLSearchParams(location.search).get('p');
+  if (pq && UNITS[pq]) { openUnit(pq); v = 'print'; }
   if (!v) v = matchMedia('(max-width: 700px)').matches ? 'read' : 'print';
   state.view = v; document.body.classList.toggle('read', v === 'read');
 })();

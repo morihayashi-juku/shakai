@@ -1,0 +1,114 @@
+{
+ "_memo": "中1の社会の宿題と記録。中2（chu2.json）と同じ書き方。回に from を書くと日付で「今ここ」が切りかわる。",
+ "updated": "2026-11-26",
+ "name": "中1",
+ "badge": "中1",
+ "longName": "中1（木曜に1週間分を渡す）",
+ "grade": "中1",
+ "days": [
+  "thu"
+ ],
+ "about": [
+  "定期テストの範囲（歴史：飛鳥〜平安時代）の宿題を、1日1枚・週7枚で出す。まず第1週（No.1〜7）。",
+  "1枚＝A4両面。表も裏も「前半＝解説、後半＝問題」。答えは必ず同じ面の解説に書いてある。各週の7枚目は解説なしの復習の日。",
+  "読むのが苦手な子たちだが、長い文を読む練習もさせたいので、解説は箇条書きにせず短めの文章にしている。",
+  "毎週木曜に1週間分（7枚・木〜水）をまとめて渡し、次の木曜に回収して丸つけ。"
+ ],
+ "checks": [
+  [
+   "print",
+   "印刷した"
+  ],
+  [
+   "give",
+   "宿題を出した"
+  ],
+  [
+   "maru",
+   "丸つけ済"
+  ]
+ ],
+ "now": {
+  "step": "c1-asuka",
+  "text": "第1週（No.1〜7）：飛鳥〜平安時代"
+ },
+ "log": [
+  {
+   "date": "2026-11-26",
+   "text": "中1の組を追加。定期テスト範囲（飛鳥〜平安）の宿題 第1週 No.1〜7 を作成。"
+  }
+ ],
+ "sets": [
+  {
+   "id": "c1w1",
+   "label": "①",
+   "from": "2026-11-20",
+   "steps": [
+    "c1-asuka",
+    "c1-nara",
+    "c1-heian",
+    "c1-fukushu-week"
+   ],
+   "title": "第1週 11/26（木）〜12/2（水）　No.1〜7",
+   "note": "11/26（木）に No.1〜7 をまとめて渡す（1日1枚）。12/3（木）に回収して丸つけ。",
+   "groups": [
+    {
+     "kind": "hw",
+     "label": "木曜に渡す（No.1〜7）",
+     "day": "thu",
+     "items": [
+      {
+       "file": "c1_hw01_shoutoku.pdf"
+      },
+      {
+       "file": "c1_hw02_taika.pdf"
+      },
+      {
+       "file": "c1_hw03_heijoukyou.pdf"
+      },
+      {
+       "file": "c1_hw04_tenpyou.pdf"
+      },
+      {
+       "file": "c1_hw05_heiankyou.pdf"
+      },
+      {
+       "file": "c1_hw06_kokufu.pdf"
+      },
+      {
+       "file": "c1_hw07_fukushu1.pdf"
+      }
+     ]
+    },
+    {
+     "kind": "teacher",
+     "label": "こたえ（No.1〜7・次の木曜に回収して丸つけ）",
+     "day": "thu",
+     "items": [
+      {
+       "file": "c1_hw01_shoutoku_ans.pdf"
+      },
+      {
+       "file": "c1_hw02_taika_ans.pdf"
+      },
+      {
+       "file": "c1_hw03_heijoukyou_ans.pdf"
+      },
+      {
+       "file": "c1_hw04_tenpyou_ans.pdf"
+      },
+      {
+       "file": "c1_hw05_heiankyou_ans.pdf"
+      },
+      {
+       "file": "c1_hw06_kokufu_ans.pdf"
+      },
+      {
+       "file": "c1_hw07_fukushu1_ans.pdf"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

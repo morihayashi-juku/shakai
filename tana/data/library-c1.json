@@ -1,0 +1,111 @@
+{
+ "_memo": "教材ライブラリ（中1）：中1のプリントはすべてここに1回だけ書く。step は data/common.json のステップ id。こたえは ans: true。ファイル名は c1_ から始める。",
+ "updated": "2026-11-26",
+ "items": [
+  {
+   "file": "c1_hw01_shoutoku.pdf",
+   "step": "c1-asuka",
+   "title": "No.1 飛鳥時代① 聖徳太子の政治",
+   "pages": 2,
+   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+  },
+  {
+   "file": "c1_hw01_shoutoku_ans.pdf",
+   "step": "c1-asuka",
+   "title": "No.1 飛鳥時代① 聖徳太子の政治 こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c1_hw02_taika.pdf",
+   "step": "c1-asuka",
+   "title": "No.2 飛鳥時代② 飛鳥文化と大化の改新",
+   "pages": 2,
+   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+  },
+  {
+   "file": "c1_hw02_taika_ans.pdf",
+   "step": "c1-asuka",
+   "title": "No.2 飛鳥時代② 飛鳥文化と大化の改新 こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c1_hw03_heijoukyou.pdf",
+   "step": "c1-nara",
+   "title": "No.3 奈良時代① 平城京と人々のくらし",
+   "pages": 2,
+   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+  },
+  {
+   "file": "c1_hw03_heijoukyou_ans.pdf",
+   "step": "c1-nara",
+   "title": "No.3 奈良時代① 平城京と人々のくらし こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c1_hw04_tenpyou.pdf",
+   "step": "c1-nara",
+   "title": "No.4 奈良時代② 天平文化と遣唐使",
+   "pages": 2,
+   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+  },
+  {
+   "file": "c1_hw04_tenpyou_ans.pdf",
+   "step": "c1-nara",
+   "title": "No.4 奈良時代② 天平文化と遣唐使 こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c1_hw05_heiankyou.pdf",
+   "step": "c1-heian",
+   "title": "No.5 平安時代① 平安京と摂関政治",
+   "pages": 2,
+   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+  },
+  {
+   "file": "c1_hw05_heiankyou_ans.pdf",
+   "step": "c1-heian",
+   "title": "No.5 平安時代① 平安京と摂関政治 こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c1_hw06_kokufu.pdf",
+   "step": "c1-heian",
+   "title": "No.6 平安時代② 国風文化",
+   "pages": 2,
+   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+  },
+  {
+   "file": "c1_hw06_kokufu_ans.pdf",
+   "step": "c1-heian",
+   "title": "No.6 平安時代② 国風文化 こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  },
+  {
+   "file": "c1_hw07_fukushu1.pdf",
+   "step": "c1-fukushu-week",
+   "title": "No.7 復習1 No.1〜6のまとめ",
+   "pages": 2,
+   "note": "A4両面1枚。解説なしの復習の日"
+  },
+  {
+   "file": "c1_hw07_fukushu1_ans.pdf",
+   "step": "c1-fukushu-week",
+   "title": "No.7 復習1 No.1〜6のまとめ こたえ",
+   "pages": 2,
+   "note": "同じ形に赤で答え",
+   "ans": true
+  }
+ ]
+}

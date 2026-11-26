@@ -1,12 +1,37 @@
 {
  "_memo": "組の順番 tracks（タブの順）、プリント一覧のファイル libraries、単元・ステップ（学年ごと・教材ライブラリの順番）。新しい単元・ステップはここに足す。最終更新日は各ファイルの updated から自動で出るので、ここには書かない。",
  "tracks": [
+  "chu1",
   "chu2"
  ],
  "libraries": [
+  "library-c1",
   "library-c2"
  ],
  "units": [
+  {
+   "id": "c1-kodai",
+   "name": "歴史（飛鳥〜平安）",
+   "grade": "中1",
+   "steps": [
+    {
+     "id": "c1-asuka",
+     "name": "飛鳥時代"
+    },
+    {
+     "id": "c1-nara",
+     "name": "奈良時代"
+    },
+    {
+     "id": "c1-heian",
+     "name": "平安時代"
+    },
+    {
+     "id": "c1-fukushu-week",
+     "name": "週の復習（解説なし）"
+    }
+   ]
+  },
   {
    "id": "c2-sekai",
    "name": "地理（世界）",

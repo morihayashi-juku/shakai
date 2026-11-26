@@ -23,7 +23,8 @@ URL：https://morihayashi-juku.github.io/shakai/tana/ （shakai リポジトリ�
     第5週 戦国・安土桃山／江戸幕府の成立／江戸の改革と文化／地理のまとめ／歴史のまとめ／全範囲ミニテスト／復習5
 - **No.1〜35 は全部作成ずみ（11/17）**。スクリプトは週ごと：`tools/c2_week1.py`〜`c2_week5.py`。共通部品は `tools/hwlib.py`（`sheet` `build` `mapsvg` `uonzu` `figq_html` `tbl` `side_by_side` `pyramid` `jisa_line`）。図の `w` で地図のはばを決める（大きすぎると3ページになる）。
   地図は `tools/figs/region.mjs`（world-atlas の国境＋d3-geo。国の色ぬり・記号・川の線。日本の地方は `res: "10m"`。向きが逆の多角形は自動で直す）。地球儀は `figs/globe.svg`（`figs/maps.mjs`）。
-- 中1など別の学年を足すときは、組の JSON（`grade` を書く）と `library-c1.json` を作り、`common.json` の `tracks` `libraries` `units` に足す。
+- **中1（11/26 追加）**：`data/chu1.json`・`library-c1.json`、スクリプト `tools/c1_week1.py`（No.1〜7、ファイル名 `c1_hw..`）。範囲は定期テストの**歴史：飛鳥〜平安時代**。中2と同じ形・同じ運用（1日1枚・週7枚・木曜に渡す・各面 前半解説後半問題・答えは同じ面の解説に）。まず1週間分だけ作った（様子を見て続きを作る）。
+  - 中1の子は読むのが苦手だが、先生は長い文章を読む訓練もさせたい → **解説は箇条書きにせず、短めの文章**。地図のヒント・語群は c1 のスクリプトの中に直接書く（c2_hints の HINTS は中2用）。`move_to_explained_side` は共通で使う。ヘッダーに「中1」と出すため `s["grade"]`。
 
 ## プリントを足す手順
 1. `git pull --rebase`

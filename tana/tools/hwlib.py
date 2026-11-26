@@ -88,10 +88,10 @@ def page(s, ans, zoom=1.0):
     p2, _ = side(s["pages"][1], ans, n, False)
     z = f".fig{{zoom:{zoom}}}.pts p{{font-size:{10.5 if zoom >= 0.9 else 10}pt;line-height:{1.6 if zoom >= 0.9 else 1.5}}}"
     return f"""<html><head><meta charset='utf-8'><style>{CSS}{z}</style></head><body>
-<div class='head'><h1>社会 宿題<span class='no'>No.{s['no']}</span><span class='sub'>{s['sub']}{'【解答】' if ans else ''}</span></h1>{name}</div>
+<div class='head'><h1>{s.get('grade', '')}社会 宿題<span class='no'>No.{s['no']}</span><span class='sub'>{s['sub']}{'【解答】' if ans else ''}</span></h1>{name}</div>
 {p1}
 <div class='pb'></div>
-<div class='head2'>No.{s['no']}　{s['sub']}（うら）</div>
+<div class='head2'>{s.get('grade', '')}No.{s['no']}　{s['sub']}（うら）</div>
 {p2}
 </body></html>"""
 

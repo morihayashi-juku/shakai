@@ -1,110 +1,320 @@
 {
- "_memo": "教材ライブラリ（中1）：中1のプリントはすべてここに1回だけ書く。step は data/common.json のステップ id。こたえは ans: true。ファイル名は c1_ から始める。",
+ "_memo": "教材ライブラリ（中1）：生徒向け社会サイト（shakai/index.html）の「読んで解く宿題」を tools/c1_yomu_export.py でPDFにしたもの。中身はサイト側で直し、もう一度書き出す。",
  "updated": "2026-11-26",
  "items": [
   {
-   "file": "c1_hw01_shoutoku.pdf",
+   "file": "c1_yomu_asuka_d1.pdf",
    "step": "c1-asuka",
-   "title": "No.1 飛鳥時代① 聖徳太子の政治",
+   "title": "飛鳥時代 1日目 東アジアの大きな変化",
    "pages": 2,
-   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+   "note": "読んで解く宿題（社会サイトと同じ）。A4両面1枚：表＝本文と問題、うら＝答え"
   },
   {
-   "file": "c1_hw01_shoutoku_ans.pdf",
+   "file": "c1_yomu_asuka_d1_ans.pdf",
    "step": "c1-asuka",
-   "title": "No.1 飛鳥時代① 聖徳太子の政治 こたえ",
-   "pages": 2,
-   "note": "同じ形に赤で答え",
+   "title": "飛鳥時代 1日目 東アジアの大きな変化 こたえ",
+   "pages": 1,
+   "note": "うらの答えと同じ（丸つけ用）",
    "ans": true
   },
   {
-   "file": "c1_hw02_taika.pdf",
+   "file": "c1_yomu_asuka_d2.pdf",
    "step": "c1-asuka",
-   "title": "No.2 飛鳥時代② 飛鳥文化と大化の改新",
+   "title": "飛鳥時代 2日目 聖徳太子の政治",
    "pages": 2,
-   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+   "note": "読んで解く宿題（社会サイトと同じ）。A4両面1枚：表＝本文と問題、うら＝答え"
   },
   {
-   "file": "c1_hw02_taika_ans.pdf",
+   "file": "c1_yomu_asuka_d2_ans.pdf",
    "step": "c1-asuka",
-   "title": "No.2 飛鳥時代② 飛鳥文化と大化の改新 こたえ",
-   "pages": 2,
-   "note": "同じ形に赤で答え",
+   "title": "飛鳥時代 2日目 聖徳太子の政治 こたえ",
+   "pages": 1,
+   "note": "うらの答えと同じ（丸つけ用）",
    "ans": true
   },
   {
-   "file": "c1_hw03_heijoukyou.pdf",
+   "file": "c1_yomu_asuka_d3.pdf",
+   "step": "c1-asuka",
+   "title": "飛鳥時代 3日目 飛鳥文化",
+   "pages": 2,
+   "note": "読んで解く宿題（社会サイトと同じ）。A4両面1枚：表＝本文と問題、うら＝答え"
+  },
+  {
+   "file": "c1_yomu_asuka_d3_ans.pdf",
+   "step": "c1-asuka",
+   "title": "飛鳥時代 3日目 飛鳥文化 こたえ",
+   "pages": 1,
+   "note": "うらの答えと同じ（丸つけ用）",
+   "ans": true
+  },
+  {
+   "file": "c1_yomu_asuka_d4.pdf",
+   "step": "c1-asuka",
+   "title": "飛鳥時代 4日目 大化の改新",
+   "pages": 2,
+   "note": "読んで解く宿題（社会サイトと同じ）。A4両面1枚：表＝本文と問題、うら＝答え"
+  },
+  {
+   "file": "c1_yomu_asuka_d4_ans.pdf",
+   "step": "c1-asuka",
+   "title": "飛鳥時代 4日目 大化の改新 こたえ",
+   "pages": 1,
+   "note": "うらの答えと同じ（丸つけ用）",
+   "ans": true
+  },
+  {
+   "file": "c1_yomu_asuka_d5.pdf",
+   "step": "c1-asuka",
+   "title": "飛鳥時代 5日目 白村江の戦いと国の守り",
+   "pages": 2,
+   "note": "読んで解く宿題（社会サイトと同じ）。A4両面1枚：表＝本文と問題、うら＝答え"
+  },
+  {
+   "file": "c1_yomu_asuka_d5_ans.pdf",
+   "step": "c1-asuka",
+   "title": "飛鳥時代 5日目 白村江の戦いと国の守り こたえ",
+   "pages": 1,
+   "note": "うらの答えと同じ（丸つけ用）",
+   "ans": true
+  },
+  {
+   "file": "c1_yomu_asuka_d6.pdf",
+   "step": "c1-asuka",
+   "title": "飛鳥時代 6日目 壬申の乱と天武天皇",
+   "pages": 2,
+   "note": "読んで解く宿題（社会サイトと同じ）。A4両面1枚：表＝本文と問題、うら＝答え"
+  },
+  {
+   "file": "c1_yomu_asuka_d6_ans.pdf",
+   "step": "c1-asuka",
+   "title": "飛鳥時代 6日目 壬申の乱と天武天皇 こたえ",
+   "pages": 1,
+   "note": "うらの答えと同じ（丸つけ用）",
+   "ans": true
+  },
+  {
+   "file": "c1_yomu_asuka_d7.pdf",
+   "step": "c1-asuka",
+   "title": "飛鳥時代 7日目 大宝律令と律令国家",
+   "pages": 2,
+   "note": "読んで解く宿題（社会サイトと同じ）。A4両面1枚：表＝本文と問題、うら＝答え"
+  },
+  {
+   "file": "c1_yomu_asuka_d7_ans.pdf",
+   "step": "c1-asuka",
+   "title": "飛鳥時代 7日目 大宝律令と律令国家 こたえ",
+   "pages": 1,
+   "note": "うらの答えと同じ（丸つけ用）",
+   "ans": true
+  },
+  {
+   "file": "c1_yomu_nara_d1.pdf",
    "step": "c1-nara",
-   "title": "No.3 奈良時代① 平城京と人々のくらし",
+   "title": "奈良時代 1日目 平城京",
    "pages": 2,
-   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+   "note": "読んで解く宿題（社会サイトと同じ）。A4両面1枚：表＝本文と問題、うら＝答え"
   },
   {
-   "file": "c1_hw03_heijoukyou_ans.pdf",
+   "file": "c1_yomu_nara_d1_ans.pdf",
    "step": "c1-nara",
-   "title": "No.3 奈良時代① 平城京と人々のくらし こたえ",
-   "pages": 2,
-   "note": "同じ形に赤で答え",
+   "title": "奈良時代 1日目 平城京 こたえ",
+   "pages": 1,
+   "note": "うらの答えと同じ（丸つけ用）",
    "ans": true
   },
   {
-   "file": "c1_hw04_tenpyou.pdf",
+   "file": "c1_yomu_nara_d2.pdf",
    "step": "c1-nara",
-   "title": "No.4 奈良時代② 天平文化と遣唐使",
+   "title": "奈良時代 2日目 口分田と税のしくみ",
    "pages": 2,
-   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+   "note": "読んで解く宿題（社会サイトと同じ）。A4両面1枚：表＝本文と問題、うら＝答え"
   },
   {
-   "file": "c1_hw04_tenpyou_ans.pdf",
+   "file": "c1_yomu_nara_d2_ans.pdf",
    "step": "c1-nara",
-   "title": "No.4 奈良時代② 天平文化と遣唐使 こたえ",
-   "pages": 2,
-   "note": "同じ形に赤で答え",
+   "title": "奈良時代 2日目 口分田と税のしくみ こたえ",
+   "pages": 1,
+   "note": "うらの答えと同じ（丸つけ用）",
    "ans": true
   },
   {
-   "file": "c1_hw05_heiankyou.pdf",
-   "step": "c1-heian",
-   "title": "No.5 平安時代① 平安京と摂関政治",
+   "file": "c1_yomu_nara_d3.pdf",
+   "step": "c1-nara",
+   "title": "奈良時代 3日目 防人と農民のくらし",
    "pages": 2,
-   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+   "note": "読んで解く宿題（社会サイトと同じ）。A4両面1枚：表＝本文と問題、うら＝答え"
   },
   {
-   "file": "c1_hw05_heiankyou_ans.pdf",
-   "step": "c1-heian",
-   "title": "No.5 平安時代① 平安京と摂関政治 こたえ",
-   "pages": 2,
-   "note": "同じ形に赤で答え",
+   "file": "c1_yomu_nara_d3_ans.pdf",
+   "step": "c1-nara",
+   "title": "奈良時代 3日目 防人と農民のくらし こたえ",
+   "pages": 1,
+   "note": "うらの答えと同じ（丸つけ用）",
    "ans": true
   },
   {
-   "file": "c1_hw06_kokufu.pdf",
-   "step": "c1-heian",
-   "title": "No.6 平安時代② 国風文化",
+   "file": "c1_yomu_nara_d4.pdf",
+   "step": "c1-nara",
+   "title": "奈良時代 4日目 墾田永年私財法",
    "pages": 2,
-   "note": "A4両面1枚。表も裏も前半＝解説・後半＝問題"
+   "note": "読んで解く宿題（社会サイトと同じ）。A4両面1枚：表＝本文と問題、うら＝答え"
   },
   {
-   "file": "c1_hw06_kokufu_ans.pdf",
-   "step": "c1-heian",
-   "title": "No.6 平安時代② 国風文化 こたえ",
-   "pages": 2,
-   "note": "同じ形に赤で答え",
+   "file": "c1_yomu_nara_d4_ans.pdf",
+   "step": "c1-nara",
+   "title": "奈良時代 4日目 墾田永年私財法 こたえ",
+   "pages": 1,
+   "note": "うらの答えと同じ（丸つけ用）",
    "ans": true
   },
   {
-   "file": "c1_hw07_fukushu1.pdf",
-   "step": "c1-fukushu-week",
-   "title": "No.7 復習1 No.1〜6のまとめ",
+   "file": "c1_yomu_nara_d5.pdf",
+   "step": "c1-nara",
+   "title": "奈良時代 5日目 聖武天皇と大仏",
    "pages": 2,
-   "note": "A4両面1枚。解説なしの復習の日"
+   "note": "読んで解く宿題（社会サイトと同じ）。A4両面1枚：表＝本文と問題、うら＝答え"
   },
   {
-   "file": "c1_hw07_fukushu1_ans.pdf",
-   "step": "c1-fukushu-week",
-   "title": "No.7 復習1 No.1〜6のまとめ こたえ",
+   "file": "c1_yomu_nara_d5_ans.pdf",
+   "step": "c1-nara",
+   "title": "奈良時代 5日目 聖武天皇と大仏 こたえ",
+   "pages": 1,
+   "note": "うらの答えと同じ（丸つけ用）",
+   "ans": true
+  },
+  {
+   "file": "c1_yomu_nara_d6.pdf",
+   "step": "c1-nara",
+   "title": "奈良時代 6日目 遣唐使と天平文化",
    "pages": 2,
-   "note": "同じ形に赤で答え",
+   "note": "読んで解く宿題（社会サイトと同じ）。A4両面1枚：表＝本文と問題、うら＝答え"
+  },
+  {
+   "file": "c1_yomu_nara_d6_ans.pdf",
+   "step": "c1-nara",
+   "title": "奈良時代 6日目 遣唐使と天平文化 こたえ",
+   "pages": 1,
+   "note": "うらの答えと同じ（丸つけ用）",
+   "ans": true
+  },
+  {
+   "file": "c1_yomu_nara_d7.pdf",
+   "step": "c1-nara",
+   "title": "奈良時代 7日目 奈良時代の書物",
+   "pages": 2,
+   "note": "読んで解く宿題（社会サイトと同じ）。A4両面1枚：表＝本文と問題、うら＝答え"
+  },
+  {
+   "file": "c1_yomu_nara_d7_ans.pdf",
+   "step": "c1-nara",
+   "title": "奈良時代 7日目 奈良時代の書物 こたえ",
+   "pages": 1,
+   "note": "うらの答えと同じ（丸つけ用）",
+   "ans": true
+  },
+  {
+   "file": "c1_yomu_heian_d1.pdf",
+   "step": "c1-heian",
+   "title": "平安時代 1日目 平安京と新しい仏教",
+   "pages": 2,
+   "note": "読んで解く宿題（社会サイトと同じ）。A4両面1枚：表＝本文と問題、うら＝答え"
+  },
+  {
+   "file": "c1_yomu_heian_d1_ans.pdf",
+   "step": "c1-heian",
+   "title": "平安時代 1日目 平安京と新しい仏教 こたえ",
+   "pages": 1,
+   "note": "うらの答えと同じ（丸つけ用）",
+   "ans": true
+  },
+  {
+   "file": "c1_yomu_heian_d2.pdf",
+   "step": "c1-heian",
+   "title": "平安時代 2日目 摂関政治",
+   "pages": 2,
+   "note": "読んで解く宿題（社会サイトと同じ）。A4両面1枚：表＝本文と問題、うら＝答え"
+  },
+  {
+   "file": "c1_yomu_heian_d2_ans.pdf",
+   "step": "c1-heian",
+   "title": "平安時代 2日目 摂関政治 こたえ",
+   "pages": 1,
+   "note": "うらの答えと同じ（丸つけ用）",
+   "ans": true
+  },
+  {
+   "file": "c1_yomu_heian_d3.pdf",
+   "step": "c1-heian",
+   "title": "平安時代 3日目 荘園の広がり",
+   "pages": 2,
+   "note": "読んで解く宿題（社会サイトと同じ）。A4両面1枚：表＝本文と問題、うら＝答え"
+  },
+  {
+   "file": "c1_yomu_heian_d3_ans.pdf",
+   "step": "c1-heian",
+   "title": "平安時代 3日目 荘園の広がり こたえ",
+   "pages": 1,
+   "note": "うらの答えと同じ（丸つけ用）",
+   "ans": true
+  },
+  {
+   "file": "c1_yomu_heian_d4.pdf",
+   "step": "c1-heian",
+   "title": "平安時代 4日目 遣唐使の停止とかな文字",
+   "pages": 2,
+   "note": "読んで解く宿題（社会サイトと同じ）。A4両面1枚：表＝本文と問題、うら＝答え"
+  },
+  {
+   "file": "c1_yomu_heian_d4_ans.pdf",
+   "step": "c1-heian",
+   "title": "平安時代 4日目 遣唐使の停止とかな文字 こたえ",
+   "pages": 1,
+   "note": "うらの答えと同じ（丸つけ用）",
+   "ans": true
+  },
+  {
+   "file": "c1_yomu_heian_d5.pdf",
+   "step": "c1-heian",
+   "title": "平安時代 5日目 国風文化の作品と浄土信仰",
+   "pages": 2,
+   "note": "読んで解く宿題（社会サイトと同じ）。A4両面1枚：表＝本文と問題、うら＝答え"
+  },
+  {
+   "file": "c1_yomu_heian_d5_ans.pdf",
+   "step": "c1-heian",
+   "title": "平安時代 5日目 国風文化の作品と浄土信仰 こたえ",
+   "pages": 1,
+   "note": "うらの答えと同じ（丸つけ用）",
+   "ans": true
+  },
+  {
+   "file": "c1_yomu_heian_d6.pdf",
+   "step": "c1-heian",
+   "title": "平安時代 6日目 武士のおこり",
+   "pages": 2,
+   "note": "読んで解く宿題（社会サイトと同じ）。A4両面1枚：表＝本文と問題、うら＝答え"
+  },
+  {
+   "file": "c1_yomu_heian_d6_ans.pdf",
+   "step": "c1-heian",
+   "title": "平安時代 6日目 武士のおこり こたえ",
+   "pages": 1,
+   "note": "うらの答えと同じ（丸つけ用）",
+   "ans": true
+  },
+  {
+   "file": "c1_yomu_heian_d7.pdf",
+   "step": "c1-heian",
+   "title": "平安時代 7日目 院政と平氏の政治",
+   "pages": 2,
+   "note": "読んで解く宿題（社会サイトと同じ）。A4両面1枚：表＝本文と問題、うら＝答え"
+  },
+  {
+   "file": "c1_yomu_heian_d7_ans.pdf",
+   "step": "c1-heian",
+   "title": "平安時代 7日目 院政と平氏の政治 こたえ",
+   "pages": 1,
+   "note": "うらの答えと同じ（丸つけ用）",
    "ans": true
   }
  ]

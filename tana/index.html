@@ -9,7 +9,7 @@
 <title>社会 教材棚</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Zen+Maru+Gothic:wght@700;900&display=swap">
-<link rel="stylesheet" href="assets/app.css?v=20261117b">
+<link rel="stylesheet" href="assets/app.css?v=20261127a">
 </head>
 <body>
 <header class="top">
@@ -46,6 +46,13 @@
   <form method="dialog" class="sp">
     <h2 id="sp-title"></h2>
     <p class="muted" id="sp-sub">印刷するものと部数をえらんでください。</p>
+    <div class="sp-opts">
+      <div class="sp-opt"><b>人数</b><span class="step"><button type="button" id="sp-pm" aria-label="人数をへらす">−</button><span id="sp-people">1人</span><button type="button" id="sp-pp" aria-label="人数をふやす">＋</button></span><small>宿題の部数をまとめて変える</small></div>
+      <div class="sp-opt"><b>そろえ方</b>
+        <label><input type="radio" name="sp-order" value="set" checked> 1人分ずつ（No.1→No.7、もう1人分…）</label>
+        <label><input type="radio" name="sp-order" value="same"> 同じものをまとめて</label></div>
+      <div class="sp-opt"><label><input type="checkbox" id="sp-duplex" checked> <b>両面印刷</b>（1ページだけのもののあとに白紙を入れて、うらがずれないようにする）</label></div>
+    </div>
     <ul class="sp-list" id="sp-list"></ul>
     <div class="sp-foot">
       <span id="sp-total"></span>
@@ -72,6 +79,6 @@
 <div id="print-root" aria-hidden="true"></div>
 
 <script src="lib/pdfjs/pdf.min.js"></script>
-<script src="assets/app.js?v=20261117b"></script>
+<script src="assets/app.js?v=20261127a"></script>
 </body>
 </html>

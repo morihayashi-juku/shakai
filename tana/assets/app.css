@@ -209,6 +209,10 @@ dialog::backdrop{background:rgba(10,14,20,.55)}
 .step{display:flex;align-items:center;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--paper)}
 .step button{border:none;background:none;width:30px;height:30px;cursor:pointer;font-size:1.05rem}
 .step span{min-width:2.6em;text-align:center;font-weight:700;font-size:.9rem}
+.sp-opts{display:grid;gap:6px;margin:0 0 10px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;font-size:.86rem}
+.sp-opt{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}
+.sp-opt small{color:var(--muted);font-size:.76rem}
+.sp-opt label{display:inline-flex;gap:5px;align-items:center}
 .sp-foot{display:flex;flex-wrap:wrap;gap:8px;align-items:center;border-top:1px solid var(--line);padding-top:12px}
 .sp-foot span{margin-right:auto;font-weight:700}
 
@@ -339,3 +343,5 @@ dialog::backdrop{background:rgba(10,14,20,.55)}
 .tile .tact{display:flex;flex-wrap:wrap;gap:4px}
 .tile .tact .pr{text-decoration:none}
 .tile .tact .pr svg{width:.95em;height:.95em;vertical-align:-.12em;margin-right:3px}
+
+#print-root .sheet.blank{background:#fff}

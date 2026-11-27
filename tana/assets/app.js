@@ -538,6 +538,16 @@ viewer.addEventListener("close", () => { if (viewIO) viewIO.disconnect(); vBody.
 /* ------------------------------------------------------------ まとめて印刷（1つの回／その曜日の全員分） */
 const sp = $("#setprint");
 let spRows = [];
+let spPeople = 1;
+/* 人数：宿題（こたえ以外）の部数をまとめて変える */
+function setPeople(n) {
+  spPeople = Math.min(30, Math.max(1, n));
+  $("#sp-people").textContent = spPeople + "人";
+  spRows.forEach((r, i) => { if (r.it.ans) return; r.copies = spPeople; const s = $("#spc" + i); if (s) s.textContent = r.copies + "部"; });
+  spTotal();
+}
+$("#sp-pm").addEventListener("click", () => setPeople(spPeople - 1));
+$("#sp-pp").addEventListener("click", () => setPeople(spPeople + 1));
 function openPrintList(title, sections) {
   // sections: [{label, kind, items:[item]}]
   $("#sp-title").textContent = title;
@@ -554,6 +564,8 @@ function openPrintList(title, sections) {
     }
   }
   $("#sp-list").innerHTML = html;
+  spPeople = Math.max(1, ...spRows.filter(r => r.it.ans !== true).map(r => r.copies), 1);
+  $("#sp-people").textContent = spPeople + "人";
   $("#sp-sub").textContent = sections.some(x => x.items.some(it => it.ans && x.kind !== "hw"))
     ? "印刷するものと部数をえらんでください。こたえは「丸つけ」で画面に出せるので、最初はチェックを外しています。"
     : "印刷するものと部数をえらんでください。";
@@ -578,7 +590,8 @@ function openDayPrint(day, g) {
   if (secs.length) openPrintList(`${g}　${DAYS[day].label}の分をまとめて印刷`, secs);
 }
 function spTotal() {
-  const n = spRows.reduce((a, r) => a + (r.on ? r.it.pages * r.copies : 0), 0);
+  const dup = $("#sp-duplex") ? $("#sp-duplex").checked : false;
+  const n = spRows.reduce((a, r) => a + (r.on ? (r.it.pages + (dup && r.it.pages % 2 ? 1 : 0)) * r.copies : 0), 0);
   $("#sp-total").textContent = `合計 ${n}ページ`;
   $("#sp-go").disabled = n === 0;
   $("#sp-go").textContent = n ? `${n}ページを印刷する` : "印刷する";
@@ -587,14 +600,16 @@ $("#sp-list").addEventListener("change", e => { const i = e.target.dataset.i; if
 $("#sp-list").addEventListener("click", e => {
   const b = e.target.closest("button[data-d]"); if (!b) return;
   const r = spRows[b.dataset.i];
-  r.copies = Math.min(9, Math.max(1, r.copies + +b.dataset.d)); r.on = true;
+  r.copies = Math.min(30, Math.max(1, r.copies + +b.dataset.d)); r.on = true;
   $("#spc" + b.dataset.i).textContent = r.copies + "部"; $("#sp" + b.dataset.i).checked = true; spTotal();
 });
 $("#sp-cancel").addEventListener("click", () => sp.close());
+$("#sp-duplex").addEventListener("change", spTotal);
 $("#sp-go").addEventListener("click", () => {
   const jobs = spRows.filter(r => r.on).map(r => ({file: r.it.file, copies: r.copies}));
+  const opts = {order: (sp.querySelector("input[name=sp-order]:checked") || {}).value || "set", duplex: $("#sp-duplex").checked};
   sp.close();
-  printJob(sp.dataset.title, jobs);
+  printJob(sp.dataset.title, jobs, opts);
 });
 
 /* ------------------------------------------------------------ 印刷のしくみ
@@ -603,6 +618,7 @@ const pageImg = new Map();
 const progress = $("#progress");
 let printing = false;
 let lastJobs = [];
+let lastOpts = {};
 const TOUCH = navigator.maxTouchPoints > 1;
 async function renderForPrint(file, n) {
   const k = file + "#" + n;
@@ -616,9 +632,20 @@ async function renderForPrint(file, n) {
   pageImg.set(k, url);
   return url;
 }
-async function printJob(title, jobs) {
+/* ならべ方（11/27 先生：3人分を印刷すると同じページが3枚ずつ出て不便）
+   order "set"  ＝1人分ずつ：1回目に全部、2回目に部数が2以上のもの…（こたえ1部は1回目だけ）
+   order "same" ＝同じものをまとめて（前のやり方）
+   duplex ＝ページ数が奇数のもののあとに白紙を入れて、次のもののおもてがうらに来ないようにする */
+function printOrder(jobs, order) {
+  const seq = [];
+  if (order === "same") jobs.forEach((j, i) => { for (let c = 0; c < j.copies; c++) seq.push(i); });
+  else { const max = Math.max(...jobs.map(j => j.copies)); for (let c = 0; c < max; c++) jobs.forEach((j, i) => { if (j.copies > c) seq.push(i); }); }
+  return seq;
+}
+async function printJob(title, jobs, opts = {}) {
   if (printing || !jobs.length) return;
-  printing = true; lastJobs = jobs;
+  const order = opts.order || "set", duplex = opts.duplex ?? true;
+  printing = true; lastJobs = jobs; lastOpts = {order, duplex};
   if (viewer.open) viewer.close();
   $("#pg-title").textContent = "印刷の準備をしています";
   $("#pg-btns").hidden = true; $("#pg-again").hidden = false; $("#pg-bar").style.width = "0"; $("#pg-text").textContent = "";
@@ -628,27 +655,30 @@ async function printJob(title, jobs) {
   try {
     const docsN = await Promise.all(jobs.map(j => getDoc(j.file).then(d => d.numPages)));
     const total = docsN.reduce((a, n) => a + n, 0);
-    const sheets = docsN.reduce((a, n, i) => a + n * jobs[i].copies, 0);
+    const lists = [];
     let done = 0;
-    const urls = [];
     for (let j = 0; j < jobs.length; j++) {
       const list = [];
       for (let n = 1; n <= docsN[j]; n++) {
         list.push(await renderForPrint(jobs[j].file, n));
         done++;
         $("#pg-bar").style.width = (100 * done / total) + "%";
-        $("#pg-text").textContent = `${done} / ${total} ページ（印刷するのは全部で ${sheets} ページ）`;
+        $("#pg-text").textContent = `${done} / ${total} ページ`;
       }
-      for (let c = 0; c < jobs[j].copies; c++) urls.push(...list);
+      if (duplex && list.length % 2) list.push(null);      // 白紙
+      lists.push(list);
     }
+    const urls = [];
+    for (const i of printOrder(jobs, order)) urls.push(...lists[i]);
+    const sheets = urls.length;
     const frag = document.createDocumentFragment();
-    const imgs = urls.map(u => { const d = document.createElement("div"); d.className = "sheet"; const im = new Image(); im.src = u; im.alt = ""; d.append(im); frag.append(d); return im; });
+    const imgs = urls.map(u => { const d = document.createElement("div"); d.className = u ? "sheet" : "sheet blank"; frag.append(d); if (!u) return null; const im = new Image(); im.src = u; im.alt = ""; d.append(im); return im; }).filter(Boolean);
     root.append(frag);
     await Promise.all(imgs.map(im => im.decode ? im.decode().catch(() => {}) : null));
     progress.close();
     doPrint(title);
     $("#pg-title").textContent = "印刷の用意ができました";
-    $("#pg-text").textContent = `全部で ${sheets} ページ。印刷画面が出ないとき（iPad など）は、下の「PDFで印刷」を押して、出てきた画面の「プリント」を選んでください。部数は印刷画面ではなく、ここでえらんだ部数になっています。`;
+    $("#pg-text").textContent = `全部で ${sheets} ページ。印刷画面が出ないとき（iPad など）は、下の「PDFで印刷」を押して、出てきた画面の「プリント」を選んでください。部数は印刷画面ではなく、ここでえらんだ部数になっています（印刷画面の部数は1のまま）。${order === "set" ? "1人分ずつそろえて出てきます。" : ""}`;
     $("#pg-btns").hidden = false; $("#pg-share").hidden = !TOUCH;
     progress.showModal();
   } catch (e) {
@@ -667,10 +697,11 @@ $("#pg-again").addEventListener("click", () => { progress.close(); doPrint(); se
 $("#pg-share").addEventListener("click", async () => {
   const btn = $("#pg-share"), old = btn.textContent; btn.disabled = true; btn.textContent = "PDFを用意しています…";
   try {
-    const files = [];
-    for (const j of lastJobs) {
-      const blob = await (await fetch(P(j.file))).blob();
-      for (let c = 0; c < j.copies; c++) files.push(new File([blob], (c ? c + "_" : "") + j.file, {type: "application/pdf"}));
+    const files = [], blobs = [], k = new Map();
+    for (const j of lastJobs) blobs.push(await (await fetch(P(j.file))).blob());
+    for (const i of printOrder(lastJobs, lastOpts.order || "set")) {
+      const c = k.get(i) || 0; k.set(i, c + 1);
+      files.push(new File([blobs[i]], String(files.length + 1).padStart(2, "0") + "_" + lastJobs[i].file, {type: "application/pdf"}));
     }
     if (navigator.canShare && navigator.canShare({files})) await navigator.share({files});
     else if (lastJobs[0]) window.open(P(lastJobs[0].file), "_blank");

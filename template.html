@@ -491,6 +491,15 @@ body.read { background: var(--paper); }
 .pmsg-in ol { margin: 6px 0; padding-left: 1.4em; }
 .pmsg-url { font-size: 12px; word-break: break-all; background: #f1efe9; border-radius: 6px; padding: 6px 8px; user-select: all; -webkit-user-select: all; }
 .pmsg-b { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.sheets-copy { display: none; }
+.copies { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; max-width: 20em; }
+.copies .ctrl-label { margin-right: 2px; }
+.copies .btn.cp { min-width: 2.2em; padding-left: 0; padding-right: 0; }
+.copies b { min-width: 2.6em; text-align: center; }
+.copies .cp-dx { font-size: 13px; display: inline-flex; align-items: center; gap: 4px; margin-left: 6px; white-space: nowrap; }
+.print-box .copies .cp-note { flex-basis: 100%; text-align: left; max-width: none; }
+.pmsg-cp { background: #f1efe9; border-radius: 6px; padding: 6px 8px; font-size: 13px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.pmsg-cp small { flex-basis: 100%; font-size: 12px; }
 .pmsg-in { max-height: calc(100vh - 32px); overflow: auto; }
 .pmsg-list { border-top: 1px solid var(--rule); margin-top: 8px; }
 .pmsg-unit { font-weight: 700; margin: 8px 0 2px; }
@@ -514,6 +523,8 @@ body.read { background: var(--paper); }
   .sheet-wrap { display: block; }
   .page { box-shadow: none; break-after: page; page-break-after: always; margin: 0; }
   .sheet-wrap:last-child .page { break-after: auto; page-break-after: auto; }
+  .sheets.more .sheet-wrap:last-child .page { break-after: page; page-break-after: always; }
+  .sheets-copy { display: block !important; zoom: 1 !important; }
   /* Safari：用紙ぴったりの高さだと余白ではみ出して白紙ページができるので、少し縮めて中央に置く */
   html.safari .page { zoom: .9; margin: 0 auto; height: 297mm; }
   .page.land { width: 210mm; height: 297mm; }
@@ -599,14 +610,62 @@ async function pdfList(id) {
   if (!PDF_INDEX) { try { PDF_INDEX = await (await fetch('pdf/index.json', { cache: 'no-cache' })).json(); } catch (e) { PDF_INDEX = {}; } }
   return PDF_INDEX[id] || [];
 }
+// ---------- 部数 ----------
+// 印刷画面で部数を3にすると、プリンターによっては「8ページ目を3枚、7ページ目を3枚…」と出てしまう。
+// そこでサイトの中で 1〜8ページ、1〜8ページ… とくり返したものを作り、印刷画面の部数は1のまま印刷してもらう。
+// 両面印刷のときは、ページ数が奇数なら1部ごとに白紙を1枚入れて、次の部が新しい紙から始まるようにする。
+state.copies = 1;
+function duplexDefault(unit) { return !!((unit.yomu && state.yans === 'back') || unit.yomu2 || unit.jugyo); }
+function isDuplex(unit) { return state.duplex === undefined ? duplexDefault(unit) : state.duplex; }
+function renderCopies() {
+  const host = $('#copies'), unit = UNITS[state.unit]; if (!host || !unit) return;
+  const n = state.copies, pages = document.querySelectorAll('#sheets > .sheet-wrap').length;
+  host.innerHTML = `<span class="ctrl-label">部数</span><button class="btn cp" id="cp-dn" aria-label="部数をへらす">−</button><b id="cp-n">${n}部</b><button class="btn cp" id="cp-up" aria-label="部数をふやす">＋</button>`
+    + (n > 1 ? `<label class="cp-dx"><input type="checkbox" id="cp-dx" ${isDuplex(unit) ? 'checked' : ''}>両面印刷する</label>` : '');
+  $('#cp-dn').onclick = () => { state.copies = Math.max(1, n - 1); renderCopies(); };
+  $('#cp-up').onclick = () => { state.copies = Math.min(40, n + 1); renderCopies(); };
+  const dx = $('#cp-dx'); if (dx) dx.onchange = () => { state.duplex = dx.checked; renderCopies(); };
+  if (n > 1 && pages) {
+    const pad = isDuplex(unit) && pages % 2 ? 1 : 0;
+    host.insertAdjacentHTML('beforeend', `<span class="hint cp-note" id="cp-note">${n}部を、1部ずつページ順にならべて印刷します（全部で ${(pages + pad) * n - pad}ページ${pad ? '。両面印刷用に、1部ごとに白紙を1枚はさみます' : ''}）。<b>印刷画面の「部数」は1のまま</b>にしてください。</span>`);
+  }
+}
+// 印刷の直前に、2部目からのページを #sheets-copy に作る（画面には出さず、印刷のときだけ出る）
+function buildCopies() {
+  let box = $('#sheets-copy');
+  if (!box) { box = document.createElement('div'); box.id = 'sheets-copy'; box.className = 'sheets sheets-copy'; $('#sheets').after(box); }
+  const unit = UNITS[state.unit], n = state.copies, wraps = [...document.querySelectorAll('#sheets > .sheet-wrap')];
+  const one = wraps.map(w => w.outerHTML).join('');
+  const blank = isDuplex(unit) && wraps.length % 2 ? '<div class="sheet-wrap"><div class="page blank-page"></div></div>' : '';
+  box.innerHTML = n > 1 && wraps.length ? Array.from({ length: n - 1 }, () => blank + one).join('') : '';
+  $('#sheets').classList.toggle('more', !!box.innerHTML);
+}
+// iPad 用のPDFを部数分くり返して1つのPDFにする（lib/pdf-lib.min.js）
+let PDFLIB = null;
+function loadPdfLib() {
+  if (window.PDFLib) return Promise.resolve(window.PDFLib);
+  if (!PDFLIB) PDFLIB = new Promise((ok, ng) => { const s = document.createElement('script'); s.src = 'lib/pdf-lib.min.js'; s.onload = () => ok(window.PDFLib); s.onerror = ng; document.head.appendChild(s); });
+  return PDFLIB;
+}
+async function repeatPdf(bytes, n, duplex) {
+  const { PDFDocument } = await loadPdfLib();
+  const src = await PDFDocument.load(bytes), out = await PDFDocument.create();
+  const idx = src.getPageIndices(), pad = duplex && idx.length % 2;
+  for (let c = 0; c < n; c++) {
+    if (c && pad) { const s = src.getPage(0).getSize(); out.addPage([s.width, s.height]); }
+    (await out.copyPages(src, idx)).forEach(pg => out.addPage(pg));
+  }
+  return out.save();
+}
 async function doPrint() {
-  if (!IS_HOME_APP) { window.print(); return; }
+  if (!IS_HOME_APP) { buildCopies(); window.print(); return; }
   const id = state.unit, unit = UNITS[id], url = printUrl();
   const box = document.createElement('div'); box.className = 'pmsg';
   box.innerHTML = `<div class="pmsg-in" role="dialog" aria-modal="true" aria-labelledby="pmsg-t">
     <h2 id="pmsg-t">PDFにして印刷します</h2>
     <p>ホーム画面から開いたときは、印刷ボタンが使えません（Apple の決まりです）。かわりに、できあがったPDFを開いて印刷します。</p>
     <ol><li>印刷したいものをえらぶ</li><li>「プリントへ」をおす</li><li>出てきたメニューで<b>「プリント」</b>をえらぶ（両面印刷はそこで設定できます）</li></ol>
+    <div class="pmsg-cp" id="pmsg-cp"></div>
     <div class="pmsg-list" id="pmsg-list"><p class="pmsg-wait">読みこみ中…</p></div>
     <details class="pmsg-more"><summary>ほかの方法（Safariで開く）</summary>
       <p>Safari で開くと、ふつうの印刷ボタンで、ページを細かくえらんで印刷できます。</p>
@@ -628,6 +687,15 @@ async function doPrint() {
     }
     e.target.textContent = ok ? 'コピーしました' : '上のリンクを長おししてコピー';
   };
+  const cpLine = () => {
+    const n = state.copies, el = box.querySelector('#pmsg-cp');
+    el.innerHTML = `部数 <button class="btn cp" data-d="-1" aria-label="部数をへらす">−</button><b>${n}部</b><button class="btn cp" data-d="1" aria-label="部数をふやす">＋</button>`
+      + (n > 1 ? `<label class="cp-dx"><input type="checkbox" ${isDuplex(unit) ? 'checked' : ''}>両面印刷する</label><small>1部ずつページ順にならべたPDFにします${isDuplex(unit) ? '（ページ数が奇数なら、1部ごとに白紙を1枚はさみます）' : ''}。<b>プリントの画面の部数は1のまま</b>にしてください。</small>` : '');
+    const reset = () => { box.querySelectorAll('.pmsg-row button[data-i]').forEach(b => { delete b.dataset.ready; b._file = null; b.textContent = 'えらぶ'; b.classList.remove('go'); }); renderCopies(); cpLine(); };
+    el.querySelectorAll('button[data-d]').forEach(b => b.onclick = () => { state.copies = Math.min(40, Math.max(1, n + +b.dataset.d)); reset(); });
+    const dx = el.querySelector('input'); if (dx) dx.onchange = () => { state.duplex = dx.checked; reset(); };
+  };
+  cpLine();
   const list = await pdfList(id), host = box.querySelector('#pmsg-list');
   if (!list.length) { host.innerHTML = '<p class="pmsg-wait">この単元のPDFはまだありません。下の「ほかの方法」で Safari から印刷してください。</p>'; box.querySelector('.pmsg-more').open = true; return; }
   host.innerHTML = `<p class="pmsg-unit">${esc(unit.title)}</p>` + list.map(([key, label, n], i) => `<div class="pmsg-row"><span>${esc(label)}<small>A4 ${n}ページ</small></span><button class="btn primary" data-i="${i}">えらぶ</button></div>`).join('');
@@ -643,14 +711,15 @@ async function doPrint() {
     }
     btn.disabled = true; btn.textContent = '準備中…';
     try {
-      const blob = await (await fetch(src)).blob();
-      btn._file = new File([blob], `${unit.title}_${label.replace(/[（）　\s]/g, '')}.pdf`, { type: 'application/pdf' });
+      let blob = await (await fetch(src)).blob();
+      if (state.copies > 1) blob = new Blob([await repeatPdf(await blob.arrayBuffer(), state.copies, isDuplex(unit))], { type: 'application/pdf' });
+      btn._file = new File([blob], `${unit.title}_${label.replace(/[（）　\s]/g, '')}${state.copies > 1 ? '_' + state.copies + '部' : ''}.pdf`, { type: 'application/pdf' });
       btn.dataset.ready = '1'; btn.textContent = 'プリントへ'; btn.classList.add('go');
     } catch (e) { btn.textContent = '読みこめませんでした'; }
     btn.disabled = false;
   });
 }
-function openUnit(id) { state.unit = id; state.subject = UNITS[id].subject; state.mode = modeOf(id); state.sel = null; }
+function openUnit(id) { state.unit = id; state.subject = UNITS[id].subject; state.mode = modeOf(id); state.sel = null; state.duplex = undefined; }
 // 今の画面（宿題／講座と問題）に出ている単元か
 function inView(id) { const u = UNITS[id]; if (!u || modeOf(id) !== state.mode) return false; return state.mode !== 'kouza' || u.subject === state.subject; }
 function setMode(m) {
@@ -905,7 +974,7 @@ function renderJugyoBar(unit, pk) {
     <div class="ctrl"><span class="ctrl-label">プリント</span><div class="picks">${unit.jugyo.sheets.map((s, i) => pk('Y' + i, `No.${i + 1}　${esc(s.t)}`)).join('')}</div></div>
     <div class="ctrl"><span class="ctrl-label">向け</span><div class="row-btns"><select class="btn" id="jteach" aria-label="生徒用か先生用か"><option value="s" ${!state.jmode || state.jmode === 's' ? 'selected' : ''}>生徒用（空らん）</option><option value="t" ${state.jmode === 't' ? 'selected' : ''}>先生用（答えを赤で入れる）</option><option value="k" ${state.jmode === 'k' ? 'selected' : ''}>先生用カンペ（授業の進め方）</option></select>
       <select class="btn" id="yans" aria-label="答えの入れ方"><option value="end" ${state.jans === 'end' ? 'selected' : ''}>答えは別の紙（最後に）</option><option value="none" ${state.jans === 'none' ? 'selected' : ''}>答えなし</option></select></div></div>
-    <div class="print-box"><button class="btn primary" id="b-print">選んだページを印刷</button><span class="hint" id="count"></span></div>`;
+    <div class="print-box"><span class="copies" id="copies"></span><button class="btn primary" id="b-print">選んだページを印刷</button><span class="hint" id="count"></span></div>`;
   $('#bar').querySelectorAll('.pick input').forEach(cb => cb.onchange = () => { state.sel[cb.id.slice(3)] = cb.checked; renderSheets(); });
   $('#yans').onchange = e => { state.jans = e.target.value; renderSheets(); };
   $('#jteach').onchange = e => { state.jmode = e.target.value; state.jteach = state.jmode === 't'; renderSheets(); };
@@ -1083,7 +1152,7 @@ function renderBar() {
       <button class="btn" id="b-all">ぜんぶ</button>${unit.lecture.length ? `<button class="btn" id="b-lec">講座だけ</button><button class="btn" id="b-q">問題と解答</button>` : ''}
       <select class="btn" id="pattern" aria-label="問題の並び">${unit.sets ? unit.sets.map((s, i) => `<option value="${i}" ${state.pattern === i ? 'selected' : ''}>セット${i + 1}（${s.note}）</option>`).join('') : PATTERNS.map((p, i) => `<option value="${i}" ${state.pattern === i ? 'selected' : ''}>パターン${p}${i === 0 ? '（基本の並び）' : '（並べかえ）'}</option>`).join('')}</select>
     </div></div>` : ''}
-    <div class="print-box"><button class="btn primary" id="b-print">選んだページを印刷</button><span class="hint" id="count"></span></div>`;
+    <div class="print-box"><span class="copies" id="copies"></span><button class="btn primary" id="b-print">選んだページを印刷</button><span class="hint" id="count"></span></div>`;
   $('#bar').querySelectorAll('.pick input').forEach(cb => cb.onchange = () => { state.sel[cb.id.slice(3)] = cb.checked; renderSheets(); });
   const setAll = f => { Object.keys(defaultSel(unit)).forEach(k => state.sel[k] = f(k)); renderBar(); renderSheets(); };
   if (!unit.sheets.length) { $('#b-print').onclick = doPrint; return; }
@@ -1099,7 +1168,7 @@ function renderYomu2Bar(unit, pk) {
     <h1><small>${SUBJECTS[unit.subject].name}　中2向け 読んで解く宿題（A4両面）</small>${unit.title.replace(/（.*）/, '')}</h1>
     <div class="ctrl"><span class="ctrl-label">プリント</span><div class="picks">${unit.yomu2.sheets.map((s, i) => pk('Y' + i, `No.${i + 1}`)).join('')}</div></div>
     <div class="ctrl"><span class="ctrl-label">答え</span><div class="row-btns"><select class="btn" id="yans" aria-label="答えの入れ方"><option value="end" ${state.y2ans === 'end' ? 'selected' : ''}>答えは別の紙（最後に）</option><option value="none" ${state.y2ans === 'none' ? 'selected' : ''}>答えなし</option></select></div></div>
-    <div class="print-box"><button class="btn primary" id="b-print">選んだページを印刷</button><span class="hint" id="count"></span></div>`;
+    <div class="print-box"><span class="copies" id="copies"></span><button class="btn primary" id="b-print">選んだページを印刷</button><span class="hint" id="count"></span></div>`;
   $('#bar').querySelectorAll('.pick input').forEach(cb => cb.onchange = () => { state.sel[cb.id.slice(3)] = cb.checked; renderSheets(); });
   $('#yans').onchange = e => { state.y2ans = e.target.value; renderSheets(); };
   $('#b-print').onclick = doPrint;
@@ -1120,7 +1189,7 @@ function renderYomuBar(unit) {
         <option value="none" ${state.yans === 'none' ? 'selected' : ''}>答えなし</option>
       </select>
     </div></div>
-    <div class="print-box"><button class="btn primary" id="b-print">選んだページを印刷</button><span class="hint" id="count"></span></div>`;
+    <div class="print-box"><span class="copies" id="copies"></span><button class="btn primary" id="b-print">選んだページを印刷</button><span class="hint" id="count"></span></div>`;
   $('#bar').querySelectorAll('.pick input').forEach(cb => cb.onchange = () => { state.sel[cb.id.slice(3)] = cb.checked; renderSheets(); });
   const setAll = f => { Object.keys(defaultSel(unit)).forEach(k => state.sel[k] = f); renderYomuBar(unit); renderSheets(); };
   $('#b-all').onclick = () => setAll(true);
@@ -1150,6 +1219,8 @@ function renderSheets() {
   host.innerHTML = out.length ? out.map(([tag, html]) => `<div class="sheet-wrap"><span class="sheet-tag">${tag}</span>${html}</div>`).join('') : `<p class="empty">印刷するページを上で選んでください。</p>`;
   const c = $('#count'); if (c) c.textContent = out.length ? `A4 ${out.length}ページ。${(unit.yomu && state.yans === 'back') || unit.yomu2 || unit.jugyo ? '「両面印刷（長辺とじ）」で印刷してください。' : ''}${IS_SAFARI ? '印刷画面で「背景をプリント」にチェック、「ヘッダとフッタをプリント」のチェックを外してください。' : '印刷画面で「余白：なし」「背景のグラフィック：オン」にするときれいに出ます。'}` : '';
   yomu2Fit(); kanpeFit();
+  const cp = $('#sheets-copy'); if (cp) cp.innerHTML = ''; $('#sheets').classList.remove('more');
+  renderCopies();
   document.querySelectorAll('#sheets .jmemo').forEach(m => m.classList.toggle('off', m.offsetHeight < m.closest('.jg').offsetHeight * 0.06));
   shrinkToFit();
   yomuFit();

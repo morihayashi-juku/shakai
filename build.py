@@ -80,6 +80,7 @@ def build_web():
         cur[k]=v; size+=b
     if cur: parts.append(cur)
     d='out/web'; shutil.rmtree(d, ignore_errors=True); os.makedirs(d)
+    if os.path.isdir('static'): shutil.copytree('static', d, dirs_exist_ok=True)   # lib/pdf-lib など、そのまま置くファイル
     for i,pt in enumerate(parts):
         open(f'{d}/figs{i+1}.js','w',encoding='utf-8').write('(window.__FIGS=window.__FIGS||[]).push('+json.dumps(pt,ensure_ascii=False)+');\n')
     html=src[:m.start()]+'const FIGS=Object.assign({},...(window.__FIGS||[]));\n'+src[m.end():]
@@ -88,6 +89,7 @@ def build_web():
     open(f'{d}/index.html','w',encoding='utf-8').write(html)
     z='out/中学社会プリント_ウェブ公開用.zip'
     with zipfile.ZipFile(z,'w',zipfile.ZIP_DEFLATED) as zf:
-        for f in sorted(os.listdir(d)): zf.write(f'{d}/{f}', f'shakai/{f}')
-    print('web', [(f, round(os.path.getsize(f'{d}/{f}')/1e6,1)) for f in sorted(os.listdir(d))], round(os.path.getsize(z)/1e6,1),'MB zip')
+        for f in sorted(os.listdir(d)):
+            if os.path.isfile(f'{d}/{f}'): zf.write(f'{d}/{f}', f'shakai/{f}')
+    print('web', [(f, round(os.path.getsize(f'{d}/{f}')/1e6,1)) for f in sorted(os.listdir(d)) if os.path.isfile(f'{d}/{f}')], round(os.path.getsize(z)/1e6,1),'MB zip')
 build_web()
